@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="2" >
+
+    <dataSet config="debug" >
+        <source path="G:\Android\StudioWorkspace\AID-AmritaInfoDesk\form-edit-text\build\intermediates\bundles\debug\res" >
+            <file
+                path="G:\Android\StudioWorkspace\AID-AmritaInfoDesk\form-edit-text\build\intermediates\bundles\debug\res\values\values.xml"
+                qualifiers="" >
+                <string name="error_email_address_not_valid" >Email address not valid
+                </string>
+                <string name="error_notvalid_personname" >Not a valid first or last name.
+                </string>
+                <string name="error_field_must_not_be_empty" >The field must not be empty
+                </string>
+                <string name="error_this_field_cannot_contain_special_character" >This field cannot contain any special character
+                </string>
+                <string name="error_domain_not_valid" >Domain name not valid
+                </string>
+                <string name="error_only_numeric_digits_allowed" >Only numeric digits are allowed.
+                </string>
+                <string name="error_ip_not_valid" >IP Address not valid
+                </string>
+                <string name="error_creditcard_number_not_valid" >Credit card number is not valid
+                </string>
+                <string name="error_phone_not_valid" >Phone number not valid
+                </string>
+                <string name="error_notvalid_personfullname" >Not a valid full name.
+                </string>
+                <string name="error_url_not_valid" >Web Url is not valid
+                </string>
+                <string name="error_only_standard_letters_are_allowed" >Only standard letters are allowed
+                </string>
+
+                <declare-styleable name="FormEditText" >
+                    <attr name="testType" >
+                        <enum
+                            name="regexp"
+                            value="0" />
+                        <enum
+                            name="numeric"
+                            value="1" />
+                        <enum
+                            name="alpha"
+                            value="2" />
+                        <enum
+                            name="alphaNumeric"
+                            value="3" />
+                        <enum
+                            name="email"
+                            value="4" />
+                        <enum
+                            name="creditCard"
+                            value="5" />
+                        <enum
+                            name="phone"
+                            value="6" />
+                        <enum
+                            name="domainName"
+                            value="7" />
+                        <enum
+                            name="ipAddress"
+                            value="8" />
+                        <enum
+                            name="webUrl"
+                            value="9" />
+                        <enum
+                            name="nocheck"
+                            value="10" />
+                        <enum
+                            name="custom"
+                            value="11" />
+                        <enum
+                            name="personName"
+                            value="12" />
+                        <enum
+                            name="personFullName"
+                            value="13" />
+                    </attr>
+                    <attr
+                        name="testErrorString"
+                        format="string" />
+                    <attr
+                        name="emptyErrorString"
+                        format="string" />
+                    <attr
+                        name="customRegexp"
+                        format="string" />
+                    <attr
+                        name="emptyAllowed"
+                        format="boolean" />
+                    <attr
+                        name="classType"
+                        format="string" />
+                </declare-styleable>
+            </file>
+            <file
+                path="G:\Android\StudioWorkspace\AID-AmritaInfoDesk\form-edit-text\build\intermediates\bundles\debug\res\values-de\values.xml"
+                qualifiers="de" >
+                <string name="error_phone_not_valid" >Telefonnummer ist nicht gültig
+                </string>
+                <string name="error_domain_not_valid" >Domainname ist nicht gültig
+                </string>
+                <string name="error_field_must_not_be_empty" >Pflichtfelder
+                </string>
+                <string name="error_ip_not_valid" >IP Adresse ist nicht gültig
+                </string>
+                <string name="error_this_field_cannot_contain_special_character" >Bitte verwenden Sie keine Sonderzeichen
+                </string>
+                <string name="error_creditcard_number_not_valid" >Kreditkartennummer ist nicht gültig
+                </string>
+                <string name="error_only_numeric_digits_allowed" >In diesen Textfeldern sollen nur Zahlen eingeben werden dürfen
+                </string>
+                <string name="error_email_address_not_valid" >E-mail Adresse ist nicht gültig
+                </string>
+                <string name="error_url_not_valid" >URL Adresse is nicht gültig
+                </string>
+                <string name="error_only_standard_letters_are_allowed" >Bitte verwenden Sie keine Standardzeichen
+                </string>
+            </file>
+            <file
+                path="G:\Android\StudioWorkspace\AID-AmritaInfoDesk\form-edit-text\build\intermediates\bundles\debug\res\values-es\values.xml"
+                qualifiers="es" >
+                <string name="error_this_field_cannot_contain_special_character" >Este campo puede contener caracteres especiales
+                </string>
+                <string name="error_url_not_valid" >URL inválido
+                </string>
+                <string name="error_only_standard_letters_are_allowed" >Solo los caracteres estándares son aceptados
+                </string>
+                <string name="error_domain_not_valid" >Nombre de domino inválido
+                </string>
+                <string name="error_creditcard_number_not_valid" >Número de tarjeta inválida
+                </string>
+                <string name="error_ip_not_valid" >IP inválida
+                </string>
+                <string name="error_phone_not_valid" >Número de teléfono inválido
+                </string>
+                <string name="error_field_must_not_be_empty" >Este campo es obligarorio
+                </string>
+                <string name="error_email_address_not_valid" >Correo electronico inválido
+                </string>
+                <string name="error_only_numeric_digits_allowed" >Solo los caracteres numéricos son aceptados
+                </string>
+            </file>
+            <file
+                path="G:\Android\StudioWorkspace\AID-AmritaInfoDesk\form-edit-text\build\intermediates\bundles\debug\res\values-fr\values.xml"
+                qualifiers="fr" >
+                <string name="error_only_numeric_digits_allowed" >Seuls les caractères numériques sont autorisés
+                </string>
+                <string name="error_phone_not_valid" >Numéro de téléphone invalide
+                </string>
+                <string name="error_domain_not_valid" >Nom de domaine invalide
+                </string>
+                <string name="error_url_not_valid" >Adresse url invalide
+                </string>
+                <string name="error_creditcard_number_not_valid" >Numéro de carte invalide
+                </string>
+                <string name="error_field_must_not_be_empty" >Le champ ne doit pas être vide
+                </string>
+                <string name="error_this_field_cannot_contain_special_character" >Ce champ ne peut contenir de caractères spéciaux
+                </string>
+                <string name="error_only_standard_letters_are_allowed" >Seuls les caractères standards sont autorisés
+                </string>
+                <string name="error_ip_not_valid" >Adresse IP invalide
+                </string>
+                <string name="error_email_address_not_valid" >Adresse email invalide
+                </string>
+            </file>
+            <file
+                path="G:\Android\StudioWorkspace\AID-AmritaInfoDesk\form-edit-text\build\intermediates\bundles\debug\res\values-it\values.xml"
+                qualifiers="it" >
+                <string name="error_field_must_not_be_empty" >Il campo non può essere vuoto
+                </string>
+                <string name="error_notvalid_personname" >Il nome o cognome non è valido.
+                </string>
+                <string name="error_this_field_cannot_contain_special_character" >Il campo non può contenere caratteri speciali
+                </string>
+                <string name="error_phone_not_valid" >L\'indirizzo di telefono non è velido
+                </string>
+                <string name="error_only_standard_letters_are_allowed" >Inserire solamente lettere
+                </string>
+                <string name="error_creditcard_number_not_valid" >La carta di credito non è valida
+                </string>
+                <string name="error_ip_not_valid" >L\'ip non è valido
+                </string>
+                <string name="error_only_numeric_digits_allowed" >Inserire solamente numeri
+                </string>
+                <string name="error_email_address_not_valid" >L\'indirizzo email non è valido
+                </string>
+                <string name="error_domain_not_valid" >Il nome di dominio non è valido
+                </string>
+                <string name="error_notvalid_personfullname" >Il campo non contiene un nome completo valido.
+                </string>
+                <string name="error_url_not_valid" >Il sito web non è valido
+                </string>
+            </file>
+            <file
+                path="G:\Android\StudioWorkspace\AID-AmritaInfoDesk\form-edit-text\build\intermediates\bundles\debug\res\values-ja\values.xml"
+                qualifiers="ja" >
+                <string name="error_url_not_valid" >有効なURLではありません。
+                </string>
+                <string name="error_this_field_cannot_contain_special_character" >特別な文字を含むことはできません。
+                </string>
+                <string name="error_only_numeric_digits_allowed" >数字のみ入力可能です。
+                </string>
+                <string name="error_field_must_not_be_empty" >入力必須です。
+                </string>
+                <string name="error_email_address_not_valid" >有効な電子メールアドレスではありません。
+                </string>
+                <string name="error_creditcard_number_not_valid" >有効なクレジットカード番号ではありません。
+                </string>
+                <string name="error_only_standard_letters_are_allowed" >一般的なアルファベットのみ入力可能です。
+                </string>
+                <string name="error_phone_not_valid" >有効な電話番号ではありません。
+                </string>
+                <string name="error_domain_not_valid" >有効なドメイン名ではありません。
+                </string>
+                <string name="error_ip_not_valid" >有効なIPアドレスではありません。
+                </string>
+            </file>
+        </source>
+    </dataSet>
+    <dataSet config="main" >
+        <source path="G:\Android\StudioWorkspace\AID-AmritaInfoDesk\form-edit-text\src\androidTest\res" />
+        <source path="G:\Android\StudioWorkspace\AID-AmritaInfoDesk\form-edit-text\build\generated\res\rs\test\debug" />
+        <source path="G:\Android\StudioWorkspace\AID-AmritaInfoDesk\form-edit-text\build\generated\res\generated\test\debug" />
+    </dataSet>
+
+</merger>

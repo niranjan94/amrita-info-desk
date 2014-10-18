@@ -1,0 +1,32 @@
+<resources>
+    <string name="title_activity_settings">Settings</string>
+    <string name="pref_header_personal_details">Personal Details</string>
+    <string name="pref_header_explorer">Amrita Explorer</string>
+    <string name="pref_header_libraries_used">Third Party Libraries</string>
+    <string-array name="campuses">
+        <item>Coimbatore</item>
+        <item>Amritapuri</item>
+        <item>Bangalore</item>
+        <item>Cochin</item>
+        <item>Mysore</item>
+        <item>Select a campus</item>
+    </string-array>
+    <string-array name="schools">
+        <item>School of Engineering</item>
+        <item>School of Business</item>
+        <item>Department of Communication</item>
+        <item>Department of Social Work</item>
+        <item>Select a school</item>
+    </string-array>
+    <string-array name="departments">
+        <item>Aerospace Engineering</item>
+        <item>Civil Engineering</item>
+        <item>Chemical Engineering</item>
+        <item>Computer Science Engineering</item>
+        <item>Electrical &amp; Electronics Engineering</item>
+        <item>Electronics &amp; Communication Engineering</item>
+        <item>Electronics &amp; Instrumentation Engineering</item>
+        <item>Mechanical Engineering</item>
+        <item>Select a department</item>
+    </string-array>
+</resources>

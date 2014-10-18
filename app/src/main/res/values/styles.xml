@@ -1,0 +1,22 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="android:Theme.Holo.Light">
+        <item name="android:actionBarItemBackground">@drawable/selectable_background_ab_blue</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu.Ab_blue</item>
+        <item name="android:dropDownListViewStyle">@style/DropDownListView.Ab_blue</item>
+        <item name="android:actionBarTabStyle">@style/ActionBarTabStyle.Ab_blue</item>
+        <item name="android:actionDropDownStyle">@style/DropDownNav.Ab_blue</item>
+        <item name="android:actionBarStyle">@style/ActionBar.Solid.Ab_blue</item>
+        <item name="android:actionModeBackground">@drawable/cab_background_top_ab_blue</item>
+        <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_ab_blue</item>
+        <item name="android:actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Ab_blue</item>
+    </style>
+
+    <style name="LandingTheme" parent="AppTheme">
+
+    </style>
+
+    <style name="Gallery" parent="android:Theme.Holo"></style>
+
+</resources>

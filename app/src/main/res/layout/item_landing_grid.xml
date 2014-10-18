@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:id="@+id/landing_item_holder"
+	android:layout_height="match_parent"
+	android:background="@color/blue" >
+
+    <com.onemarker.ark.SquareImageView
+        android:id="@+id/landing_picture"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="50dp"
+        android:background="@drawable/landing_grid_selector"
+        android:scaleType="centerCrop"
+        android:layout_gravity="center" />
+
+    <TextView
+	    android:id="@+id/landing_text"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_gravity="bottom|center"
+	    android:background="#55000000"
+	    android:paddingBottom="10dp"
+	    android:paddingLeft="10dp"
+	    android:paddingRight="10dp"
+        android:ellipsize="marquee"
+	    android:paddingTop="10dp"
+	    android:textColor="@android:color/white" />
+
+</FrameLayout>

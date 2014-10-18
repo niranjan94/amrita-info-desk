@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="app_name">AID - Amrita Info Desk</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_amrita">About Amrita</string>
+    <string name="dummy"></string>
+    <string name="title_activity_traininfo">Train Info</string>
+    <string name="title_activity_explorer">Amrita Explorer</string>
+    <string name="title_activity_academic_calender">Academic Calender</string>
+    <string name="select_semester_prompt">Select a semester</string>
+    <string name="title_activity_aums">Amrita UMS</string>
+    <string name="title_activity_aums_grades">Your Grades</string>
+    <string name="title_activity_aums_attendance">Attendance Levels</string>
+    <string name="title_activity_departments">Department Info</string>
+    <string name="title_activity_curriculum">Curriculum Info</string>
+    <string name="title_activity_gallery">Gallery</string>
+    <string name="title_activity_train_bus_info">Train &amp; Bus Info</string>
+    <string name="crash_toast_text" tools:ignore="TypographyEllipsis">Oops ! I Crashed ! Sorry about that ... But a report has been sent to my developer to fix me up ! :)</string>
+    <string name="title_activity_about_app">About this app</string>
+    <string name="hello_world">Hello world!</string>
+
+</resources>

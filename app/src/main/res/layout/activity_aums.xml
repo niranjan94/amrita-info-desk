@@ -1,0 +1,94 @@
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:val="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:background="@color/white"
+    android:scrollbarStyle="outsideInset">
+
+    <LinearLayout
+        android:id="@+id/aumsLinearView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dummy"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:text="Username:"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+       	<com.andreabaccega.widget.FormEditText
+		    android:id="@+id/roll_no"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+            val:emptyErrorString="You MUST enter your Roll Number"
+            val:testErrorString="Enter a proper Roll Number"
+		    android:ems="10"
+		    android:hint="Your Full Roll Number ..."
+            val:testType="alphaNumeric"
+		    android:inputType="text"  />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:text="Password:"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+		
+		<com.andreabaccega.widget.FormEditText
+		    android:id="@+id/pwd"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+            val:emptyErrorString="You MUST enter your Password"
+            val:testErrorString="Enter a proper Password"
+		    android:ems="10"
+		    android:hint="Your secret password ..."
+            val:testType="nocheck"
+		    android:inputType="textPassword"  />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dummy"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/button1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="login"
+                android:text="&apos;Try&apos; to login"
+                android:width="130dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical" >
+
+                <Button
+                    android:id="@+id/button2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:onClick="reset"
+                    android:text="Start Over"
+                    android:width="130dp" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
