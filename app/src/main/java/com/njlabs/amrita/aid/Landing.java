@@ -147,7 +147,7 @@ public class Landing extends Activity implements NavigationDrawerFragment.Naviga
         }
 
         public PlaceholderFragment() {
-         
+
         }
 
         @Override
