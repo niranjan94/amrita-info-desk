@@ -3,24 +3,18 @@ package com.njlabs.amrita.aid.aums;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.TypedValue;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
-import android.widget.Spinner;
+import android.widget.ListView;
 import android.widget.TextView;
 
-import com.androidquery.AQuery;
-import com.androidquery.callback.AjaxCallback;
-import com.androidquery.callback.AjaxStatus;
 import com.njlabs.amrita.aid.R;
-import com.onemarker.ark.Security;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -28,254 +22,169 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-public class AumsGrades extends Activity implements OnItemSelectedListener {
+public class AumsGrades extends Activity {
 
-    private AQuery aq;
     ProgressDialog dialog;
-
-    String FinalUserName = null;
-    String FinalPassword = null;
-
-    int check = 0;
+    ListView list;
+    ArrayList<CourseGradeData> attendanceData = new ArrayList<CourseGradeData>();
+    String sgpa;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_aums_grades);
-        ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
 
         Bundle extras = getIntent().getExtras();
+        String response = null;
         if (extras != null) {
-            FinalUserName = extras.getString("FinalUserName");
-            FinalPassword = extras.getString("FinalPassword");
+            response = extras.getString("response");
         }
 
-        aq = new AQuery(this);
+        setContentView(new LinearLayout(this));
 
-        SetSpinnerContent(0);
+        ActionBar actionBar = getActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         dialog = new ProgressDialog(this);
         dialog.setIndeterminate(true);
         dialog.setCancelable(false);
         dialog.setInverseBackgroundForced(false);
         dialog.setCanceledOnTouchOutside(false);
-
-    }
-
-    public void SetSpinnerContent(int position) {
-        Spinner spinner = (Spinner) findViewById(R.id.spinner);
-        spinner.setOnItemSelectedListener(this);
-
-        List<String> itemss = new ArrayList<String>();
-        itemss.add("1");
-        itemss.add("2");
-        itemss.add("Vacation 1");
-        itemss.add("3");
-        itemss.add("4");
-        itemss.add("Vacation 2");
-        itemss.add("5");
-        itemss.add("6");
-        itemss.add("Vacation 3");
-        itemss.add("7");
-        itemss.add("8");
-        itemss.add("Vacation 4");
-        itemss.add("9");
-        itemss.add("10");
-        itemss.add("Vacation 5");
-        itemss.add("11");
-        itemss.add("12");
-        itemss.add("Vacation 6");
-        itemss.add("13");
-        itemss.add("14");
-        itemss.add("15");
-
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, itemss);
-        // Drop down layout style - list view with radio button
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // attaching data adapter to spinner
-        spinner.setAdapter(dataAdapter);
-        if (position != 0) {
-            spinner.setSelection(position);
-        }
-        check = 0;
-        spinner.setOnItemSelectedListener(this);
-
-    }
-
-    public void GetGrades(String Semester, final int position) {
-        dialog.setMessage("Receiving Data (Might take a while)");
+        dialog.setMessage("Parsing data...");
         dialog.show();
-        String key = "6f0d380df08a284d";
-        String url = "http://njlabs.kovaideals.com/api/aid/aums/main.php?what=grades";
 
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("id", Security.encrypt(FinalUserName, key));
-        params.put("pwd", Security.encrypt(FinalPassword, key));
-        params.put("semester", Semester);
-
-        aq.ajax(url, params, String.class, new AjaxCallback<String>() {
-            @Override
-            public void callback(String url, String html, AjaxStatus status) {
-                dialog.setMessage("Parsing the received data ");
-                DataParser(html, position);
-            }
-
-        });
+        DataParser(response);
     }
 
-    public void DataParser(String html, int position) {
-        setContentView(R.layout.activity_aums_grades);
-        SetSpinnerContent(position);
-
-        boolean Published = true;
+    public void DataParser(String html) {
 
         Document doc = Jsoup.parse(html);
-
         Element PublishedState = doc.select("input[name=htmlPageTopContainer_status]").first();
         if (PublishedState.attr("value").equals("Result Not Published.")) {
-            Published = false;
+            dialog.dismiss();
         }
-        LinearLayout layout = (LinearLayout) findViewById(R.id.grade_layout);
+        else {
+            Element table = doc.select("table[width=75%] > tbody").first();
+            Elements rows = table.select("tr:gt(0)");
 
-        if (Published) {
-            Elements Columns = doc.select("span.rowBG1");
-            int count = 0;
-            int TrueCount = 0;
-            TextView tv = null;
-            for (Element column : Columns) {
-                String Data = column.text();
-                if (TrueCount > 4) {
-                    TextView dummy;
-                    switch (count) {
-                        case 0:
-                            count++;
-                            break;
+            for(Element row : rows) {
+                Elements dataHolders = row.select("td > span");
 
-                        case 1:
-                            tv = new TextView(getApplicationContext());
-                            tv.setText(Data);
-                            tv.setTextAppearance(this, android.R.style.TextAppearance_Small);
-                            layout.addView(tv);
-                            count++;
-                            break;
+                CourseGradeData adata = new CourseGradeData();
 
-                        case 2:
-                            tv = new TextView(getApplicationContext());
-                            tv.setText(Data);
-                            tv.setTextAppearance(this, android.R.style.TextAppearance_Large);
-                            tv.setTypeface(Typeface.DEFAULT_BOLD);
-                            layout.addView(tv);
-
-                            dummy = new TextView(getApplicationContext());
-                            dummy.setText(" ");
-                            dummy.setTextAppearance(this, android.R.style.TextAppearance_Small);
-                            layout.addView(dummy);
-
-                            count++;
-                            break;
-
-                        case 3:
-                            tv = new TextView(getApplicationContext());
-                            tv.setText("Type   : " + Data);
-                            tv.setTextAppearance(this, android.R.style.TextAppearance_Medium);
-                            layout.addView(tv);
-                            count++;
-                            break;
-
-                        case 4:
-                            tv = new TextView(getApplicationContext());
-                            tv.setText("Grade : " + Data);
-                            tv.setTextAppearance(this, android.R.style.TextAppearance_Medium);
-                            layout.addView(tv);
-
-                            dummy = new TextView(getApplicationContext());
-                            dummy.setText(" ");
-                            dummy.setTextAppearance(this, android.R.style.TextAppearance_Small);
-                            layout.addView(dummy);
-
-                            tv = new TextView(getApplicationContext());
-                            tv.setTypeface(Typeface.DEFAULT_BOLD);
-                            tv.setTextAppearance(this, android.R.style.TextAppearance_Small);
-
-                            if (Data.trim().equals("F") || Data.trim().equals("F(Supply)")) {
-                                tv.setText("SORRY ! YOU HAVE FAILED !");
-                                tv.setTextColor(Color.parseColor("#cc0000"));
-                            } else if (Data.trim().equals("A+") || Data.trim().equals("A") || Data.trim().equals("B") || Data.trim().equals("B+") || Data.trim().equals("C") || Data.trim().equals("C+") || Data.trim().equals("D") || Data.trim().equals("D+")) {
-                                tv.setText("CONGRATULATIONS ! YOU PASSED !");
-                                tv.setTextColor(Color.parseColor("#669900"));
-                            } else if (Data.trim().equals("A+(Supply)") || Data.trim().equals("A(Supply)") || Data.trim().equals("B(Supply)") || Data.trim().equals("B+(Supply)") || Data.trim().equals("C(Supply)") || Data.trim().equals("C+(Supply)") || Data.trim().equals("D(Supply)") || Data.trim().equals("D+(Supply)")) {
-                                tv.setText("CONGRATULATIONS ! YOU PASSED !");
-                                tv.setTextColor(Color.parseColor("#669900"));
-                            } else {
-                                tv.setText("");
-                            }
-
-                            layout.addView(tv);
-
-                            dummy = new TextView(getApplicationContext());
-                            dummy.setText(" ");
-                            dummy.setTextAppearance(this, android.R.style.TextAppearance_Small);
-                            layout.addView(dummy);
-
-                            View divider = new View(getApplicationContext());
-                            int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics());
-                            divider.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, height));
-                            divider.setBackgroundColor(Color.parseColor("#969696"));
-                            layout.addView(divider);
-
-                            dummy = new TextView(getApplicationContext());
-                            dummy.setText(" ");
-                            dummy.setTextAppearance(this, android.R.style.TextAppearance_Small);
-                            layout.addView(dummy);
-
-                            count = 0;
-                            break;
-                    }
+                if(dataHolders.size()>2) {
+                    adata.setCourseCode(dataHolders.get(1).text());
+                    adata.setCourseTitle(dataHolders.get(2).text());
+                    adata.setType(dataHolders.get(4).text());
+                    adata.setGrade(dataHolders.get(5).text());
+                    attendanceData.add(adata);
                 }
-                TrueCount++;
+                else {
+                    sgpa=dataHolders.get(1).text();
+                }
             }
-            tv.setVisibility(View.GONE);
-
-            Element SGPA = doc.select("span.rowBG1").last();
-            String Data = SGPA.text();
-            tv = new TextView(getApplicationContext());
-            tv.setText("Final SGPA   : " + Data);
-            tv.setTypeface(Typeface.DEFAULT_BOLD);
-            tv.setTextAppearance(this, android.R.style.TextAppearance_Medium);
-            layout.addView(tv);
-        } else {
-            TextView dummy = new TextView(getApplicationContext());
-            dummy.setText(" ");
-            dummy.setTextAppearance(this, android.R.style.TextAppearance_Small);
-            layout.addView(dummy);
-
-            TextView tv = new TextView(getApplicationContext());
-            tv.setText("The Results have not been published yet !");
-            tv.setTextAppearance(this, android.R.style.TextAppearance_Large);
-            layout.addView(tv);
         }
+        setupList();
+    }
 
+    public void setupList() {
+
+        list = new ListView(this);
+        list.setBackgroundColor(getResources().getColor(R.color.white));
+
+        ArrayAdapter<CourseGradeData> dataAdapter = new ArrayAdapter<CourseGradeData>(getBaseContext(), R.layout.item_aums_attendance, attendanceData) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                if (convertView == null) {
+                    convertView = getLayoutInflater().inflate(R.layout.item_aums_attendance, null);
+                }
+                CourseGradeData data = getItem(position);
+                ((TextView)convertView.findViewById(R.id.course_title)).setText(data.courseTitle);
+
+                String grade = data.grade.trim();
+
+                if(grade.toLowerCase().contains("supply"))
+                {
+                    grade = grade.replace("(Supply)","");
+                    ((TextView)convertView.findViewById(R.id.attendance_status)).setText(data.courseCode+" - " + data.type + " - Supply");
+                }
+                else
+                {
+                    ((TextView)convertView.findViewById(R.id.attendance_status)).setText(data.courseCode+" - " + data.type);
+                }
+                if(grade.equals("A+") || grade.equals("A") || grade.equals("B+") || grade.equals("B") || grade.equals("C+")) {
+                    convertView.findViewById(R.id.indicator).setBackgroundResource(R.drawable.circle_green);
+                }
+                else if(grade.equals("C") || grade.equals("D+") || grade.equals("D")) {
+                    convertView.findViewById(R.id.indicator).setBackgroundResource(R.drawable.circle_yellow);
+                }
+                else {
+                    convertView.findViewById(R.id.indicator).setBackgroundResource(R.drawable.circle_red);
+                }
+                ((TextView)convertView.findViewById(R.id.percentage)).setText(grade);
+                return convertView;
+            }
+        };
+
+        TextView header = new TextView(this);
+        header.setPadding(10,10,10,10);
+        header.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
+        header.setText("This semester's GPA : "+sgpa);
+        list.setHeaderDividersEnabled(true);
+        list.addHeaderView(header);
+        list.setAdapter(dataAdapter);
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+        });
+
+        setContentView(list);
         dialog.dismiss();
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        check = check + 1;
-        if (check > 1) {
-            String item = parent.getItemAtPosition(position).toString();
-            GetGrades(item, position);
+    class CourseGradeData {
+        public String courseCode;
+        public String courseTitle;
+        public String type;
+        public String grade;
+
+        CourseGradeData() {
+
+        }
+
+        public void setCourseCode(String courseCode) {
+            this.courseCode = courseCode;
+        }
+
+        public void setCourseTitle(String courseTitle) {
+            this.courseTitle = courseTitle;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public void setGrade(String grade) {
+            this.grade = grade;
         }
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> arg0) {
-        // TODO Auto-generated method stub
-
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                overridePendingTransition(R.anim.fadein,R.anim.fadeout);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.fadein,R.anim.fadeout);
+    }
 }

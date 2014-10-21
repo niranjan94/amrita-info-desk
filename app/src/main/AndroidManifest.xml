@@ -34,7 +34,7 @@
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyAQHOzuZSsCce18N5FAI8RCu4XWtojrYJU" />
-
+        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
         <activity
             android:name="com.njlabs.amrita.aid.Landing"
             android:label="@string/app_name"
@@ -95,19 +95,11 @@
         </activity>
         <activity
             android:name="com.njlabs.amrita.aid.aums.AumsGrades"
-            android:label="@string/title_activity_aums_grades"
-            android:parentActivityName="com.njlabs.amrita.aid.Landing" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.njlabs.amrita.aid.Landing" />
+            android:label="@string/title_activity_aums_grades" >
         </activity>
         <activity
             android:name="com.njlabs.amrita.aid.aums.AumsAttendance"
-            android:label="@string/title_activity_aums_attendance"
-            android:parentActivityName="com.njlabs.amrita.aid.Landing" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.njlabs.amrita.aid.Landing" />
+            android:label="@string/title_activity_aums_attendance">
         </activity>
         <activity
             android:name="com.njlabs.amrita.aid.Departments"
@@ -171,8 +163,25 @@
                 android:value="com.njlabs.amrita.aid.Landing" />
         </activity>
         <activity
-            android:name=".about.App"
+            android:name="com.njlabs.amrita.aid.about.App"
             android:label="@string/title_activity_about_app"
+            android:parentActivityName="com.njlabs.amrita.aid.Landing" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.njlabs.amrita.aid.Landing" />
+        </activity>
+        <activity
+            android:name="com.njlabs.amrita.aid.aums.AttendanceFlow"
+            android:label="@string/title_activity_attendance_flow"
+            android:parentActivityName="com.njlabs.amrita.aid.Landing" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.njlabs.amrita.aid.Landing" />
+        </activity>
+
+        <activity
+            android:name="com.njlabs.amrita.aid.push.PushNotifications"
+            android:label="@string/title_activity_push_notifications"
             android:parentActivityName="com.njlabs.amrita.aid.Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

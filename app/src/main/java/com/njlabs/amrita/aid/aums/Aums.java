@@ -8,81 +8,80 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.andreabaccega.widget.FormEditText;
-import com.androidquery.AQuery;
-import com.androidquery.callback.AjaxCallback;
-import com.androidquery.callback.AjaxStatus;
-import com.androidquery.callback.ImageOptions;
 import com.github.johnpersano.supertoasts.SuperToast;
+import com.loopj.android.http.FileAsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.TextHttpResponseHandler;
 import com.njlabs.amrita.aid.Landing;
 import com.njlabs.amrita.aid.R;
 import com.onemarker.ark.ConnectionDetector;
+import com.onemarker.ark.logging.Ln;
 
-import org.acra.ACRA;
-import org.apache.http.cookie.Cookie;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.apache.commons.lang3.text.WordUtils;
+import org.apache.http.Header;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
 public class Aums extends Activity {
 
-    private AQuery aq;
-
-    Boolean isInternetPresent = false;
     private static long BackPress;
 
     ConnectionDetector cd;
 
     ProgressDialog dialog;
+    AumsClient client;
 
     // STUDENT DETAILS VARIABLES
-    String StudentName = null;
-    String StudentRollNo = null;
-    String StudentCurrentSem = null;
-    String StudentCurrentBranch = null;
-    String StudentCurrentProgram = null;
-    String StudentCurrentCGPA = null;
-    String StudentProfilePic = null;
+    private String StudentName = null;
+    private String StudentRollNo = null;
+    private String StudentCurrentSem = null;
+    private String StudentCurrentBranch = null;
+    private String StudentCurrentProgram = null;
+    private String StudentCurrentCGPA = null;
 
-    String FinalJSESSIONID = null;
-    String FinalJSESSIONID1 = null;
-    String FinalRT = null;
+    private Boolean LoggedIn = false;
+    private Boolean gotAttendance = false;
+    private Boolean gradesOnce=false;
 
-    String FinalUserName = null;
-    String FinalPassword = null;
+    private String getAttendanceResponse;
 
-    Boolean LoggedIn = false;
+    private Map<String,String> semesterMapping = new HashMap<String, String>();
+
+    int gradeRefIndex=1;
+    int attendanceRefIndex=1;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_aums);
+
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        aq = new AQuery(this);
-        cd = new ConnectionDetector(getApplicationContext());
-        isInternetPresent = cd.isConnectingToInternet();
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);    // ALERT DIALOG
-        builder.setTitle("Have a look at this !")
-                .setMessage("Amrita University does not provide a public API for accessing AUMS data. Therefore, if Amrita University makes a change to the site it may cause AUMS Login to stop working. In that case please be patient while I try to catch up.")
+        builder .setMessage("Amrita University does not provide an API for accessing AUMS data. " +
+                "So, if any changes are made to the AUMS Website, please be patient while I try to catch up.")
                 .setCancelable(true)
                 .setIcon(R.drawable.info)
                 .setPositiveButton("Got it !", new DialogInterface.OnClickListener() {
@@ -91,15 +90,12 @@ public class Aums extends Activity {
                     }
                 });
         AlertDialog alert = builder.create();
+        alert.requestWindowFeature(Window.FEATURE_NO_TITLE);
         alert.show();
         // check for Internet status
-        if (isInternetPresent) {
-            // Internet Connection is Present
-            // proceed normally
+        if ((new ConnectionDetector(getApplicationContext())).isConnectingToInternet()) {
 
         } else {
-            // Internet connection is not present
-            // Ask user to connect to Internet
             AlertDialog.Builder builder1 = new AlertDialog.Builder(this);    // ALERT DIALOG
             builder1.setTitle("No Internet Connection")
                     .setMessage("A working internet connection is required for accessing Amrita UMS !")
@@ -112,10 +108,8 @@ public class Aums extends Activity {
                     });
             AlertDialog alert1 = builder1.create();
             alert1.show();
-
         }
         dialog = new ProgressDialog(this);
-
         dialog.setIndeterminate(true);
         dialog.setCancelable(false);
         dialog.setInverseBackgroundForced(false);
@@ -129,8 +123,9 @@ public class Aums extends Activity {
         }
     }
 
-    public void login(View view) {
-        FormEditText RollNo = (FormEditText) findViewById(R.id.roll_no);
+    public void loginStart(View view) {
+
+        final FormEditText RollNo = (FormEditText) findViewById(R.id.roll_no);
         FormEditText Password = (FormEditText) findViewById(R.id.pwd);
         FormEditText[] allFields = {RollNo, Password};
 
@@ -140,326 +135,414 @@ public class Aums extends Activity {
         }
 
         if (allValid) {
-            SharedPreferences preferences = getSharedPreferences("aums_prefs", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putString("RollNo", RollNo.getText().toString());
-            editor.commit();
-            GetSessionID();
-            dialog.show();
+
+            final CharSequence[] items = {"amritavidya.amrita.edu (recommended)","amritavidya2.amrita.edu"};
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Select a server to use");
+            builder.setItems(items, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialogList, int item) {
+
+                    SharedPreferences preferences = getSharedPreferences("aums_prefs", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString("RollNo", RollNo.getText().toString());
+                    editor.commit();
+
+                    refreshSession();
+
+                    if(item==1)
+                        client.setBaseURL("https://amritavidya2.amrita.edu:8444");
+                    else
+                        client.setBaseURL("https://amritavidya.amrita.edu:8444");
+
+                    GetSessionID();
+                    dialog.show();
+                }
+            });
+            AlertDialog alert_d = builder.create();
+            alert_d.show();
+
         } else {
-            // EditText are going to appear with an exclamation mark and an explicative message.
+
         }
     }
 
-    // INITIAL SESSION RECIEVER
-    public void GetSessionID() {
+    // INITIAL SESSION RECEIVER
+    private void GetSessionID() {
         dialog.setMessage("Starting a new Session !");
 
-        Log.d("STATUS", "Getting Session ID");
+        Ln.d("Starting Session");
+        RequestParams params = new RequestParams();
+        params.put("service", client.BASE_URL+"/aums/Jsp/Common/index.jsp");
 
-        String url = "https://amritavidya.amrita.edu:8444/cas/login?service=https%3A%2F%2Famritavidya.amrita.edu%3A8444%2Faums%2FJsp%2FCommon%2Findex.jsp";
-
-        AjaxCallback<String> cb = new AjaxCallback<String>();
-        cb.url(url).type(String.class).weakHandler(this, "SessionCallBack");
-
-        cb.header("Referer", "http://www.amrita.edu/");
-        cb.header("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0.2) Gecko/20100101 Firefox/6.0.2");
-
-        aq.ajax(cb);
-
-    }
-
-    // INITIAL SESSION RECIEVER CALL BACK
-    public void SessionCallBack(String url, String html, AjaxStatus status) {
-        if (html != null && html != "") {
-            Document doc = Jsoup.parse(html);
-
-            Element FormElement = doc.select("#fm1").first();
-            String FormRef = FormElement.attr("action");
-
-            Elements InputFields = doc.getElementsByTag("input");
-
-            String lt = null;
-            for (Element InputField : InputFields) {
-                if (InputField.attr("name").equals("lt")) {
-                    lt = InputField.attr("value");
-                }
+        client.get("/cas/login", params, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Ln.e("Session ERROR. Code:%s Response:%s", statusCode, responseString);
+                serverError();
+                closeSession(true);
             }
-            List<Cookie> cookies = status.getCookies();
-            String JSESSIONID = getCookieValue(cookies, "JSESSIONID", "");
-            //Toast.makeText(Aums.this, "REF:"+FormRef+"-SESSION:"+lt+"-JSESSIONID:"+JSESSIONID, Toast.LENGTH_SHORT).show();
-            Login(FormRef, lt, JSESSIONID);
-        } else {
-            SuperToast superToast = new SuperToast(this);
-            superToast.setDuration(SuperToast.Duration.LONG);
-            superToast.setAnimations(SuperToast.Animations.FLYIN);
-            superToast.setBackground(SuperToast.Background.RED);
-            superToast.setTextColor(Color.WHITE);
-            superToast.setText("Server error ! Please try again after some time !");
-            superToast.show();
-            dialog.dismiss();
-        }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                String formAction;
+                String lt;
+
+                Document doc = Jsoup.parse(responseString);
+                Element form = doc.select("#fm1").first();
+                formAction = form.attr("action");
+
+                Element hiddenInput = doc.select("input[name=lt]").first();
+                lt = hiddenInput.attr("value");
+
+                Ln.d("Session Done. action=%s lt=%s", formAction, lt);
+                login(formAction, lt);
+            }
+        });
+
     }
 
-    //
-    // LOGIN (and get Name and Image)
-    //
-    public void Login(String FormRef, String lt, String JSESSIONID) {
+    private void login(String formAction, String lt) {
 
         dialog.setMessage("Authenticating your credentials ...");
 
         FormEditText RollNo = (FormEditText) findViewById(R.id.roll_no);
         FormEditText Password = (FormEditText) findViewById(R.id.pwd);
 
-        Log.d("STATUS", "Getting Session ID");
-
-        String url = "https://amritavidya.amrita.edu:8444" + FormRef;
-
-        AjaxCallback<String> cb = new AjaxCallback<String>();
-        Map<String, Object> params = new HashMap<String, Object>();
+        Ln.d("Start Login");
+        RequestParams params = new RequestParams();
         params.put("username", RollNo.getText());
         params.put("password", Password.getText());
-
-        FinalUserName = RollNo.getText().toString();
-        FinalPassword = Password.getText().toString();
-
         params.put("_eventId", "submit");
         params.put("lt", lt);
         params.put("submit", "LOGIN");
 
-        cb.url(url).params(params).type(String.class).weakHandler(this, "LoginCallBack");
-
-        cb.header("Referer", "https://amritavidya.amrita.edu:8444/cas/login?service=https%3A%2F%2Famritavidya.amrita.edu%3A8444%2Faums%2FJsp%2FCommon%2Findex.jsp");
-        cb.header("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0.2) Gecko/20100101 Firefox/6.0.2");
-        cb.cookie("JSESSIONID", JSESSIONID);
-        aq.ajax(cb);
-    }
-
-    // LOGIN CALL BACK
-    public void LoginCallBack(String url, String html, AjaxStatus status) {
-        if (html != null && html != "") {
-            Document doc = Jsoup.parse(html);
-            Elements TableElements = doc.getElementsByTag("td");
-
-            String Name = null;
-            for (Element TableElement : TableElements) {
-                if (TableElement.attr("class").equals("style3") && TableElement.attr("width").equals("70%") && TableElement.attr("valign").equals("bottom")) {
-                    Name = TableElement.text();
-                }
-            }
-            if (Name != null && Name != "") {
-                List<Cookie> cookies = status.getCookies();
-
-                for (Cookie cookie : cookies) {
-                    Log.d("DEBUG_COOKIE", cookie.getName() + ":" + cookie.getValue());
-                }
-
-                String JSESSIONID = getCookieValue(cookies, "JSESSIONID", "");
-                String JSESSIONID1 = getCookieValue(cookies, "JSESSIONID1", "");
-                String RT = getCookieValue(cookies, "RT", "");
-
-                //Toast.makeText(this,"(!@!)JID:"+JSESSIONID+"/JID1:"+JSESSIONID1+"/RT:"+RT, Toast.LENGTH_LONG).show();
-
-                if (RT == null) {
-                    RT = "";
-                }
-                StudentProfile(JSESSIONID, JSESSIONID1, RT);
-                Name = Name.replace("Welcome ", "");
-                Name = Name.replace(")", "");
-                String[] result = Name.split("\\(");
-                StudentName = result[0];
-                StudentRollNo = result[1];
-                //Toast.makeText(Aums.this, "Name:"+Name, Toast.LENGTH_SHORT).show();
-            } else {
-                SuperToast superToast = new SuperToast(this);
-                superToast.setDuration(SuperToast.Duration.LONG);
-                superToast.setAnimations(SuperToast.Animations.FLYIN);
-                superToast.setBackground(SuperToast.Background.RED);
-                superToast.setTextColor(Color.WHITE);
-                superToast.setText("Your credentials (Roll No (and/or) Password) were incorrect !");
-                superToast.show();
-                dialog.dismiss();
-            }
-        } else {
-            SuperToast superToast = new SuperToast(this);
-            superToast.setDuration(SuperToast.Duration.LONG);
-            superToast.setAnimations(SuperToast.Animations.FLYIN);
-            superToast.setBackground(SuperToast.Background.RED);
-            superToast.setTextColor(Color.WHITE);
-            superToast.setText("Server error ! Please try again after some time !");
-            superToast.show();
-            dialog.dismiss();
-        }
-    }
-
-    public void StudentProfile(String JSESSIONID, String JSESSIONID1, String RT) {
-        FinalJSESSIONID = JSESSIONID;
-        FinalJSESSIONID1 = JSESSIONID1;
-        FinalRT = RT;
-        //Toast.makeText(this,"JID:"+FinalJSESSIONID+"/JID1:"+FinalJSESSIONID1+"/RT:"+FinalRT, Toast.LENGTH_LONG).show();
-        dialog.setMessage("Getting Student Profile ...");
-
-        Log.d("STATUS", "Getting Session ID");
-
-        String url = "https://amritavidya.amrita.edu:8444/aums/Jsp/Student/Student.jsp?action=UMS-SRM_INIT_STUDENTPROFILE_SCREEN";
-
-        AjaxCallback<String> cb = new AjaxCallback<String>();
-
-        cb.url(url).type(String.class).weakHandler(this, "StudentProfileCallBack");
-
-        cb.header("Referer", "https://amritavidya.amrita.edu:8444/aums/Jsp/Core_Common/index.jsp?task=off");
-        cb.header("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0.2) Gecko/20100101 Firefox/6.0.2");
-        cb.cookie("JSESSIONID", JSESSIONID);
-        cb.cookie("JSESSIONID1", JSESSIONID1);
-        cb.cookie("RT", RT);
-        aq.ajax(cb);
-    }
-
-    // LOGIN CALL BACK
-    public void StudentProfileCallBack(String url, String html, AjaxStatus status) {
-        Document doc = Jsoup.parse(html);
-        Elements InputElements = doc.getElementsByTag("input");
-
-        String EncodedId = null;
-        for (Element InputElement : InputElements) {
-            if (InputElement.attr("name").equals("htmlPageTopContainer_encodedenrollmentId")) {
-                EncodedId = InputElement.attr("value");
-            }
-        }
-
-        Element Sem = doc.select("td[width=9%] > b").last();
-        String CurrentSem = Sem.text().trim();
-        Element Branch = doc.select("td[width=6%] > b").first();
-        String CurrentBranch = Branch.text().trim();
-        Element Program = doc.select("td[width=10%] > b").first();
-        String CurrentProgram = Program.text().trim();
-
-        StudentCurrentSem = CurrentSem;
-        StudentCurrentBranch = CurrentBranch;
-        StudentCurrentProgram = CurrentProgram;
-        List<Cookie> cookies = status.getCookies();
-        for (Cookie cookie : cookies) {
-            Log.d("DEBUG_COOKIE", cookie.getName() + ":" + cookie.getValue());
-        }
-        getCookieValue(cookies, "JSESSIONID", "");
-        getCookieValue(cookies, "JSESSIONID1", "");
-        String RT = getCookieValue(cookies, "RT", "");
-        if (RT == null) {
-            RT = "";
-        }
-
-        // TODO - IMPORTANT !!
-        // SEND ENCRYPTED COOKIE VALUE TO THIRD-PARTY SERVER FOR PROCESSING USER PHOTO.
-        // THE PHOTO WILL BE DOWNLOADED AND THEN DELETED AFTER 30 mins (Privacy Concerns)
-
-        String urlpic = "http://njlabs.kovaideals.com/api/aid/aums/get_photo.php?jsession=" + FinalJSESSIONID + "&jsession1=" + FinalJSESSIONID1 + "&personid=" + EncodedId;
-
-        aq.ajax(urlpic, JSONObject.class, new AjaxCallback<JSONObject>() {
+        client.post(formAction, params, new TextHttpResponseHandler() {
             @Override
-            public void callback(String url, JSONObject json, AjaxStatus status) {
-                if (json != null) {
-                    try {
-                        String ImgName = json.getString("imgname");
-                        StudentProfilePic = ImgName;
-                        StudentCGPA(FinalJSESSIONID, FinalJSESSIONID1, FinalRT);
-                    } catch (JSONException e) {
-                        ACRA.getErrorReporter().handleException(e);
-                    }
-                } else {
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Ln.e("Login ERROR. Code:%s Response:%s",statusCode,responseString);
+                serverError();
+                closeSession(true);
+            }
 
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Ln.d("Login Done.");
+                // VERIFY SUCCESSFUL AUTHENTICATION
+                Document doc = Jsoup.parse(responseString);
+                Elements TableElements = doc.getElementsByTag("td");
+
+                String Name = null;
+                for (Element TableElement : TableElements) {
+                    if (TableElement.attr("class").equals("style3") && TableElement.attr("width").equals("70%") && TableElement.attr("valign").equals("bottom")) {
+                        Name = TableElement.text();
+                    }
+                }
+                if (Name != null && Name != "") {
+                    dialog.setMessage("Authorization successful");
+                    Name = Name.replace("Welcome ", "");
+                    Name = Name.replace(")", "");
+                    String[] result = Name.split("\\(");
+                    StudentName = result[0];
+                    StudentRollNo = result[1].toUpperCase();
+                    getCGPA();
+                }
+                else
+                {
+                    SuperToast superToast = new SuperToast(Aums.this);
+                    superToast.setDuration(SuperToast.Duration.LONG);
+                    superToast.setAnimations(SuperToast.Animations.FLYIN);
+                    superToast.setBackground(SuperToast.Background.RED);
+                    superToast.setTextColor(Color.WHITE);
+                    superToast.setText("Your credentials (Roll No (and/or) Password) were incorrect ! (or try changing the server)");
+                    superToast.show();
+                    dialog.dismiss();
+                }
+
+            }
+        });
+    }
+    private void getCGPA()
+    {
+        dialog.setMessage("Requesting Student Profile...");
+        RequestParams params = new RequestParams();
+        params.put("action", "UMS-EVAL_STUDPERFORMSURVEY_INIT_SCREEN");
+        params.put("isMenu", "true");
+        client.get("/aums/Jsp/StudentGrade/StudentPerformanceWithSurvey.jsp", params, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Ln.e("CGPA ERROR. Code:%s Response:%s", statusCode, responseString);
+                serverError();
+                closeSession(true);
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+
+                Document doc = Jsoup.parse(responseString);
+                Element CGPA = doc.select("td[width=19%].rowBG1").last();
+                StudentCurrentCGPA = CGPA.text().trim();
+                getPhoto();
+            }
+        });
+    }
+
+    private void getPhoto()
+    {
+        RequestParams params = new RequestParams();
+        params.put("action", "UMS-SRM_INIT_STUDENTPROFILE_SCREEN");
+
+        client.get("/aums/Jsp/Student/Student.jsp", params, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Ln.e("CGPA ERROR. Code:%s Response:%s",statusCode,responseString);
+                serverError();
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+
+                Document doc = Jsoup.parse(responseString);
+                Elements InputElements = doc.getElementsByTag("input");
+
+                String EncodedId = null;
+                for (Element InputElement : InputElements) {
+                    if (InputElement.attr("name").equals("htmlPageTopContainer_encodedenrollmentId")) {
+                        EncodedId = InputElement.attr("value");
+                    }
+                }
+
+                Element Sem = doc.select("td[width=9%] > b").last();
+                StudentCurrentSem = Sem.text().trim();
+                Element Branch = doc.select("td[width=6%] > b").first();
+                StudentCurrentBranch = Branch.text().trim();
+                Element Program = doc.select("td[width=10%] > b").first();
+                StudentCurrentProgram = Program.text().trim();
+
+                DiplayDataView(EncodedId);
+            }
+        });
+    }
+
+    private void getPhotoFile(String encodedID, final int studentProfilePicProgress, final int studentProfilePic)
+    {
+        RequestParams params = new RequestParams();
+        params.put("action", "SHOW_STUDENT_PHOTO");
+        params.put("encodedenrollmentId", encodedID);
+
+        client.get("/aums/FileUploadServlet", params, new FileAsyncHttpResponseHandler(this) {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, File file) {
+                serverError();
+                findViewById(studentProfilePicProgress).setVisibility(View.GONE);
+                ImageView myImage = (ImageView) findViewById(studentProfilePic);
+                myImage.setVisibility(View.VISIBLE);
+                myImage.setImageResource(R.drawable.user_128);
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, File file) {
+
+                findViewById(studentProfilePicProgress).setVisibility(View.GONE);
+
+                if(file.exists()){
+                    Bitmap myBitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+                    ImageView myImage = (ImageView) findViewById(studentProfilePic);
+                    myImage.setVisibility(View.VISIBLE);
+                    myImage.setImageBitmap(myBitmap);
                 }
             }
         });
     }
 
-    public void StudentCGPA(String JSESSIONID, String JSESSIONID1, String RT) {
-        dialog.setMessage("Getting Student CGPA ...");
-        Log.d("DEBUG", "JSID-" + JSESSIONID + "-JSID1-" + JSESSIONID1 + "-RT-" + RT);
-        String url = "https://amritavidya.amrita.edu:8444/aums/Jsp/StudentGrade/StudentPerformanceWithSurvey.jsp?action=UMS-EVAL_STUDPERFORMSURVEY_INIT_SCREEN&isMenu=true";
+    //
+    //
+    //
+    private void DiplayDataView(String EncodedId) {
 
-        AjaxCallback<String> cb = new AjaxCallback<String>();
-
-        cb.url(url).type(String.class).weakHandler(this, "StudentCGPACallBack");
-
-        cb.header("Referer", "https://amritavidya.amrita.edu:8444/aums/Jsp/Core_Common/index.jsp?task=off");
-        cb.header("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0.2) Gecko/20100101 Firefox/6.0.2");
-        cb.cookie("JSESSIONID", JSESSIONID);
-        cb.cookie("JSESSIONID1", JSESSIONID1);
-        cb.cookie("RT", RT);
-
-        aq.ajax(cb);
-    }
-
-    public void StudentCGPACallBack(String url, String html, AjaxStatus status) {
-        Document doc = Jsoup.parse(html);
-        Element CGPA = doc.select("td[width=19%].rowBG1").last();
-        String CurrentCGPA = CGPA.text().trim();
-        StudentCurrentCGPA = CurrentCGPA;
         dialog.dismiss();
-        DiplayDataView();
-    }
-
-    //
-    //
-    //
-    public void DiplayDataView() {
         setContentView(R.layout.activity_aums_profile);
-
         LoggedIn = true;
 
         TextView StudentNameView = (TextView) findViewById(R.id.StudentName);
         TextView StudentRollNoView = (TextView) findViewById(R.id.StudentRollNo);
         TextView StudentCurrentCGPAView = (TextView) findViewById(R.id.StudentCurrentCGPA);
-        StudentNameView.setText(StudentName);
+
+        StudentNameView.setText(WordUtils.capitalizeFully(StudentName));
         StudentRollNoView.setText(StudentRollNo);
         StudentCurrentCGPAView.setText(StudentCurrentCGPA);
         ActionBar actionBar = getActionBar();
         actionBar.setSubtitle("Welcome " + StudentName + " !");
-        String imageUrl = "http://njlabs.kovaideals.com/api/aid/aums/pics/" + StudentProfilePic;
 
-        ImageOptions options = new ImageOptions();
-        options.round = 15;
-        options.fileCache = true;
-        options.memCache = true;
-        options.fallback = R.drawable.user_128;
-        options.targetWidth = 128;
-        options.animation = AQuery.FADE_IN;
-        options.ratio = AQuery.RATIO_PRESERVE;
+        findViewById(R.id.StudentProfilePicProgress).setVisibility(View.VISIBLE);
+        getPhotoFile(EncodedId,R.id.StudentProfilePicProgress,R.id.StudentProfilePic);
 
-        aq.progress(R.id.StudentProfilePicProgress).id(R.id.StudentProfilePic).image(imageUrl, options);
+        semesterMapping.put("1","7");
+        semesterMapping.put("2","8");
+        semesterMapping.put("Vacation 1","231");
+        semesterMapping.put("3","9");
+        semesterMapping.put("4","10");
+        semesterMapping.put("Vacation 2","232");
+        semesterMapping.put("5","11");
+        semesterMapping.put("6","12");
+        semesterMapping.put("Vacation 3","233");
+        semesterMapping.put("7","13");
+        semesterMapping.put("8","14");
+        semesterMapping.put("Vacation 4","234");
+        semesterMapping.put("9","72");
+        semesterMapping.put("10","73");
+        semesterMapping.put("Vacation 5","243");
+        semesterMapping.put("11","138");
+        semesterMapping.put("12","139");
+        semesterMapping.put("Vacation 6","244");
+        semesterMapping.put("13","177");
+        semesterMapping.put("14","190");
+        semesterMapping.put("15","219");
     }
 
     //
     //
     //
+
+    public void getAttendance()
+    {
+        if(gotAttendance)
+        {
+            dialog.dismiss();
+            Intent i = new Intent(getApplicationContext(), AumsAttendance.class);
+            i.putExtra("response", getAttendanceResponse);
+            startActivity(i);
+        }
+        else {
+
+            Ln.d("Start getAttendance Stage 1");
+            RequestParams params = new RequestParams();
+            params.put("action", "UMS-ATD_INIT_ATDREPORTSTUD_SCREEN");
+            params.put("isMenu", "true");
+
+            client.get("/aums/Jsp/Attendance/AttendanceReportStudent.jsp", params, new TextHttpResponseHandler() {
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                    Ln.e("Attendance Stage 1 ERROR. Code:%s Response:%s", statusCode, responseString);
+                    serverError();
+                }
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                    Ln.d("Start getAttendance stage 2");
+                    // GET ACTUAL ATTENDACE DATA
+                    RequestParams params = new RequestParams();
+                    params.put("htmlPageTopContainer_selectSem", "11");
+                    params.put("Page_refIndex_hidden", attendanceRefIndex++);
+                    params.put("htmlPageTopContainer_selectCourse", "0");
+                    params.put("htmlPageTopContainer_selectType", "1");
+                    params.put("htmlPageTopContainer_hiddentSummary", "");
+                    params.put("htmlPageTopContainer_status", "");
+                    params.put("htmlPageTopContainer_action", "UMS-ATD_SHOW_ATDSUMMARY_SCREEN");
+                    params.put("htmlPageTopContainer_notify", "");
+
+                    client.post("/aums/Jsp/Attendance/AttendanceReportStudent.jsp?action=UMS-ATD_INIT_ATDREPORTSTUD_SCREEN&isMenu=true&pagePostSerialID=0", params, new TextHttpResponseHandler() {
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                            Ln.e("Attendance Stage 2 ERROR. Code:%s Response:%s", statusCode, responseString);
+                            serverError();
+                        }
+
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                            dialog.dismiss();
+                            gotAttendance = true;
+                            getAttendanceResponse = responseString;
+                            Intent i = new Intent(getApplicationContext(), AumsAttendance.class);
+                            i.putExtra("response", responseString);
+                            startActivity(i);
+                            overridePendingTransition(R.anim.fadein,R.anim.fadeout);
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+   /* public void getGrades(final String semesterCode)
+    {
+        if(true)
+        {
+            Ln.d("Already pinged. Proceed to Stage 2 directly");
+            getGradesStage2(semesterCode);
+        }
+        else {
+            Ln.d("Start getGrades Stage 1");
+            RequestParams params = new RequestParams();
+            params.put("action", "UMS-EVAL_STUDPERFORMSURVEY_INIT_SCREEN");
+            params.put("isMenu", "true");
+
+            client.get("/aums/Jsp/StudentGrade/StudentPerformanceWithSurvey.jsp", params, new TextHttpResponseHandler() {
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                    Ln.e("getGrades Stage 1 ERROR. Code:%s Response:%s", statusCode, responseString);
+                    serverError();
+                }
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                    Ln.d(responseString);
+                    getGradesStage2(semesterCode);
+                }
+            });
+        }
+    }*/
+
+    private void getGrades(String semesterCode)
+    {
+        Ln.d("Start getGrades stage 2");
+        // GET ACTUAL ATTENDACE DATA
+        RequestParams params = new RequestParams();
+        params.put("htmlPageTopContainer_selectStep", semesterCode);
+        params.put("Page_refIndex_hidden", gradeRefIndex++);
+        params.put("htmlPageTopContainer_hiddentblGrades", "");
+        params.put("htmlPageTopContainer_status", "");
+        params.put("htmlPageTopContainer_action", "UMS-EVAL_STUDPERFORMSURVEY_CHANGESEM_SCREEN");
+        params.put("htmlPageTopContainer_notify", "");
+
+        client.post("/aums/Jsp/StudentGrade/StudentPerformanceWithSurvey.jsp?action=UMS-EVAL_STUDPERFORMSURVEY_INIT_SCREEN&isMenu=true&pagePostSerialID=0", params, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Ln.e("getGrades Stage 2 ERROR. Code:%s Response:%s", statusCode, responseString);
+                serverError();
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                dialog.dismiss();
+                gradesOnce = true;
+                Intent i = new Intent(getApplicationContext(), AumsGrades.class);
+                i.putExtra("response", responseString);
+                startActivity(i);
+                overridePendingTransition(R.anim.fadein,R.anim.fadeout);
+            }
+        });
+    }
     public void OpenAttendance(View view) {
-        Intent i = new Intent(getApplicationContext(), AumsAttendance.class);
-        i.putExtra("FinalUserName", FinalUserName);
-        i.putExtra("FinalPassword", FinalPassword);
-        i.putExtra("StudentCurrentSem", StudentCurrentSem);
-        startActivity(i);
+
+        dialog.setMessage("Getting your attendance summary");
+        dialog.show();
+        getAttendance();
     }
 
     public void OpenGrades(View view) {
-        Intent i = new Intent(getApplicationContext(), AumsGrades.class);
-        i.putExtra("FinalUserName", FinalUserName);
-        i.putExtra("FinalPassword", FinalPassword);
-        startActivity(i);
-    }
 
-    public void OpenResources(View view) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);    // ALERT DIALOG
-        builder.setTitle("Sorry guys !")
-                .setMessage("Haven't added resources yet ... It'll be ready in about a week :)")
-                .setCancelable(true)
-                .setIcon(R.drawable.info)
-                .setPositiveButton("Got it !", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-        AlertDialog alert = builder.create();
-        alert.show();
+        final CharSequence[] items = {"1","2","Vacation 1","3","4","Vacation 2","5","6","Vacation 3","7","8","Vacation 4","9","10","Vacation 5","11","12","Vacation 6","13","14","15"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select a Semester");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialogList, int item) {
+                dialog.setMessage("Getting your grades");
+                dialog.show();
+                getGrades(semesterMapping.get(items[item]));
+            }
+        });
+        AlertDialog alert_d = builder.create();
+        alert_d.show();
     }
 
     //
@@ -472,70 +555,60 @@ public class Aums extends Activity {
         Password.setText(null);
     }
 
-    // COOKIE VALUE GET FUNCTION
-    public static String getCookieValue(List<Cookie> cookies, String cookieName, String defaultValue) {
-
-        for (Cookie cookie : cookies) {
-            if (cookieName.equals(cookie.getName())) {
-                return (cookie.getValue());
-            }
-        }
-        return (defaultValue);
-
-    }
+    private Toast toast;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
             case android.R.id.home:
-                // app icon in action bar clicked; go home
-                if (LoggedIn) {
-                    if (LoggedIn) {
-                        if (BackPress + 2000 > System.currentTimeMillis()) {
-
-                            // need to cancel the toast here
-                            toast.cancel();
-                            Toast.makeText(getApplicationContext(), "You have successfully logged out !", Toast.LENGTH_LONG).show();
-                            Intent intent = new Intent(this, Landing.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(intent);
-                        } else {
-                            // ask user to press back button one more time to close app
-                            toast = Toast.makeText(getBaseContext(), "Press once again to Log Out of AUMS!", Toast.LENGTH_SHORT);
-                            toast.show();
-                        }
-                        BackPress = System.currentTimeMillis();
-                    } else {
-                        Intent intent = new Intent(this, Landing.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(intent);
-                    }
-                } else {
-                    Intent intent = new Intent(this, Landing.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
-                }
+                exitAums();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private Toast toast;
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        exitAums();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            exitAums();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+    private void serverError()
+    {
+        SuperToast superToast = new SuperToast(Aums.this);
+        superToast.setDuration(SuperToast.Duration.LONG);
+        superToast.setAnimations(SuperToast.Animations.FLYIN);
+        superToast.setBackground(SuperToast.Background.RED);
+        superToast.setTextColor(Color.WHITE);
+        superToast.setText("Server error ! Please try again after some time ! (or try changing the server)");
+        superToast.show();
+        if(dialog!=null)
+            dialog.dismiss();
+
+    }
+    private void exitAums()
+    {
         if (LoggedIn) {
             if (BackPress + 2000 > System.currentTimeMillis()) {
-
                 // need to cancel the toast here
                 toast.cancel();
+                closeSession(true);
                 Toast.makeText(getApplicationContext(), "You have successfully logged out !", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(this, Landing.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
+                overridePendingTransition(R.anim.fadein,R.anim.fadeout);
             } else {
                 // ask user to press back button one more time to close app
                 toast = Toast.makeText(getBaseContext(), "Press once again to Log Out of AUMS!", Toast.LENGTH_SHORT);
@@ -543,39 +616,29 @@ public class Aums extends Activity {
             }
             BackPress = System.currentTimeMillis();
         } else {
+            closeSession(true);
             Intent intent = new Intent(this, Landing.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
+            overridePendingTransition(R.anim.fadein,R.anim.fadeout);
         }
-
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (LoggedIn) {
-                if (BackPress + 2000 > System.currentTimeMillis()) {
-
-                    // need to cancel the toast here
-                    toast.cancel();
-                    Toast.makeText(getApplicationContext(), "You have successfully logged out !", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(this, Landing.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
-                } else {
-                    // ask user to press back button one more time to close app
-                    toast = Toast.makeText(getBaseContext(), "Press once again to Log Out of AUMS!", Toast.LENGTH_SHORT);
-                    toast.show();
-                }
-                BackPress = System.currentTimeMillis();
-            } else {
-                Intent intent = new Intent(this, Landing.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-            }
-            return true;
+    private void closeSession(boolean clearAll)
+    {
+        client.closeClient();
+        if(clearAll) {
+            getSharedPreferences("CookiePrefsFile", 0).edit().clear().commit();
+            File deletePrefFile = new File("/data/data/com.njlabs.amrita.aid/shared_prefs/CookiePrefsFile.xml");
+            deletePrefFile.delete();
         }
-        return super.onKeyDown(keyCode, event);
     }
 
+    private void refreshSession()
+    {
+        getSharedPreferences("CookiePrefsFile", 0).edit().clear().commit();
+        File deletePrefFile = new File("/data/data/com.njlabs.amrita.aid/shared_prefs/CookiePrefsFile.xml");
+        deletePrefFile.delete();
+        client = new AumsClient(this);
+    }
 }

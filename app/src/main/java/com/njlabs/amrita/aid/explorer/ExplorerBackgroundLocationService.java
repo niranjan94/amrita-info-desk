@@ -10,13 +10,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.androidquery.AQuery;
-import com.androidquery.callback.AjaxCallback;
-import com.androidquery.callback.AjaxStatus;
 import com.github.johnpersano.supertoasts.SuperActivityToast;
 
 import org.acra.ACRA;
-import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -28,7 +24,6 @@ import java.util.Map;
 
 public class ExplorerBackgroundLocationService extends IntentService {
 
-    AQuery aq;
     String mobile_num;
     LocationManager locationManager;
 
@@ -92,7 +87,7 @@ public class ExplorerBackgroundLocationService extends IntentService {
             String url = "http://njlabs.kovaideals.com/api/aid/explorer.php?type=location_ping&mobile=" + mobile_num + "&lat=" + latitude + "&lon=" + longitude + "&datetime=" + timeStamp;
             Map<String, Object> params = new HashMap<String, Object>();
             params.put("authkey", "bdc0fabcbfa45a3506d1e66a6ff77596");
-            aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
+            /*aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
                 @Override
                 public void callback(String url, JSONObject json, AjaxStatus status) {
                     if (json != null) {
@@ -101,7 +96,7 @@ public class ExplorerBackgroundLocationService extends IntentService {
 
                     }
                 }
-            });
+            });*/
         }
     }
 

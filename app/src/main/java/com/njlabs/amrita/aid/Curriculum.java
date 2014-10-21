@@ -3,6 +3,7 @@ package com.njlabs.amrita.aid;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.webkit.WebView;
 
 public class Curriculum extends Activity {
@@ -37,6 +38,18 @@ public class Curriculum extends Activity {
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setSubtitle(department);
+    }
+    public boolean onMenuItemSelected(int featureId, MenuItem item){
+        if(item.getItemId() == android.R.id.home) {
+            finish();
+            overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+        }
+        return true;
+    }
+    @Override
+    public void onBackPressed() {
+        finish(); //go back to the previous Activity
+        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
     }
 
 }

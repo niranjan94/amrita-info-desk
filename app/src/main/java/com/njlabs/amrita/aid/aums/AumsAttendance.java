@@ -3,37 +3,32 @@ package com.njlabs.amrita.aid.aums;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.TypedValue;
+import android.text.Html;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
-import android.widget.ScrollView;
+import android.widget.ListView;
 import android.widget.TextView;
 
-import com.androidquery.AQuery;
-import com.androidquery.callback.AjaxCallback;
-import com.androidquery.callback.AjaxStatus;
-import com.onemarker.ark.Security;
+import com.njlabs.amrita.aid.R;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
 
 public class AumsAttendance extends Activity {
 
-    private AQuery aq;
     ProgressDialog dialog;
-
-    String StudentCurrentSem = null;
-    String FinalUserName = null;
-    String FinalPassword = null;
+    ListView list;
+    String responseString = null;
+    ArrayList<CourseAttendanceData> attendanceData = new ArrayList<CourseAttendanceData>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,170 +36,133 @@ public class AumsAttendance extends Activity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            StudentCurrentSem = extras.getString("StudentCurrentSem");
-            FinalUserName = extras.getString("FinalUserName");
-            FinalPassword = extras.getString("FinalPassword");
+            responseString = extras.getString("response");
         }
+
+        setContentView(new LinearLayout(this));
+
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        aq = new AQuery(this);
 
         dialog = new ProgressDialog(this);
         dialog.setIndeterminate(true);
         dialog.setCancelable(false);
         dialog.setInverseBackgroundForced(false);
         dialog.setCanceledOnTouchOutside(false);
-        dialog.setMessage("Receiving Data (Might take a while)");
-        GetData();
-    }
-
-    public void GetData() {
-        dialog.show();
-        String key = "6f0d380df08a284d";
-        String url = "http://njlabs.kovaideals.com/api/aid/aums/main.php?what=attendance";
-
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("id", Security.encrypt(FinalUserName, key));
-        params.put("pwd", Security.encrypt(FinalPassword, key));
-        params.put("semester", StudentCurrentSem);
-
-        aq.ajax(url, params, String.class, new AjaxCallback<String>() {
-            @Override
-            public void callback(String url, String html, AjaxStatus status) {
-                dialog.setMessage("Parsing the received data ");
-                DataParser(html);
-            }
-
-        });
+        dialog.setMessage("Parsing the received data ");
+        DataParser(responseString);
     }
 
     public void DataParser(String html) {
         Document doc = Jsoup.parse(html);
 
-        ScrollView scrolllayout = new ScrollView(this);
-        LinearLayout layout = new LinearLayout(this);
-        scrolllayout.addView(layout);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(16, 16, 16, 16);
+        Element table = doc.select("table[width=75%] > tbody").first();
+        Elements rows = table.select("tr:gt(0)");
 
+        for(Element row : rows) {
+            Elements dataHolders = row.select("td > span");
 
-        Elements Columns = doc.select("span.rowBG1");
-        int count = 0;
-        int TrueCount = 0;
-        int TotalTemp = 0;
-        for (Element column : Columns) {
-            String Data = column.text();
-            if (TrueCount > 5) {
-                TextView tv;
-                TextView dummy;
-                switch (count) {
-                    case 0:
-                        tv = new TextView(getApplicationContext());
-                        tv.setText(Data);
-                        tv.setTextAppearance(this, android.R.style.TextAppearance_Small);
-                        layout.addView(tv);
-                        count++;
-                        break;
+            CourseAttendanceData adata = new CourseAttendanceData();
 
-                    case 1:
-                        tv = new TextView(getApplicationContext());
-                        tv.setText(Data);
-                        tv.setTextAppearance(this, android.R.style.TextAppearance_Large);
-                        tv.setTypeface(Typeface.DEFAULT_BOLD);
-                        layout.addView(tv);
+            adata.setCourseCode(dataHolders.get(0).text());
+            adata.setCourseTitle(dataHolders.get(1).text());
+            adata.setTotal(dataHolders.get(3).text());
+            adata.setAttended(dataHolders.get(4).text());
+            adata.setPercentage(dataHolders.get(5).text());
 
-                        dummy = new TextView(getApplicationContext());
-                        dummy.setText(" ");
-                        dummy.setTextAppearance(this, android.R.style.TextAppearance_Small);
-                        layout.addView(dummy);
-
-                        count++;
-                        break;
-
-                    case 2:
-
-                        count++;
-                        break;
-
-                    case 3:
-                        tv = new TextView(getApplicationContext());
-                        tv.setText("Total Classes : " + Data);
-                        TotalTemp = Integer.parseInt(Data.trim());
-                        tv.setTextAppearance(this, android.R.style.TextAppearance_Medium);
-                        layout.addView(tv);
-                        count++;
-                        break;
-
-                    case 4:
-                        tv = new TextView(getApplicationContext());
-                        tv.setText("You Attended : " + Data);
-                        tv.setTextAppearance(this, android.R.style.TextAppearance_Medium);
-                        layout.addView(tv);
-
-                        int BunkedClasses = TotalTemp - Integer.parseInt(Data.trim());
-
-                        tv = new TextView(getApplicationContext());
-                        tv.setText("You Bunked    : " + BunkedClasses);
-                        TotalTemp = Integer.parseInt(Data.trim());
-                        tv.setTextAppearance(this, android.R.style.TextAppearance_Medium);
-                        layout.addView(tv);
-
-                        count++;
-                        break;
-
-                    case 5:
-                        tv = new TextView(getApplicationContext());
-                        tv.setText("Percentage     : " + Data);
-                        tv.setTextAppearance(this, android.R.style.TextAppearance_Medium);
-                        layout.addView(tv);
-
-                        dummy = new TextView(getApplicationContext());
-                        dummy.setText(" ");
-                        dummy.setTextAppearance(this, android.R.style.TextAppearance_Small);
-                        layout.addView(dummy);
-
-                        float percentage = Float.parseFloat(Data);
-
-                        tv = new TextView(getApplicationContext());
-                        tv.setTypeface(Typeface.DEFAULT_BOLD);
-                        tv.setTextAppearance(this, android.R.style.TextAppearance_Small);
-
-                        if (percentage > 85) {
-                            tv.setText("YOU ARE SAFE !");
-                            tv.setTextColor(Color.parseColor("#669900"));
-                        } else if (percentage < 85 && percentage > 80) {
-                            tv.setText("YOU MIGHT BE IN DANGER !");
-                            tv.setTextColor(Color.parseColor("#ff8800"));
-                        } else {
-                            tv.setText("YOU ARE IN DANGER !");
-                            tv.setTextColor(Color.parseColor("#cc0000"));
-                        }
-
-                        layout.addView(tv);
-
-                        dummy = new TextView(getApplicationContext());
-                        dummy.setText(" ");
-                        dummy.setTextAppearance(this, android.R.style.TextAppearance_Small);
-                        layout.addView(dummy);
-
-                        View divider = new View(getApplicationContext());
-                        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics());
-                        divider.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, height));
-                        divider.setBackgroundColor(Color.parseColor("#969696"));
-                        layout.addView(divider);
-
-                        dummy = new TextView(getApplicationContext());
-                        dummy.setText(" ");
-                        dummy.setTextAppearance(this, android.R.style.TextAppearance_Small);
-                        layout.addView(dummy);
-
-                        count = 0;
-                        break;
-                }
-            }
-            TrueCount++;
+            attendanceData.add(adata);
         }
-        setContentView(scrolllayout);
+        setupList();
+
+    }
+    public void setupList() {
+        list = new ListView(this);
+        list.setBackgroundColor(getResources().getColor(R.color.white));
+
+        ArrayAdapter<CourseAttendanceData> dataAdapter = new ArrayAdapter<CourseAttendanceData>(getBaseContext(), R.layout.item_aums_attendance, attendanceData) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                if (convertView == null) {
+                    convertView = getLayoutInflater().inflate(R.layout.item_aums_attendance, null);
+                }
+                CourseAttendanceData data = getItem(position);
+                ((TextView)convertView.findViewById(R.id.course_title)).setText(data.courseTitle);
+                ((TextView)convertView.findViewById(R.id.attendance_status)).setText(Html.fromHtml("You attended <b>"+data.attended+"</b> of <b>"+data.total+"</b> classes"));
+                ((TextView)convertView.findViewById(R.id.percentage)).setText(Math.round(data.percentage)+"%");
+
+                if(Math.round(data.percentage)>=85) {
+                    convertView.findViewById(R.id.indicator).setBackgroundResource(R.drawable.circle_green);
+                }
+                else if(Math.round(data.percentage)>=80) {
+                    convertView.findViewById(R.id.indicator).setBackgroundResource(R.drawable.circle_yellow);
+                }
+                else {
+                    convertView.findViewById(R.id.indicator).setBackgroundResource(R.drawable.circle_red);
+                }
+
+                return convertView;
+            }
+        };
+        list.setAdapter(dataAdapter);
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+        });
+
+        setContentView(list);
         dialog.dismiss();
+    }
+    public class CourseAttendanceData
+    {
+        public String courseCode;
+        public String courseTitle;
+        public int total;
+        public int attended;
+        public int bunked;
+        public float percentage;
+
+        public CourseAttendanceData() {
+
+        }
+
+        public void setCourseCode(String courseCode) {
+            this.courseCode = courseCode;
+        }
+
+        public void setCourseTitle(String courseTitle) {
+            this.courseTitle = courseTitle;
+        }
+
+        public void setTotal(String total) {
+            this.total = Integer.parseInt(total);
+        }
+
+        public void setAttended(String attended) {
+            this.attended = Integer.parseInt(attended);
+            this.bunked = this.total-this.attended;
+        }
+
+        public void setPercentage(String percentage) {
+            this.percentage = Float.parseFloat(percentage);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                overridePendingTransition(R.anim.fadein,R.anim.fadeout);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.fadein,R.anim.fadeout);
     }
 }

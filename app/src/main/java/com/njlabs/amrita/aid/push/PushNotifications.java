@@ -11,8 +11,6 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.androidquery.service.MarketService;
-
 import java.util.List;
 
 /**
@@ -38,8 +36,6 @@ public class PushNotifications extends Activity {
         	ACE=false;
         }
         actionBar.setDisplayHomeAsUpEnabled(true);
-        MarketService ms = new MarketService(this);
-        ms.level(MarketService.REVISION).checkVersion();
         ScrollView scrolllayout = new ScrollView(this);        
         setContentView(scrolllayout);
         LinearLayout layout = new LinearLayout(this);

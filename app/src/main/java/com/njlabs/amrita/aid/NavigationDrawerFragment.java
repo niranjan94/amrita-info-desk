@@ -101,7 +101,7 @@ public class NavigationDrawerFragment extends Fragment {
         });
         String[] drawerItems = new String[]{"Home",
                 "About this app",
-                "Help & Support",
+                /*"Help & Support",*/
                 "Settings"};
         mDrawerListView.setAdapter(new ArrayAdapter<String>(getActionBar().getThemedContext(), R.layout.item_drawer, drawerItems) {
             @Override

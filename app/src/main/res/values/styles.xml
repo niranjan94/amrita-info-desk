@@ -11,6 +11,7 @@
         <item name="android:actionModeBackground">@drawable/cab_background_top_ab_blue</item>
         <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_ab_blue</item>
         <item name="android:actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Ab_blue</item>
+        <item name="android:typeface">sans</item>
     </style>
 
     <style name="LandingTheme" parent="AppTheme">

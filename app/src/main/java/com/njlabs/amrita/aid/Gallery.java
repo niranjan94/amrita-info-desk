@@ -4,10 +4,13 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
+
+import com.njlabs.amrita.aid.util.HackyViewPager;
 
 import uk.co.senab.photoview.PhotoView;
 
@@ -57,6 +60,18 @@ public class Gallery extends Activity {
             return view == object;
         }
 
+    }
+    public boolean onMenuItemSelected(int featureId, MenuItem item){
+        if(item.getItemId() == android.R.id.home) {
+            finish();
+            overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+        }
+        return true;
+    }
+    @Override
+    public void onBackPressed() {
+        finish(); //go back to the previous Activity
+        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
     }
 
 }

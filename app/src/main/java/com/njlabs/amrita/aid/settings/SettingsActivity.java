@@ -36,12 +36,13 @@ public class SettingsActivity extends PreferenceActivity {
      * as a master/detail two-pane view on tablets. When true, a single pane is
      * shown on tablets.
      */
-    private static final boolean ALWAYS_SIMPLE_PREFS = false;
+    private static final boolean ALWAYS_SIMPLE_PREFS = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
+        this.setContentView(R.layout.activity_settings);
     }
 
     /**
@@ -264,5 +265,17 @@ public class SettingsActivity extends PreferenceActivity {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_libraries);
         }
+    }
+    public boolean onMenuItemSelected(int featureId, MenuItem item){
+        if(item.getItemId() == android.R.id.home) {
+            finish();
+            overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+        }
+        return true;
+    }
+    @Override
+    public void onBackPressed() {
+        finish(); //go back to the previous Activity
+        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
     }
 }

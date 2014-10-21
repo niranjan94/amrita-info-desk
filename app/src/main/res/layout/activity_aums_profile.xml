@@ -171,43 +171,12 @@
 
             </LinearLayout>
         </LinearLayout>
-        
+
 	    <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=" "
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
-	    <LinearLayout
-	        android:layout_width="wrap_content"
-	        android:layout_height="fill_parent" >
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="OpenResources"
-                android:src="@drawable/course_resources" />
-
-            <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="fill_parent"
-                    android:onClick="OpenResources"
-                    android:layout_height="fill_parent" android:paddingLeft="5dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Course Resources"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="View and Download Resources uploaded by your professors"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-
-            </LinearLayout>
-        </LinearLayout>
-	    
-	</LinearLayout>
+    </LinearLayout>
 </ScrollView>

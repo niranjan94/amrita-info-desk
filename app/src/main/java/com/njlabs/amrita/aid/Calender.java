@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.caldroid.CaldroidFragment;
@@ -568,5 +569,17 @@ public class Calender extends FragmentActivity {
             dialogCaldroidFragment.saveStatesToKey(outState,
                     "DIALOG_CALDROID_SAVED_STATE");
         }
+    }
+    public boolean onMenuItemSelected(int featureId, MenuItem item){
+        if(item.getItemId() == android.R.id.home) {
+            finish();
+            overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+        }
+        return true;
+    }
+    @Override
+    public void onBackPressed() {
+        finish(); //go back to the previous Activity
+        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
     }
 }

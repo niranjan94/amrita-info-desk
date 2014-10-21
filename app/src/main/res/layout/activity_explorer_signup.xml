@@ -14,14 +14,12 @@
         android:paddingTop="@dimen/activity_vertical_margin" >
 
         <ImageView
-            android:id="@+id/imageView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:src="@drawable/explorer" />
 
         <TextView
-            android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -29,7 +27,6 @@
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <TextView
-            android:id="@+id/arrival"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -37,19 +34,10 @@
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
-            android:id="@+id/textView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="Amrita Explorer"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/dummy"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <EditText
@@ -59,17 +47,10 @@
             android:layout_gravity="center"
             android:ems="10"
             android:hint="First Name Last name"
+            android:layout_marginTop="10dp"
             android:inputType="textPersonName" >
-
             <requestFocus />
         </EditText>
-
-        <TextView
-            android:id="@+id/textView5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/dummy"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <EditText
             android:id="@+id/mobile"
@@ -77,14 +58,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:ems="10"
+            android:layout_marginTop="10dp"
+            android:hint="Mobile Number"
             android:inputType="phone" />
-
-        <TextView
-            android:id="@+id/textView6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/dummy"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <EditText
             android:id="@+id/email_id"
@@ -92,68 +68,58 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:ems="10"
+            android:layout_marginTop="10dp"
             android:hint="example@example.com"
             android:inputType="textEmailAddress" />
 
-        <TextView
-            android:id="@+id/textView7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/dummy"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-
         <LinearLayout
+            style="?android:attr/buttonBarStyle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:gravity="bottom|right"
+            android:layout_marginTop="15dp"
+            android:orientation="horizontal"
+            android:background="@color/button_bar_grey" >
 
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" >
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/previous"
+                android:onClick="goBack"
+                android:text="Exit" />
 
-                <Button
-                    android:id="@+id/button1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/previous"
-                    android:gravity="left|center_vertical"
-                    android:onClick="go_back"
-                    android:text="Go Back" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" >
-
-                <Button
-                    android:id="@+id/button2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right"
-                    android:drawableRight="@drawable/next"
-                    android:gravity="left|center_vertical"
-                    android:onClick="start"
-                    android:text="I wanna try it" />
-
-            </LinearLayout>
-
+                android:layout_weight="1"
+                android:drawableRight="@drawable/next"
+                android:onClick="start"
+                android:text="Proceed" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/textView8"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            style="?android:attr/buttonBarStyle"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/dummy"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:layout_alignParentBottom="true"
+            android:gravity="bottom|right"
+            android:layout_marginTop="15dp"
+            android:orientation="horizontal"
+            android:background="@color/button_bar_grey" >
 
-        <Button
-            android:id="@+id/button3"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:onClick="already_registered"
-            android:text="Already Registered" />
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="alreadyRegistered"
+                android:text="Already Registered" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

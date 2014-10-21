@@ -25,6 +25,7 @@
 	    android:paddingRight="10dp"
         android:ellipsize="marquee"
 	    android:paddingTop="10dp"
-	    android:textColor="@android:color/white" />
+        android:textSize="15sp"
+        android:textColor="@android:color/white" />
 
 </FrameLayout>

@@ -3,6 +3,7 @@ package com.njlabs.amrita.aid;
 import android.app.Activity;
 import android.os.Bundle;
 import android.text.Html;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -502,5 +503,17 @@ public class TrainBusInfo extends Activity {
             this.to = to;
             this.type = type;
         }
+    }
+    public boolean onMenuItemSelected(int featureId, MenuItem item){
+        if(item.getItemId() == android.R.id.home) {
+            finish();
+            overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+        }
+        return true;
+    }
+    @Override
+    public void onBackPressed() {
+        finish(); //go back to the previous Activity
+        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
     }
 }

@@ -9,4 +9,5 @@
    	<color name="lighter_grey">#ffe6e6e6</color>
    	<color name="transparent">#00000000</color>
    	<color name="njlabs_tint_grey">#d0d0d0</color>
+    <color name="button_bar_grey">#fff5f5f5</color>
 </resources>

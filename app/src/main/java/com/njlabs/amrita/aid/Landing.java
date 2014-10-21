@@ -8,6 +8,7 @@ import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
@@ -15,10 +16,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.njlabs.amrita.aid.about.Amrita;
 import com.njlabs.amrita.aid.about.App;
 import com.njlabs.amrita.aid.aums.Aums;
@@ -26,6 +31,11 @@ import com.njlabs.amrita.aid.explorer.Explorer;
 import com.njlabs.amrita.aid.explorer.ExplorerSignup;
 import com.njlabs.amrita.aid.settings.SettingsActivity;
 import com.onemarker.ark.ConnectionDetector;
+
+import org.acra.ACRA;
+import org.apache.http.Header;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class Landing extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -53,6 +63,8 @@ public class Landing extends Activity implements NavigationDrawerFragment.Naviga
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+
+        checkForUpdates();
     }
 
     @Override
@@ -63,12 +75,14 @@ public class Landing extends Activity implements NavigationDrawerFragment.Naviga
         {
             case 1:
                 startActivity(new Intent(Landing.this, App.class));
-                break;
-            case 2:
-
+                overridePendingTransition(R.anim.fadein,R.anim.fadeout);
                 break;
             case 3:
+
+                break;
+            case 2:
                 startActivity(new Intent(Landing.this, SettingsActivity.class));
+                overridePendingTransition(R.anim.fadein,R.anim.fadeout);
                 break;
             default:
                 FragmentManager fragmentManager = getFragmentManager();
@@ -222,6 +236,7 @@ public class Landing extends Activity implements NavigationDrawerFragment.Naviga
                                     Intent department_open = new Intent(getActivity(), Departments.class);
                                     department_open.putExtra("department", items_d[item]);
                                     startActivity(department_open);
+                                    getActivity().overridePendingTransition(R.anim.fadein,R.anim.fadeout);
                                 }
                             });
                             AlertDialog alert_d = builder_d.create();
@@ -238,6 +253,7 @@ public class Landing extends Activity implements NavigationDrawerFragment.Naviga
                                     Intent curriculum_open = new Intent(getActivity(), Curriculum.class);
                                     curriculum_open.putExtra("department", items_c[item]);
                                     startActivity(curriculum_open);
+                                    getActivity().overridePendingTransition(R.anim.fadein,R.anim.fadeout);
                                 }
                             });
                             AlertDialog alert_c = builder_c.create();
@@ -254,6 +270,7 @@ public class Landing extends Activity implements NavigationDrawerFragment.Naviga
                                     Intent trainBusOpen = new Intent(getActivity(), TrainBusInfo.class);
                                     trainBusOpen.putExtra("type", items_t[item]);
                                     startActivity(trainBusOpen);
+                                    getActivity().overridePendingTransition(R.anim.fadein,R.anim.fadeout);
                                 }
                             });
                             AlertDialog alert_t = builder_t.create();
@@ -268,6 +285,8 @@ public class Landing extends Activity implements NavigationDrawerFragment.Naviga
                             Toast.makeText(getActivity(), String.valueOf(i), Toast.LENGTH_SHORT).show();
 
                     }
+                    getActivity().overridePendingTransition(R.anim.fadein,R.anim.fadeout);
+
                 }
             });
             return rootView;
@@ -279,6 +298,80 @@ public class Landing extends Activity implements NavigationDrawerFragment.Naviga
             ((Landing) activity).onSectionAttached(
                     getArguments().getInt(ARG_SECTION_NUMBER));
         }
+    }
+    public void checkForUpdates()
+    {
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get("http://api.onemarker.com/update_status.php?app=com.njlabs.amrita.aid", new JsonHttpResponseHandler() {
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+
+            }
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                String Status=null;
+                try
+                {
+                    Status= response.getString("status");
+                }
+
+                catch (JSONException e1)
+                {
+                    ACRA.getErrorReporter().handleSilentException(e1);
+                }
+                if(Status.equals("ok"))
+                {
+                    Double Latest = null;
+                    String Description = null;
+                    try
+                    {
+                        Latest = response.getDouble("latest");
+                        Description = response.getString("description");
+                    }
+                    catch (JSONException e)
+                    {
+                        ACRA.getErrorReporter().handleSilentException(e);
+                    }
+                    if(Latest > MainApplication.currentVersion)
+                    {
+                        AlertDialog.Builder alt_bld = new AlertDialog.Builder(Landing.this);
+                        LayoutInflater factory = LayoutInflater.from(Landing.this);
+                        final View WebViewDialog = factory.inflate(R.layout.webview_dialog, null);
+                        LinearLayout WebViewDialogLayout = (LinearLayout) WebViewDialog.findViewById(R.id.WebViewDialogLayout);
+                        WebViewDialogLayout.setPadding(5, 5, 5, 5);
+                        WebView LicensesView = (WebView) WebViewDialog.findViewById(R.id.LicensesView);
+                        LicensesView.loadData(String.format("%s", Description), "text/html", "utf-8");
+                        LicensesView.setBackgroundColor(0);
+                        LicensesView.setOnLongClickListener(new View.OnLongClickListener() {
+                            @Override
+                            public boolean onLongClick(View v) {
+                                return true;
+                            }
+                        });
+                        LicensesView.setLongClickable(false);
+                        alt_bld.setView(WebViewDialog).setCancelable(true)
+                                .setNegativeButton("Will Update Later !",new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                })
+                                .setPositiveButton("I'll Update Now !", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        Uri uri = Uri.parse("market://details?id=com.njlabs.amrita.aid");
+                                        Intent it = new Intent(Intent.ACTION_VIEW, uri);
+                                        startActivity(it);
+                                    }
+                                });
+
+                        AlertDialog alert = alt_bld.create();
+                        alert.setTitle("New Update Available (Version "+Latest+") !");
+                        alert.setIcon(R.drawable.ic_launcher);
+                        alert.show();
+                    }
+                }
+            }
+        });
     }
 
 }
