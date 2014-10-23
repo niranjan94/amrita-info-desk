@@ -2,15 +2,19 @@ package com.njlabs.amrita.aid;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,15 +31,20 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.njlabs.amrita.aid.about.Amrita;
 import com.njlabs.amrita.aid.about.App;
 import com.njlabs.amrita.aid.aums.Aums;
+import com.njlabs.amrita.aid.aums.alerts.AumsReceiver;
+import com.njlabs.amrita.aid.bunker.AttendanceManager;
 import com.njlabs.amrita.aid.explorer.Explorer;
 import com.njlabs.amrita.aid.explorer.ExplorerSignup;
 import com.njlabs.amrita.aid.settings.SettingsActivity;
 import com.onemarker.ark.ConnectionDetector;
+import com.orm.SugarRecord;
 
 import org.acra.ACRA;
 import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Calendar;
 
 
 public class Landing extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -64,7 +73,34 @@ public class Landing extends Activity implements NavigationDrawerFragment.Naviga
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
+
+
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.SECOND, 1);
+
+        Intent downloader = new Intent(this, AumsReceiver.class);
+        downloader.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, downloader, PendingIntent.FLAG_CANCEL_CURRENT);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 1000 * 30, pendingIntent);
+        Log.d("MyActivity", "Set alarmManager.setRepeating to: " + cal.getTime().toLocaleString());
         checkForUpdates();
+        // SUGAR ORM DATABASE INITIALIZATION
+        AppMetadata amd = new AppMetadata("version",String.valueOf(MainApplication.currentVersion));
+
+    }
+    // TODO MOVE TO SPERATE FILE FOR IT TO WORK
+    public class AppMetadata extends SugarRecord<AppMetadata> {
+        public String key;
+        public String value;
+
+        public AppMetadata() {
+        }
+
+        public AppMetadata(String key, String value) {
+            this.key = key;
+            this.value = value;
+        }
     }
 
     @Override
@@ -225,41 +261,6 @@ public class Landing extends Activity implements NavigationDrawerFragment.Naviga
                             startActivity(new Intent(getActivity(), Aums.class));
                             break;
                         case 4:
-                            // DEPARTMENT INFO
-                            final CharSequence[] items_d = {"Aerospace", "Civil", "Chemical", "Computer Science", "Electrical", "Electronics", "Mechanical", "Humanities", "Mathematics", "Sciences"};
-                            AlertDialog.Builder builder_d = new AlertDialog.Builder(getActivity());
-                            builder_d.setTitle("Select a Department");
-                            builder_d.setItems(items_d, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int item) {
-                                    // Showing Alert Message
-                                    //Toast.makeText(getActivity(), "Welcome to the " + items_d[item] +" Department", Toast.LENGTH_LONG).show();
-                                    Intent department_open = new Intent(getActivity(), Departments.class);
-                                    department_open.putExtra("department", items_d[item]);
-                                    startActivity(department_open);
-                                    getActivity().overridePendingTransition(R.anim.fadein,R.anim.fadeout);
-                                }
-                            });
-                            AlertDialog alert_d = builder_d.create();
-                            alert_d.show();
-                            break;
-                        case 5:
-                            // CURRICULUM INFO
-                            final CharSequence[] items_c = {"Aerospace Engineering", "Civil Engineering", "Chemical Engineering", "Computer Science Engineering", "Electrical & Electronics Engineering", "Electronics & Communication Engineering", "Electronics & Instrumentation Engineering", "Mechanical Engineering"};
-                            AlertDialog.Builder builder_c = new AlertDialog.Builder(getActivity());
-                            builder_c.setTitle("Select your Department");
-                            builder_c.setItems(items_c, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int item) {
-                                    // Showing Alert Message
-                                    Intent curriculum_open = new Intent(getActivity(), Curriculum.class);
-                                    curriculum_open.putExtra("department", items_c[item]);
-                                    startActivity(curriculum_open);
-                                    getActivity().overridePendingTransition(R.anim.fadein,R.anim.fadeout);
-                                }
-                            });
-                            AlertDialog alert_c = builder_c.create();
-                            alert_c.show();
-                            break;
-                        case 6:
                             // TRAIN & BUS INFO
                             final CharSequence[] items_t = {"Trains from Coimbatore", "Trains from Palghat", "Trains to Coimbatore", "Trains to Palghat", "Buses from Coimbatore", "Buses to Coimbatore"};
                             AlertDialog.Builder builder_t = new AlertDialog.Builder(getActivity());
@@ -276,6 +277,29 @@ public class Landing extends Activity implements NavigationDrawerFragment.Naviga
                             AlertDialog alert_t = builder_t.create();
                             alert_t.show();
                             break;
+
+                        case 5:
+                            // ATTENDANCE MANAGER
+                            startActivity(new Intent(getActivity(), AttendanceManager.class));
+                            break;
+                        case 6:
+                            // CURRICULUM INFO
+                            final CharSequence[] items_c = {"Aerospace Engineering", "Civil Engineering", "Chemical Engineering", "Computer Science Engineering", "Electrical & Electronics Engineering", "Electronics & Communication Engineering", "Electronics & Instrumentation Engineering", "Mechanical Engineering"};
+                            AlertDialog.Builder builder_c = new AlertDialog.Builder(getActivity());
+                            builder_c.setTitle("Select your Department");
+                            builder_c.setItems(items_c, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int item) {
+                                    // Showing Alert Message
+                                    Intent curriculum_open = new Intent(getActivity(), Curriculum.class);
+                                    curriculum_open.putExtra("department", items_c[item]);
+                                    startActivity(curriculum_open);
+                                    getActivity().overridePendingTransition(R.anim.fadein,R.anim.fadeout);
+                                }
+                            });
+                            AlertDialog alert_c = builder_c.create();
+                            alert_c.show();
+                            break;
+
                         case 7:
                             // GALLERY
                             startActivity(new Intent(getActivity(), Gallery.class));

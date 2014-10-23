@@ -2,7 +2,6 @@ package com.njlabs.amrita.aid.about;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import com.njlabs.amrita.aid.R;
@@ -14,6 +13,7 @@ public class App extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about_app);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
     }
     public boolean onMenuItemSelected(int featureId, MenuItem item){
         if(item.getItemId() == android.R.id.home) {

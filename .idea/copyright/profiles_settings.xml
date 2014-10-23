@@ -1,7 +1,3 @@
 <component name="CopyrightManager">
-  <settings default="Niranjan Rajendran">
-    <module2copyright>
-      <element module="Project Files" copyright="Niranjan Rajendran" />
-    </module2copyright>
-  </settings>
+  <settings default="Niranjan Rajendran" />
 </component>

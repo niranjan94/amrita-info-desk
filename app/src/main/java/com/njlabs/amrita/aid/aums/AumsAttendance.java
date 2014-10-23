@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.njlabs.amrita.aid.R;
+import com.njlabs.amrita.aid.aums.classes.CourseAttendanceData;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -59,6 +60,8 @@ public class AumsAttendance extends Activity {
         Element table = doc.select("table[width=75%] > tbody").first();
         Elements rows = table.select("tr:gt(0)");
 
+        CourseAttendanceData.deleteAll(CourseAttendanceData.class);
+
         for(Element row : rows) {
             Elements dataHolders = row.select("td > span");
 
@@ -70,8 +73,10 @@ public class AumsAttendance extends Activity {
             adata.setAttended(dataHolders.get(4).text());
             adata.setPercentage(dataHolders.get(5).text());
 
+            adata.save();
             attendanceData.add(adata);
         }
+
         setupList();
 
     }
@@ -113,40 +118,7 @@ public class AumsAttendance extends Activity {
         setContentView(list);
         dialog.dismiss();
     }
-    public class CourseAttendanceData
-    {
-        public String courseCode;
-        public String courseTitle;
-        public int total;
-        public int attended;
-        public int bunked;
-        public float percentage;
 
-        public CourseAttendanceData() {
-
-        }
-
-        public void setCourseCode(String courseCode) {
-            this.courseCode = courseCode;
-        }
-
-        public void setCourseTitle(String courseTitle) {
-            this.courseTitle = courseTitle;
-        }
-
-        public void setTotal(String total) {
-            this.total = Integer.parseInt(total);
-        }
-
-        public void setAttended(String attended) {
-            this.attended = Integer.parseInt(attended);
-            this.bunked = this.total-this.attended;
-        }
-
-        public void setPercentage(String percentage) {
-            this.percentage = Float.parseFloat(percentage);
-        }
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

@@ -36,9 +36,9 @@ public class LandingAdapter extends BaseAdapter {
         items.add(new Item("#3f51b5", "Amrita Explorer", Iconify.IconValue.fa_globe));
         items.add(new Item("#e51c23", "Academic Calender", Iconify.IconValue.fa_calendar));
         items.add(new Item("#e91e63", "Amrita UMS Login", Iconify.IconValue.fa_lock));
-        items.add(new Item("#9c27b0", "Departments", Iconify.IconValue.fa_university));
-        items.add(new Item("#009688", "Curriculum Info", Iconify.IconValue.fa_book));
-        items.add(new Item("#259b24", "Train & Bus Timings", Iconify.IconValue.fa_clock_o));
+        items.add(new Item("#9c27b0", "Train & Bus Timings", Iconify.IconValue.fa_clock_o));
+        items.add(new Item("#009688", "Attendance Manager", Iconify.IconValue.fa_smile_o));
+        items.add(new Item("#259b24", "Curriculum Info", Iconify.IconValue.fa_book));
         items.add(new Item("#ffc107", "Photo Gallery", Iconify.IconValue.fa_photo));
     }
 

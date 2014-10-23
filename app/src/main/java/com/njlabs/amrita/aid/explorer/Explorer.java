@@ -27,6 +27,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.njlabs.amrita.aid.Landing;
 import com.njlabs.amrita.aid.R;
 
 import org.acra.ACRA;
@@ -425,14 +426,18 @@ public class Explorer extends FragmentActivity implements LocationListener {
     }
     public boolean onMenuItemSelected(int featureId, MenuItem item){
         if(item.getItemId() == android.R.id.home) {
-            finish();
+            Intent exit = new Intent(Explorer.this, Landing.class);
+            exit.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(exit);
             overridePendingTransition(R.anim.fadein, R.anim.fadeout);
         }
         return true;
     }
     @Override
     public void onBackPressed() {
-        finish(); //go back to the previous Activity
+        Intent exit = new Intent(Explorer.this, Landing.class);
+        exit.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(exit);
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);
     }
 }

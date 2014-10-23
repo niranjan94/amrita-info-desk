@@ -185,7 +185,7 @@ public abstract class ObscuredSharedPreferences implements SharedPreferences {
             Cipher pbeCipher = Cipher.getInstance("PBEWithMD5AndDES");
             pbeCipher.init(Cipher.ENCRYPT_MODE, key, new PBEParameterSpec(getAndroidId()
                     .getBytes(UTF8), 20));
-            return new String(Base64.encode(pbeCipher.doFinal(bytes), Base64.NO_WRAP), UTF8);
+            return new String(Base64Adv.encode(pbeCipher.doFinal(bytes), Base64Adv.NO_WRAP), UTF8);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -203,7 +203,7 @@ public abstract class ObscuredSharedPreferences implements SharedPreferences {
 
     protected String decrypt(String value) {
         try {
-            final byte[] bytes = value != null ? Base64.decode(value, Base64.DEFAULT) : new byte[0];
+            final byte[] bytes = value != null ? Base64Adv.decode(value, Base64Adv.DEFAULT) : new byte[0];
             SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
             SecretKey key = keyFactory.generateSecret(new PBEKeySpec(getSpecialCode()));
             Cipher pbeCipher = Cipher.getInstance("PBEWithMD5AndDES");

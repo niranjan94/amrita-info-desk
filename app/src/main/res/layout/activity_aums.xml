@@ -78,6 +78,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:onClick="loginStart"
+                android:focusable="true"
                 android:text="Login" />
         </LinearLayout>
     </LinearLayout>
