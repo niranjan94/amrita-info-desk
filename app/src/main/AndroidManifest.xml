@@ -43,7 +43,7 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/Theme.Main" >
         <meta-data
             android:name="DATABASE"
             android:value="datastore.db" />
@@ -59,8 +59,7 @@
 
         <activity
             android:name="com.njlabs.amrita.aid.Landing"
-            android:label="@string/app_name"
-            android:theme="@style/LandingTheme" >
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -86,7 +85,8 @@
         <activity
             android:name="com.njlabs.amrita.aid.explorer.Explorer"
             android:label="@string/title_activity_explorer"
-            android:parentActivityName="com.njlabs.amrita.aid.Landing" >
+            android:parentActivityName="com.njlabs.amrita.aid.Landing"
+            android:theme="@style/Theme.Explorer" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.njlabs.amrita.aid.Landing" />
@@ -143,7 +143,7 @@
             android:name="com.njlabs.amrita.aid.Gallery"
             android:label="@string/title_activity_gallery"
             android:parentActivityName="com.njlabs.amrita.aid.Landing"
-            android:theme="@style/Gallery" >
+            android:theme="@style/Theme.Gallery" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.njlabs.amrita.aid.Landing" />
@@ -215,6 +215,15 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.njlabs.amrita.aid.Landing" />
+        </activity>
+        <activity
+            android:name="com.njlabs.amrita.aid.CardTrial"
+            android:label="@string/title_activity_card_trial" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 

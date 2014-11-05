@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Landing$PlaceholderFragment">
-
     <GridView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -15,5 +14,4 @@
         android:listSelector="@drawable/landing_grid_selector"
         android:id="@+id/landing_grid">
     </GridView>
-
 </RelativeLayout>

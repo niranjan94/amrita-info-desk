@@ -1,6 +1,5 @@
 package com.njlabs.amrita.aid.explorer;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Criteria;
@@ -9,7 +8,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -51,7 +51,7 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Explorer extends FragmentActivity implements LocationListener {
+public class Explorer extends ActionBarActivity implements LocationListener {
 
     private LocationManager locationManager;
 
@@ -94,8 +94,9 @@ public class Explorer extends FragmentActivity implements LocationListener {
         mobile_num = preferences.getString("mobile_number", "");
 
         // ACTIONBAR STUFF
-        ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // FINAL MAP SETUPS AND AUTO UPDATE START
         setUpMapIfNeeded();
@@ -424,7 +425,9 @@ public class Explorer extends FragmentActivity implements LocationListener {
         mUiSettings = mMap.getUiSettings();
         mMap.addMarker(new MarkerOptions().position(new LatLng(10.900539, 76.902806)).title("Amrita School Of Engineering"));
     }
-    public boolean onMenuItemSelected(int featureId, MenuItem item){
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
         if(item.getItemId() == android.R.id.home) {
             Intent exit = new Intent(Explorer.this, Landing.class);
             exit.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

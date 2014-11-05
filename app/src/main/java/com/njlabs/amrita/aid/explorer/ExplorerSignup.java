@@ -1,6 +1,5 @@
 package com.njlabs.amrita.aid.explorer;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
@@ -10,8 +9,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -30,7 +31,7 @@ import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class ExplorerSignup extends Activity {
+public class ExplorerSignup extends ActionBarActivity {
 
     public String mobile_num = null;
     Boolean isInternetPresent = false;
@@ -41,7 +42,7 @@ public class ExplorerSignup extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_explorer_signup);
-        getActionBar().hide();
+
         ConnectionDetector cd = new ConnectionDetector(getApplicationContext());
         boolean isInternetPresent = cd.isConnectingToInternet();
 
@@ -221,20 +222,16 @@ public class ExplorerSignup extends Activity {
     @SuppressWarnings("unchecked")
     public void alreadyRegistered(final View view) {
 
-            final Builder alert = new Builder(this);
-            alert.setTitle("Mobile Number ?");
-            alert.setMessage("Please enter your 10 digit mobile number for verification");
+        LayoutInflater factory = LayoutInflater.from(this);
+        final View dialogEntryView = factory.inflate(R.layout.dialog_input, null);
+        final Builder alert = new Builder(this);
+        alert.setView(dialogEntryView);
 
-            // Set an EditText view to get user input
-            final EditText input = new EditText(this);
-            input.setHint("10-digit mobile number");
-            alert.setView(input);
+        alert.setPositiveButton("Let's get started !", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String value = ((EditText)dialogEntryView.findViewById(R.id.mobile)).getText().toString().trim();
 
-            alert.setPositiveButton("Let's get started !", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    String value = input.getText().toString().trim();
-
-                    if (value == null || value.equals("") || value.equals(" ") || value.length() < 10) {
+                if (value == null || value.equals("") || value.equals(" ") || value.length() < 10) {
 
                         SuperToast superToast = new SuperToast(ExplorerSignup.this);
                         superToast.setDuration(SuperToast.Duration.LONG);
@@ -253,7 +250,7 @@ public class ExplorerSignup extends Activity {
 
 
     }
-    public boolean onMenuItemSelected(int featureId, MenuItem item){
+    public boolean onOptionsItemSelected(int featureId, MenuItem item){
         if(item.getItemId() == android.R.id.home) {
             finish();
             overridePendingTransition(R.anim.fadein, R.anim.fadeout);

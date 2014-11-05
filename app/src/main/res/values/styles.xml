@@ -1,23 +1,24 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Holo.Light">
-        <item name="android:actionBarItemBackground">@drawable/selectable_background_ab_blue</item>
-        <item name="android:popupMenuStyle">@style/PopupMenu.Ab_blue</item>
-        <item name="android:dropDownListViewStyle">@style/DropDownListView.Ab_blue</item>
-        <item name="android:actionBarTabStyle">@style/ActionBarTabStyle.Ab_blue</item>
-        <item name="android:actionDropDownStyle">@style/DropDownNav.Ab_blue</item>
-        <item name="android:actionBarStyle">@style/ActionBar.Solid.Ab_blue</item>
-        <item name="android:actionModeBackground">@drawable/cab_background_top_ab_blue</item>
-        <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_ab_blue</item>
-        <item name="android:actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Ab_blue</item>
+    <style name="Theme.Main" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryDark">@color/lighter_grey</item>
+        <item name="colorAccent">@color/blue</item>
         <item name="android:typeface">sans</item>
     </style>
 
-    <style name="LandingTheme" parent="AppTheme">
-
+    <style name="Theme.Preference" parent="android:Theme.Holo.Light.NoActionBar">
+        <item name="android:typeface">sans</item>
+    </style>
+    <style name="Theme.Explorer" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:typeface">sans</item>
     </style>
 
-    <style name="Gallery" parent="android:Theme.Holo"></style>
+    <style name="Theme.Gallery" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/transparent</item>
+        <item name="colorPrimaryDark">@color/black</item>
+        <item name="android:typeface">sans</item>
+    </style>
 
 </resources>

@@ -1,32 +1,36 @@
 package com.njlabs.amrita.aid;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.view.Window;
 
 import com.njlabs.amrita.aid.util.HackyViewPager;
 
 import uk.co.senab.photoview.PhotoView;
 
-public class Gallery extends Activity {
+public class Gallery extends ActionBarActivity {
 
     private ViewPager mViewPager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
-        mViewPager = new HackyViewPager(this);
-        setContentView(mViewPager);
+
+        setContentView(R.layout.activity_gallery);
+
+        mViewPager = (HackyViewPager) findViewById(R.id.viewPager);
         mViewPager.setAdapter(new GalleryPagerAdapter());
-        getActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.ab_bg_black));
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.ab_bg_black));
     }
 
     static class GalleryPagerAdapter extends PagerAdapter {
@@ -61,13 +65,16 @@ public class Gallery extends Activity {
         }
 
     }
-    public boolean onMenuItemSelected(int featureId, MenuItem item){
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
         if(item.getItemId() == android.R.id.home) {
             finish();
             overridePendingTransition(R.anim.fadein, R.anim.fadeout);
         }
         return true;
     }
+
     @Override
     public void onBackPressed() {
         finish(); //go back to the previous Activity

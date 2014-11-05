@@ -25,6 +25,10 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile "com.android.support:appcompat-v7:21.0.+"
+    compile 'com.android.support:cardview-v7:21.0.+'
+    compile 'com.android.support:recyclerview-v7:21.0.+'
+
     compile project(':Caldroid')
     compile 'org.apache.commons:commons-lang3:3.3.2'
     compile project(':ark-hacks')

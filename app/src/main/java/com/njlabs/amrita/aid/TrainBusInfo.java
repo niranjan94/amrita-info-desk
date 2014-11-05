@@ -1,7 +1,9 @@
 package com.njlabs.amrita.aid;
 
-import android.app.Activity;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,10 +16,11 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 
-public class TrainBusInfo extends Activity {
+public class TrainBusInfo extends ActionBarActivity {
 
-    ListView listView = null;
-    ArrayList<Transporter> transporters;
+    private ListView listView = null;
+    private ArrayList<Transporter> transporters;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,10 +31,16 @@ public class TrainBusInfo extends Activity {
 
         setContentView(R.layout.activity_train_bus_info);
 
-        getActionBar().setSubtitle(type);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setSubtitle(type);
 
         listView = (ListView) findViewById(R.id.list);
         transporters = new ArrayList<Transporter>();
+
+
+
         //
         // TODO TRAINS FROM CBE TO ETMD
         //
@@ -504,13 +513,16 @@ public class TrainBusInfo extends Activity {
             this.type = type;
         }
     }
-    public boolean onMenuItemSelected(int featureId, MenuItem item){
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
         if(item.getItemId() == android.R.id.home) {
             finish();
             overridePendingTransition(R.anim.fadein, R.anim.fadeout);
         }
         return true;
     }
+
     @Override
     public void onBackPressed() {
         finish(); //go back to the previous Activity

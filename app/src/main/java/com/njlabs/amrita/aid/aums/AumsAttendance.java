@@ -1,16 +1,15 @@
 package com.njlabs.amrita.aid.aums;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -24,7 +23,7 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 
-public class AumsAttendance extends Activity {
+public class AumsAttendance extends ActionBarActivity {
 
     ProgressDialog dialog;
     ListView list;
@@ -40,10 +39,11 @@ public class AumsAttendance extends Activity {
             responseString = extras.getString("response");
         }
 
-        setContentView(new LinearLayout(this));
+        setContentView(R.layout.activity_aums_data);
 
-        ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         dialog = new ProgressDialog(this);
         dialog.setIndeterminate(true);
@@ -81,7 +81,7 @@ public class AumsAttendance extends Activity {
 
     }
     public void setupList() {
-        list = new ListView(this);
+        list = (ListView) findViewById(R.id.list);
         list.setBackgroundColor(getResources().getColor(R.color.white));
 
         ArrayAdapter<CourseAttendanceData> dataAdapter = new ArrayAdapter<CourseAttendanceData>(getBaseContext(), R.layout.item_aums_attendance, attendanceData) {
@@ -114,8 +114,7 @@ public class AumsAttendance extends Activity {
 
             }
         });
-
-        setContentView(list);
+        list.setVisibility(View.VISIBLE);
         dialog.dismiss();
     }
 

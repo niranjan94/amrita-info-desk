@@ -1,4 +1,4 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -6,45 +6,53 @@
     android:background="@color/white"
     android:fillViewport="false">
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp">
+    <include layout="@layout/toolbar" android:id="@+id/toolbar"/>
 
-        <ImageView
-            android:layout_width="90dp"
-            android:layout_height="90dp"
-            android:id="@+id/imageView"
-            android:src="@drawable/app_icon"
-            android:layout_gravity="center_horizontal" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Amrita Info Desk"
-            android:id="@+id/textView"
-            android:layout_gravity="center_horizontal" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Version 2.0.2"
-            android:id="@+id/textView5"
-            android:layout_gravity="center_horizontal" />
+            <ImageView
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:id="@+id/imageView"
+                android:src="@drawable/app_icon"
+                android:layout_gravity="center_horizontal" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="By Niranjan"
-            android:id="@+id/textView6"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="5dp"
-            android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Amrita Info Desk"
+                android:id="@+id/textView"
+                android:layout_gravity="center_horizontal" />
 
-    </LinearLayout>
-</ScrollView>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Version 2.0.2"
+                android:id="@+id/textView5"
+                android:layout_gravity="center_horizontal" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="By Niranjan"
+                android:id="@+id/textView6"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="5dp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

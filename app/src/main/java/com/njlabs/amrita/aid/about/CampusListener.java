@@ -27,6 +27,7 @@ public class CampusListener extends FragmentPagerAdapter {
             case 0:
                 CampusAbout campusAbout = new CampusAbout();
                 data.putInt("current_page", arg0 + 1);
+                data.putString("title","About Campus");
                 campusAbout.setArguments(data);
                 return campusAbout;
 
@@ -34,6 +35,7 @@ public class CampusListener extends FragmentPagerAdapter {
             case 1:
                 CampusContact campusContact = new CampusContact();
                 data.putInt("current_page", arg0 + 1);
+                data.putString("title","Contact");
                 campusContact.setArguments(data);
                 return campusContact;
         }
@@ -46,5 +48,17 @@ public class CampusListener extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         return PAGE_COUNT;
+    }
+
+    @Override
+    public String getPageTitle(int position) {
+        switch (position) {
+            case 0:
+                return "About Campus";
+            case 1:
+                return "Contact";
+            default:
+                return "";
+        }
     }
 }

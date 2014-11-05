@@ -1,85 +1,92 @@
-<ScrollView
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:val="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:background="@color/white"
-    android:scrollbarStyle="outsideInset">
+    android:layout_height="fill_parent">
 
-    <LinearLayout
-        android:id="@+id/aumsLinearView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="10dp"
-            android:text="Username:"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:layout_marginTop="10dp" />
-
-       	<com.andreabaccega.widget.FormEditText
-		    android:id="@+id/roll_no"
-		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-            val:emptyErrorString="You MUST enter your Roll Number"
-            val:testErrorString="Enter a proper Roll Number"
-		    android:ems="10"
-            android:textAllCaps="true"
-		    android:hint="Your Full Roll Number ..."
-            val:testType="alphaNumeric"
-		    android:inputType="text"  />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="10dp"
-            android:text="Password:"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:layout_marginTop="5dp" />
-		
-		<com.andreabaccega.widget.FormEditText
-		    android:id="@+id/pwd"
-		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-            val:emptyErrorString="You MUST enter your Password"
-            val:testErrorString="Enter a proper Password"
-		    android:ems="10"
-		    android:hint="Your secret password ..."
-            val:testType="nocheck"
-		    android:inputType="textPassword"  />
+    <include layout="@layout/toolbar" android:id="@+id/toolbar"/>
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:background="@color/white"
+        android:scrollbarStyle="outsideInset"
+        android:layout_below="@+id/toolbar">
 
         <LinearLayout
-            android:id="@+id/buttonArea"
-            style="?android:attr/buttonBarStyle"
+            android:id="@+id/aumsLinearView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:gravity="bottom|right"
-            android:layout_marginTop="15dp"
-            android:orientation="horizontal"
-            android:background="@color/button_bar_grey" >
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
 
-            <Button
-                style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="0dp"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="reset"
-                android:text="Reset" />
+                android:paddingTop="10dp"
+                android:text="Username:"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_marginTop="10dp" />
 
-            <Button
-                style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="0dp"
+            <com.andreabaccega.widget.FormEditText
+                android:id="@+id/roll_no"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="loginStart"
-                android:focusable="true"
-                android:text="Login" />
+                val:emptyErrorString="You MUST enter your Roll Number"
+                val:testErrorString="Enter a proper Roll Number"
+                android:ems="10"
+                android:textAllCaps="true"
+                android:hint="Your Full Roll Number ..."
+                val:testType="alphaNumeric"
+                android:inputType="text"  />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:text="Password:"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_marginTop="5dp" />
+
+            <com.andreabaccega.widget.FormEditText
+                android:id="@+id/pwd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                val:emptyErrorString="You MUST enter your Password"
+                val:testErrorString="Enter a proper Password"
+                android:ems="10"
+                android:hint="Your secret password ..."
+                val:testType="nocheck"
+                android:inputType="textPassword"  />
+
+            <LinearLayout
+                android:id="@+id/buttonArea"
+                style="?android:attr/buttonBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:gravity="bottom|right"
+                android:layout_marginTop="15dp"
+                android:orientation="horizontal"
+                android:background="@color/button_bar_grey" >
+
+                <Button
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="reset"
+                    android:text="Reset" />
+
+                <Button
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="loginStart"
+                    android:focusable="true"
+                    android:text="Login" />
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+</RelativeLayout>

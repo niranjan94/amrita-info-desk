@@ -1,7 +1,5 @@
 package com.njlabs.amrita.aid.aums;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -12,6 +10,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -53,7 +53,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class Aums extends Activity {
+public class Aums extends ActionBarActivity {
 
     private static long BackPress;
 
@@ -115,8 +115,9 @@ public class Aums extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_aums);
 
-        ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         serviceContext = this;
 
@@ -366,7 +367,7 @@ public class Aums extends Activity {
                     } catch (MalformedURLException e) {
 
                     }
-                    if((retry==false && calledBy.equals("activity"))||(calledBy.equals("data_hook")&&dialog!=null)) {
+                    if(retry==false && (calledBy.equals("activity")||(calledBy.equals("data_hook")&&dialog!=null))) {
 
                         SuperToast superToast = new SuperToast(serviceContext);
                         superToast.setDuration(SuperToast.Duration.LONG);
@@ -452,7 +453,7 @@ public class Aums extends Activity {
                 if(methodToCall!=null) {
                     Method method = null;
                     try {
-                        method = Aums.this.getClass().getMethod(methodToCall);
+                        method = ((Object) Aums.this).getClass().getMethod(methodToCall);
                     } catch (SecurityException e) {
 
                     } catch (NoSuchMethodException e) {
@@ -528,8 +529,10 @@ public class Aums extends Activity {
         StudentNameView.setText(WordUtils.capitalizeFully(StudentName));
         StudentRollNoView.setText(StudentRollNo);
         StudentCurrentCGPAView.setText(StudentCurrentCGPA);
-        ActionBar actionBar = getActionBar();
-        actionBar.setSubtitle("Welcome " + StudentName + " !");
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setSubtitle("Welcome " + StudentName + " !");
 
         findViewById(R.id.StudentProfilePicProgress).setVisibility(View.VISIBLE);
         getPhotoFile(EncodedId,R.id.StudentProfilePicProgress,R.id.StudentProfilePic);
@@ -777,6 +780,7 @@ public class Aums extends Activity {
 
         final CharSequence[] items = {"1","2","Vacation 1","3","4","Vacation 2","5","6","Vacation 3","7","8","Vacation 4","9","10","Vacation 5","11","12","Vacation 6","13","14","15"};
         AlertDialog.Builder builder = new AlertDialog.Builder(serviceContext);
+        builder.setCancelable(true);
         builder.setTitle("Select a Semester");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialogList, int item) {

@@ -4,7 +4,6 @@ import com.njlabs.amrita.aid.util.FontsOverride;
 import com.orm.SugarApp;
 import com.parse.Parse;
 
-import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 
@@ -28,7 +27,7 @@ public class MainApplication extends SugarApp {
     {
         super.onCreate();
         Parse.initialize(this, "rh6SYwa5Gfxk9rBzIEZvXSloGRl50pMnockRYK5E", "DwA9WHCbzgXBfLMosxl32LPEhZGtEqe2jYVuXhCj");
-        ACRA.init(this);
+        //ACRA.init(this);
         FontsOverride.setDefaultFont(this);
     }
 }

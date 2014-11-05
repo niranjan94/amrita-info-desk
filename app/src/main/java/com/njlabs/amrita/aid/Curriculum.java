@@ -1,12 +1,12 @@
 package com.njlabs.amrita.aid;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.webkit.WebView;
 
-public class Curriculum extends Activity {
+public class Curriculum extends ActionBarActivity {
 
     private WebView webView;
 
@@ -35,17 +35,21 @@ public class Curriculum extends Activity {
         } else if (department.equals("Electronics & Instrumentation Engineering")) {
             webView.loadUrl("file:///android_asset/curriculum/eie.html");
         }
-        ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setSubtitle(department);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setSubtitle(department);
     }
-    public boolean onMenuItemSelected(int featureId, MenuItem item){
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
         if(item.getItemId() == android.R.id.home) {
             finish();
             overridePendingTransition(R.anim.fadein, R.anim.fadeout);
         }
         return true;
     }
+
     @Override
     public void onBackPressed() {
         finish(); //go back to the previous Activity

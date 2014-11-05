@@ -1,19 +1,23 @@
 package com.njlabs.amrita.aid;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,10 +26,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.joanzapata.android.iconify.IconDrawable;
+import com.joanzapata.android.iconify.Iconify;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.njlabs.amrita.aid.about.Amrita;
@@ -44,46 +53,44 @@ import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Calendar;
 
-
-public class Landing extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+public class Landing extends ActionBarActivity{
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
-    private NavigationDrawerFragment mNavigationDrawerFragment;
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing);
 
-        mNavigationDrawerFragment = (NavigationDrawerFragment)
-                getFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        // Set up the drawer.
-        mNavigationDrawerFragment.setUp(
-                R.id.navigation_drawer,
-                (DrawerLayout) findViewById(R.id.drawer_layout));
+        // DRAWER SETUP
+        setUpDrawer();
 
-
-
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, 1);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setTitle("Amrita Info Desk");
 
         Intent downloader = new Intent(this, AumsReceiver.class);
         downloader.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, downloader, PendingIntent.FLAG_CANCEL_CURRENT);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 1000 * 30, pendingIntent);
-        Log.d("MyActivity", "Set alarmManager.setRepeating to: " + cal.getTime().toLocaleString());
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, 200 , 1000 * 30, pendingIntent);
+        Log.d("MyActivity", "Set alarmManager.setRepeating to: ");
         checkForUpdates();
         // SUGAR ORM DATABASE INITIALIZATION
         AppMetadata amd = new AppMetadata("version",String.valueOf(MainApplication.currentVersion));
@@ -102,60 +109,97 @@ public class Landing extends Activity implements NavigationDrawerFragment.Naviga
             this.value = value;
         }
     }
+    private void setUpDrawer() {
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.drawer_list);
+        String[] drawerItems = new String[]{"Home","About this app","Settings"};
+        mDrawerList.setAdapter(new ArrayAdapter<String>(getSupportActionBar().getThemedContext(), R.layout.item_drawer, drawerItems) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                if (convertView == null) {
+                    convertView = View.inflate(getSupportActionBar().getThemedContext(), R.layout.item_drawer, null);
+                }
+                TextView textView = (TextView) convertView.findViewById(R.id.text);
+                String text = getItem(position);
+                if (text.equals("Home")) {
+                    textView.setCompoundDrawables(new IconDrawable(getSupportActionBar().getThemedContext(), Iconify.IconValue.fa_home).colorRes(R.color.njlabs_grey).actionBarSize(), null, null, null);
+                    textView.setText(" " + text);
+                }
+                if (text.equals("About this app")) {
+                    textView.setCompoundDrawables(new IconDrawable(getSupportActionBar().getThemedContext(), Iconify.IconValue.fa_info_circle).colorRes(R.color.njlabs_grey).actionBarSize(), null, null, null);
+                    textView.setText(" " + text);
+                }
+                if (text.equals("Help & Support")) {
+                    textView.setCompoundDrawables(new IconDrawable(getSupportActionBar().getThemedContext(), Iconify.IconValue.fa_question_circle).colorRes(R.color.njlabs_grey).actionBarSize(), null, null, null);
+                    textView.setText(" " + text);
+                }
+                if (text.equals("Settings")) {
+                    textView.setCompoundDrawables(new IconDrawable(getSupportActionBar().getThemedContext(), Iconify.IconValue.fa_cog).colorRes(R.color.njlabs_grey).actionBarSize(), null, null, null);
+                    textView.setText(" " + text);
+                }
+                return convertView;
+            }
+        });
 
-    @Override
-    public void onNavigationDrawerItemSelected(int position) {
-        // update the main content by replacing fragments
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,                    /* host Activity */
+                mDrawerLayout,                    /* DrawerLayout object */
+                toolbar,             /* nav drawer image to replace 'Up' caret */
+                R.string.navigation_drawer_open,  /* "open drawer" description for accessibility */
+                R.string.navigation_drawer_close  /* "close drawer" description for accessibility */
+        ) {
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
 
-        switch(position)
-        {
-            case 1:
-                startActivity(new Intent(Landing.this, App.class));
-                overridePendingTransition(R.anim.fadein,R.anim.fadeout);
-                break;
-            case 3:
+                //getActivity().invalidateOptionsMenu(); // calls onPrepareOptionsMenu()
+            }
 
-                break;
-            case 2:
-                startActivity(new Intent(Landing.this, SettingsActivity.class));
-                overridePendingTransition(R.anim.fadein,R.anim.fadeout);
-                break;
-            default:
-                FragmentManager fragmentManager = getFragmentManager();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                        .commit();
-        }
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+
+            }
+        };
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.container, MainFragment.newInstance(1)).commit();
     }
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView parent, View view, int position, long id) {
 
-    public void onSectionAttached(int number) {
-        switch (number) {
-            case 1:
-                mTitle = getString(R.string.app_name);
-                break;
-            case 2:
-                mTitle = getString(R.string.app_name);
-                break;
-            case 3:
-                mTitle = getString(R.string.app_name);
-                break;
+            switch (position) {
+                case 1:
+                    mDrawerLayout.closeDrawer(mDrawerList);
+                    startActivity(new Intent(Landing.this, App.class));
+                    overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+                    break;
+                case 2:
+                    mDrawerLayout.closeDrawer(mDrawerList);
+                    startActivity(new Intent(Landing.this, SettingsActivity.class));
+                    overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+                    break;
+                default:
+                    mDrawerLayout.closeDrawer(mDrawerList);
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    fragmentManager.beginTransaction().replace(R.id.container, MainFragment.newInstance(position + 1)).commit();
+            }
         }
     }
 
     public void restoreActionBar() {
-        ActionBar actionBar = getActionBar();
+
+        ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mNavigationDrawerFragment.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
+        if (!mDrawerLayout.isDrawerOpen(mDrawerList)) {
             restoreActionBar();
             return true;
         }
@@ -164,9 +208,6 @@ public class Landing extends Activity implements NavigationDrawerFragment.Naviga
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
@@ -174,29 +215,30 @@ public class Landing extends Activity implements NavigationDrawerFragment.Naviga
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    public static class MainFragment extends Fragment {
         private static final String ARG_SECTION_NUMBER = "section_number";
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
+        public static MainFragment newInstance(int sectionNumber) {
+            MainFragment fragment = new MainFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
             return fragment;
         }
 
-        public PlaceholderFragment() {
+        public MainFragment() {
 
         }
 
@@ -319,8 +361,6 @@ public class Landing extends Activity implements NavigationDrawerFragment.Naviga
         @Override
         public void onAttach(Activity activity) {
             super.onAttach(activity);
-            ((Landing) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
         }
     }
     public void checkForUpdates()

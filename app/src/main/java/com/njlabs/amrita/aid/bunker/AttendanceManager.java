@@ -4,12 +4,13 @@
 
 package com.njlabs.amrita.aid.bunker;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -18,8 +19,9 @@ import com.njlabs.amrita.aid.MainApplication;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.aums.Aums;
 import com.onemarker.ark.Security;
+import com.onemarker.ark.logging.Ln;
 
-public class AttendanceManager extends Activity {
+public class AttendanceManager extends ActionBarActivity {
 
     Aums aums;
     @Override
@@ -27,11 +29,13 @@ public class AttendanceManager extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_attendance_manager_login);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         SharedPreferences preferences = getSharedPreferences("aums_prefs", Context.MODE_PRIVATE);
         String RollNo = preferences.getString("RollNo", "");
         String encodedPassword = preferences.getString("Password","");
-
-        getActionBar().setDisplayHomeAsUpEnabled(true);
 
         if (RollNo != null && RollNo != "") {
             ((FormEditText) findViewById(R.id.roll_no)).setText(RollNo);
@@ -75,7 +79,7 @@ public class AttendanceManager extends Activity {
             dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
-
+                    Ln.d("Process over");
                 }
             });
         }
@@ -87,7 +91,8 @@ public class AttendanceManager extends Activity {
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);
     }
 
-    public boolean onMenuItemSelected(int featureId, MenuItem item){
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
         if(item.getItemId() == android.R.id.home) {
             finish();
             overridePendingTransition(R.anim.fadein, R.anim.fadeout);

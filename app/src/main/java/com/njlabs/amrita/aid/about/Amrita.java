@@ -1,8 +1,6 @@
 package com.njlabs.amrita.aid.about;
 
-import android.app.ActionBar;
 import android.app.AlertDialog;
-import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Criteria;
@@ -11,19 +9,20 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.TrainInfo;
+import com.njlabs.amrita.aid.util.PagerSlidingTabStrip;
 
-import static android.app.ActionBar.Tab;
-
-public class Amrita extends FragmentActivity {
+public class Amrita extends ActionBarActivity {
 
     ActionBar mActionBar;
     ViewPager mPager;
@@ -33,10 +32,12 @@ public class Amrita extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about_campus);
         /** Getting a reference to action bar of this activity */
-        mActionBar = getActionBar();
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        mActionBar = getSupportActionBar();
 
         /** Set tab navigation mode */
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         mActionBar.setDisplayHomeAsUpEnabled(true);
         /** Getting a reference to ViewPager from the layout */
         mPager = (ViewPager) findViewById(R.id.pager);
@@ -49,7 +50,6 @@ public class Amrita extends FragmentActivity {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
-                mActionBar.setSelectedNavigationItem(position);
             }
         };
 
@@ -64,38 +64,11 @@ public class Amrita extends FragmentActivity {
 
         mActionBar.setDisplayShowTitleEnabled(true);
 
-        /** Defining tab listener */
-        ActionBar.TabListener tabListener = new ActionBar.TabListener() {
+        // Bind the tabs to the ViewPager
+        PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
+        tabs.setViewPager(mPager);
 
-            @Override
-            public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-            }
 
-            @Override
-            public void onTabSelected(Tab tab, FragmentTransaction ft) {
-                mPager.setCurrentItem(tab.getPosition());
-            }
-
-            @Override
-            public void onTabReselected(Tab tab, FragmentTransaction ft) {
-            }
-        };
-
-        /** Creating Android Tab */
-        Tab tab = mActionBar.newTab()
-                .setText("About Campus")
-                /*.setIcon(R.drawable.android)*/
-                .setTabListener(tabListener);
-
-        mActionBar.addTab(tab);
-
-        /** Creating Apple Tab */
-        tab = mActionBar.newTab()
-                .setText("Contact Details")
-                /*.setIcon(R.drawable.apple)*/
-                .setTabListener(tabListener);
-
-        mActionBar.addTab(tab);
 
     }
 
@@ -188,7 +161,9 @@ public class Amrita extends FragmentActivity {
         startActivity(it);
 
     }
-    public boolean onMenuItemSelected(int featureId, MenuItem item){
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
         if(item.getItemId() == android.R.id.home) {
             finish();
             overridePendingTransition(R.anim.fadein, R.anim.fadeout);

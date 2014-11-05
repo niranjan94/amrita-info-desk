@@ -29,4 +29,4 @@ int layout date_cell 0x7f030001
 int layout date_grid_fragment 0x7f030002
 int string app_name 0x7f050000
 int style AppBaseTheme 0x7f060000
-int style AppTheme 0x7f060001
+int style Theme_Main 0x7f060001

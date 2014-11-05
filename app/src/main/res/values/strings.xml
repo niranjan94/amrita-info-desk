@@ -24,5 +24,6 @@
     <string name="title_activity_attendance_flow">Attendance Flow Test</string>
     <string name="title_activity_push_notifications">Announcements</string>
     <string name="title_activity_attendance_manager">Attendance Manager</string>
+    <string name="title_activity_card_trial">Card Trial</string>
 
 </resources>

@@ -1,14 +1,14 @@
 package com.njlabs.amrita.aid;
 
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -24,7 +24,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 @SuppressLint("SimpleDateFormat")
-public class Calender extends FragmentActivity {
+public class Calender extends ActionBarActivity {
 
     private CaldroidFragment caldroidFragment;
     private CaldroidFragment dialogCaldroidFragment;
@@ -47,143 +47,143 @@ public class Calender extends FragmentActivity {
         // Create a hash map
         HashMap hm = new HashMap();
         // HOLIDAYS
-        hm.put(ParseDate("15-08-2014"), R.color.green);
-        hm.put(ParseDate("16-08-2014"), R.color.green);
-        hm.put(ParseDate("17-08-2014"), R.color.green);
-        hm.put(ParseDate("29-08-2014"), R.color.green);
-        hm.put(ParseDate("30-08-2014"), R.color.green);
-        hm.put(ParseDate("31-08-2014"), R.color.green);
-        hm.put(ParseDate("05-09-2014"), R.color.green);
-        hm.put(ParseDate("06-09-2014"), R.color.green);
-        hm.put(ParseDate("07-09-2014"), R.color.green);
-        hm.put(ParseDate("27-09-2014"), R.color.green);
-        hm.put(ParseDate("02-10-2014"), R.color.green);
-        hm.put(ParseDate("03-10-2014"), R.color.green);
-        hm.put(ParseDate("04-10-2014"), R.color.green);
-        hm.put(ParseDate("05-10-2014"), R.color.green);
-        hm.put(ParseDate("18-10-2014"), R.color.green);
-        hm.put(ParseDate("19-10-2014"), R.color.green);
-        hm.put(ParseDate("20-10-2014"), R.color.green);
-        hm.put(ParseDate("21-10-2014"), R.color.green);
-        hm.put(ParseDate("22-10-2014"), R.color.green);
-        hm.put(ParseDate("03-12-2014"), R.color.green);
-        hm.put(ParseDate("10-12-2014"), R.color.green);
-        hm.put(ParseDate("25-12-2014"), R.color.green);
-        hm.put(ParseDate("01-01-2015"), R.color.green);
-        hm.put(ParseDate("14-01-2015"), R.color.green);
-        hm.put(ParseDate("15-01-2015"), R.color.green);
-        hm.put(ParseDate("16-01-2015"), R.color.green);
-        hm.put(ParseDate("17-01-2015"), R.color.green);
-        hm.put(ParseDate("18-01-2015"), R.color.green);
-        hm.put(ParseDate("26-01-2015"), R.color.green);
-        hm.put(ParseDate("15-02-2015"), R.color.green);
-        hm.put(ParseDate("21-03-2015"), R.color.green);
-        hm.put(ParseDate("03-04-2015"), R.color.green);
-        hm.put(ParseDate("05-04-2015"), R.color.green);
-        hm.put(ParseDate("13-04-2015"), R.color.green);
-        hm.put(ParseDate("14-04-2015"), R.color.green);
-        hm.put(ParseDate("15-04-2015"), R.color.green);
-        hm.put(ParseDate("01-05-2015"), R.color.green);
-        hm.put(ParseDate("21-05-2015"), R.color.green);
+        hm.put(ParseDate("15-08-2014"), R.color.caldroid_green);
+        hm.put(ParseDate("16-08-2014"), R.color.caldroid_green);
+        hm.put(ParseDate("17-08-2014"), R.color.caldroid_green);
+        hm.put(ParseDate("29-08-2014"), R.color.caldroid_green);
+        hm.put(ParseDate("30-08-2014"), R.color.caldroid_green);
+        hm.put(ParseDate("31-08-2014"), R.color.caldroid_green);
+        hm.put(ParseDate("05-09-2014"), R.color.caldroid_green);
+        hm.put(ParseDate("06-09-2014"), R.color.caldroid_green);
+        hm.put(ParseDate("07-09-2014"), R.color.caldroid_green);
+        hm.put(ParseDate("27-09-2014"), R.color.caldroid_green);
+        hm.put(ParseDate("02-10-2014"), R.color.caldroid_green);
+        hm.put(ParseDate("03-10-2014"), R.color.caldroid_green);
+        hm.put(ParseDate("04-10-2014"), R.color.caldroid_green);
+        hm.put(ParseDate("05-10-2014"), R.color.caldroid_green);
+        hm.put(ParseDate("18-10-2014"), R.color.caldroid_green);
+        hm.put(ParseDate("19-10-2014"), R.color.caldroid_green);
+        hm.put(ParseDate("20-10-2014"), R.color.caldroid_green);
+        hm.put(ParseDate("21-10-2014"), R.color.caldroid_green);
+        hm.put(ParseDate("22-10-2014"), R.color.caldroid_green);
+        hm.put(ParseDate("03-12-2014"), R.color.caldroid_green);
+        hm.put(ParseDate("10-12-2014"), R.color.caldroid_green);
+        hm.put(ParseDate("25-12-2014"), R.color.caldroid_green);
+        hm.put(ParseDate("01-01-2015"), R.color.caldroid_green);
+        hm.put(ParseDate("14-01-2015"), R.color.caldroid_green);
+        hm.put(ParseDate("15-01-2015"), R.color.caldroid_green);
+        hm.put(ParseDate("16-01-2015"), R.color.caldroid_green);
+        hm.put(ParseDate("17-01-2015"), R.color.caldroid_green);
+        hm.put(ParseDate("18-01-2015"), R.color.caldroid_green);
+        hm.put(ParseDate("26-01-2015"), R.color.caldroid_green);
+        hm.put(ParseDate("15-02-2015"), R.color.caldroid_green);
+        hm.put(ParseDate("21-03-2015"), R.color.caldroid_green);
+        hm.put(ParseDate("03-04-2015"), R.color.caldroid_green);
+        hm.put(ParseDate("05-04-2015"), R.color.caldroid_green);
+        hm.put(ParseDate("13-04-2015"), R.color.caldroid_green);
+        hm.put(ParseDate("14-04-2015"), R.color.caldroid_green);
+        hm.put(ParseDate("15-04-2015"), R.color.caldroid_green);
+        hm.put(ParseDate("01-05-2015"), R.color.caldroid_green);
+        hm.put(ParseDate("21-05-2015"), R.color.caldroid_green);
 
 
         // EVENTS
-        hm.put(ParseDate("12-07-2014"), R.color.blue);
-        hm.put(ParseDate("23-07-2014"), R.color.blue);
-        hm.put(ParseDate("30-07-2014"), R.color.blue);
-        hm.put(ParseDate("06-08-2014"), R.color.blue);
-        hm.put(ParseDate("21-11-2014"), R.color.blue);
-        hm.put(ParseDate("29-11-2014"), R.color.blue);
-        hm.put(ParseDate("29-12-2014"), R.color.blue);
-        hm.put(ParseDate("06-03-2015"), R.color.blue);
-        hm.put(ParseDate("07-03-2015"), R.color.blue);
-        hm.put(ParseDate("30-04-2015"), R.color.blue);
-        hm.put(ParseDate("11-07-2015"), R.color.blue);
-        hm.put(ParseDate("20-07-2015"), R.color.blue);
-        hm.put(ParseDate("21-07-2015"), R.color.blue);
-        hm.put(ParseDate("22-07-2015"), R.color.blue);
-        hm.put(ParseDate("23-07-2015"), R.color.blue);
-        hm.put(ParseDate("24-07-2015"), R.color.blue);
-        hm.put(ParseDate("25-07-2015"), R.color.blue);
+        hm.put(ParseDate("12-07-2014"), R.color.caldroid_blue);
+        hm.put(ParseDate("23-07-2014"), R.color.caldroid_blue);
+        hm.put(ParseDate("30-07-2014"), R.color.caldroid_blue);
+        hm.put(ParseDate("06-08-2014"), R.color.caldroid_blue);
+        hm.put(ParseDate("21-11-2014"), R.color.caldroid_blue);
+        hm.put(ParseDate("29-11-2014"), R.color.caldroid_blue);
+        hm.put(ParseDate("29-12-2014"), R.color.caldroid_blue);
+        hm.put(ParseDate("06-03-2015"), R.color.caldroid_blue);
+        hm.put(ParseDate("07-03-2015"), R.color.caldroid_blue);
+        hm.put(ParseDate("30-04-2015"), R.color.caldroid_blue);
+        hm.put(ParseDate("11-07-2015"), R.color.caldroid_blue);
+        hm.put(ParseDate("20-07-2015"), R.color.caldroid_blue);
+        hm.put(ParseDate("21-07-2015"), R.color.caldroid_blue);
+        hm.put(ParseDate("22-07-2015"), R.color.caldroid_blue);
+        hm.put(ParseDate("23-07-2015"), R.color.caldroid_blue);
+        hm.put(ParseDate("24-07-2015"), R.color.caldroid_blue);
+        hm.put(ParseDate("25-07-2015"), R.color.caldroid_blue);
 
 
         // EXAMS
-        hm.put(ParseDate("01-09-2014"), R.color.red);
-        hm.put(ParseDate("02-09-2014"), R.color.red);
-        hm.put(ParseDate("03-09-2014"), R.color.red);
-        hm.put(ParseDate("08-09-2014"), R.color.red);
-        hm.put(ParseDate("09-09-2014"), R.color.red);
-        hm.put(ParseDate("10-09-2014"), R.color.red);
-        hm.put(ParseDate("13-10-2014"), R.color.red);
-        hm.put(ParseDate("14-10-2014"), R.color.red);
-        hm.put(ParseDate("15-10-2014"), R.color.red);
-        hm.put(ParseDate("27-10-2014"), R.color.red);
-        hm.put(ParseDate("28-10-2014"), R.color.red);
-        hm.put(ParseDate("29-10-2014"), R.color.red);
-        hm.put(ParseDate("10-11-2014"), R.color.red);
-        hm.put(ParseDate("11-11-2014"), R.color.red);
-        hm.put(ParseDate("12-11-2014"), R.color.red);
-        hm.put(ParseDate("17-11-2014"), R.color.red);
-        hm.put(ParseDate("18-11-2014"), R.color.red);
-        hm.put(ParseDate("19-11-2014"), R.color.red);
-        hm.put(ParseDate("24-11-2014"), R.color.red);
-        hm.put(ParseDate("25-11-2014"), R.color.red);
-        hm.put(ParseDate("26-11-2014"), R.color.red);
-        hm.put(ParseDate("27-11-2014"), R.color.red);
-        hm.put(ParseDate("01-12-2014"), R.color.red);
-        hm.put(ParseDate("02-12-2014"), R.color.red);
-        hm.put(ParseDate("03-12-2014"), R.color.red);
-        hm.put(ParseDate("04-12-2014"), R.color.red);
-        hm.put(ParseDate("05-12-2014"), R.color.red);
-        hm.put(ParseDate("06-12-2014"), R.color.red);
-        hm.put(ParseDate("08-12-2014"), R.color.red);
-        hm.put(ParseDate("09-12-2014"), R.color.red);
-        hm.put(ParseDate("15-12-2014"), R.color.red);
-        hm.put(ParseDate("16-12-2014"), R.color.red);
-        hm.put(ParseDate("17-12-2014"), R.color.red);
-        hm.put(ParseDate("18-12-2014"), R.color.red);
-        hm.put(ParseDate("19-12-2014"), R.color.red);
-        hm.put(ParseDate("22-12-2014"), R.color.red);
-        hm.put(ParseDate("23-12-2014"), R.color.red);
-        hm.put(ParseDate("24-12-2014"), R.color.red);
-        hm.put(ParseDate("09-02-2014"), R.color.red);
-        hm.put(ParseDate("10-02-2014"), R.color.red);
-        hm.put(ParseDate("11-02-2014"), R.color.red);
-        hm.put(ParseDate("12-02-2014"), R.color.red);
-        hm.put(ParseDate("23-03-2014"), R.color.red);
-        hm.put(ParseDate("24-03-2014"), R.color.red);
-        hm.put(ParseDate("25-03-2014"), R.color.red);
-        hm.put(ParseDate("20-04-2014"), R.color.red);
-        hm.put(ParseDate("21-04-2014"), R.color.red);
-        hm.put(ParseDate("22-04-2014"), R.color.red);
-        hm.put(ParseDate("04-05-2014"), R.color.red);
-        hm.put(ParseDate("05-05-2014"), R.color.red);
-        hm.put(ParseDate("06-05-2014"), R.color.red);
-        hm.put(ParseDate("07-05-2014"), R.color.red);
-        hm.put(ParseDate("08-05-2014"), R.color.red);
-        hm.put(ParseDate("11-05-2014"), R.color.red);
-        hm.put(ParseDate("12-05-2014"), R.color.red);
-        hm.put(ParseDate("13-05-2014"), R.color.red);
-        hm.put(ParseDate("14-05-2014"), R.color.red);
-        hm.put(ParseDate("15-05-2014"), R.color.red);
-        hm.put(ParseDate("16-05-2014"), R.color.red);
-        hm.put(ParseDate("18-05-2014"), R.color.red);
-        hm.put(ParseDate("19-05-2014"), R.color.red);
-        hm.put(ParseDate("20-05-2014"), R.color.red);
-        hm.put(ParseDate("22-05-2014"), R.color.red);
-        hm.put(ParseDate("23-05-2014"), R.color.red);
-        hm.put(ParseDate("01-06-2015"), R.color.red);
-        hm.put(ParseDate("02-06-2015"), R.color.red);
-        hm.put(ParseDate("03-06-2015"), R.color.red);
-        hm.put(ParseDate("04-06-2015"), R.color.red);
-        hm.put(ParseDate("05-06-2015"), R.color.red);
-        hm.put(ParseDate("08-06-2015"), R.color.red);
-        hm.put(ParseDate("09-06-2015"), R.color.red);
-        hm.put(ParseDate("10-06-2015"), R.color.red);
-        hm.put(ParseDate("11-06-2015"), R.color.red);
-        hm.put(ParseDate("12-06-2015"), R.color.red);
-        hm.put(ParseDate("15-06-2015"), R.color.red);
-        hm.put(ParseDate("16-06-2015"), R.color.red);
+        hm.put(ParseDate("01-09-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("02-09-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("03-09-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("08-09-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("09-09-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("10-09-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("13-10-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("14-10-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("15-10-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("27-10-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("28-10-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("29-10-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("10-11-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("11-11-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("12-11-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("17-11-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("18-11-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("19-11-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("24-11-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("25-11-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("26-11-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("27-11-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("01-12-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("02-12-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("03-12-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("04-12-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("05-12-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("06-12-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("08-12-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("09-12-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("15-12-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("16-12-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("17-12-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("18-12-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("19-12-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("22-12-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("23-12-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("24-12-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("09-02-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("10-02-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("11-02-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("12-02-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("23-03-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("24-03-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("25-03-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("20-04-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("21-04-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("22-04-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("04-05-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("05-05-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("06-05-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("07-05-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("08-05-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("11-05-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("12-05-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("13-05-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("14-05-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("15-05-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("16-05-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("18-05-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("19-05-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("20-05-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("22-05-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("23-05-2014"), R.color.caldroid_red);
+        hm.put(ParseDate("01-06-2015"), R.color.caldroid_red);
+        hm.put(ParseDate("02-06-2015"), R.color.caldroid_red);
+        hm.put(ParseDate("03-06-2015"), R.color.caldroid_red);
+        hm.put(ParseDate("04-06-2015"), R.color.caldroid_red);
+        hm.put(ParseDate("05-06-2015"), R.color.caldroid_red);
+        hm.put(ParseDate("08-06-2015"), R.color.caldroid_red);
+        hm.put(ParseDate("09-06-2015"), R.color.caldroid_red);
+        hm.put(ParseDate("10-06-2015"), R.color.caldroid_red);
+        hm.put(ParseDate("11-06-2015"), R.color.caldroid_red);
+        hm.put(ParseDate("12-06-2015"), R.color.caldroid_red);
+        hm.put(ParseDate("15-06-2015"), R.color.caldroid_red);
+        hm.put(ParseDate("16-06-2015"), R.color.caldroid_red);
 
 
         // TEXT HASH MAP
@@ -335,9 +335,10 @@ public class Calender extends FragmentActivity {
         setContentView(R.layout.activity_calender);
         final SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
         final Calender this_context = this;
-        ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle("Academic Calender");
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Academic Calender");
         SharedPreferences preferences = getSharedPreferences("app_extra", Context.MODE_PRIVATE);
         Boolean AgreeStatus = preferences.getBoolean("calender_agree", false);
         if (AgreeStatus == true) {
@@ -570,13 +571,16 @@ public class Calender extends FragmentActivity {
                     "DIALOG_CALDROID_SAVED_STATE");
         }
     }
-    public boolean onMenuItemSelected(int featureId, MenuItem item){
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
         if(item.getItemId() == android.R.id.home) {
             finish();
             overridePendingTransition(R.anim.fadein, R.anim.fadeout);
         }
         return true;
     }
+
     @Override
     public void onBackPressed() {
         finish(); //go back to the previous Activity

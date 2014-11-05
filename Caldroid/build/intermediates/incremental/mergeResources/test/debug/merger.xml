@@ -83,9 +83,11 @@
                 </color>
                 <color name="caldroid_gray" >#CCC
                 </color>
+                <color name="caldroid_holo_blue_light" >#ff33b5e5
+                </color>
                 <color name="caldroid_white" >#FFFFFF
                 </color>
-                <color name="caldroid_holo_blue_light" >#ff33b5e5
+                <color name="caldroid_holo_blue_dark" >#ff0099cc
                 </color>
 
                 <style
@@ -99,14 +101,12 @@
                     -->
                 </style>
 
-                <color name="caldroid_holo_blue_dark" >#ff0099cc
+                <color name="caldroid_black" >#000000
                 </color>
 
                 <string name="app_name" >CalendarFragment
                 </string>
 
-                <color name="caldroid_black" >#000000
-                </color>
                 <color name="caldroid_darker_gray" >#aaa
                 </color>
                 <color name="caldroid_transparent" >#00000000
@@ -115,7 +115,7 @@
                 </color>
 
                 <style
-                    name="AppTheme"
+                    name="Theme.Main"
                     parent="AppBaseTheme" >
 
                     <!-- All customizations that are NOT specific to a particular API-level can go here. -->
