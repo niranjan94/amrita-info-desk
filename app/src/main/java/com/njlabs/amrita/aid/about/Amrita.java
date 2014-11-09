@@ -3,6 +3,7 @@ package com.njlabs.amrita.aid.about;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -16,10 +17,9 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.njlabs.amrita.aid.R;
-import com.njlabs.amrita.aid.TrainInfo;
+import com.njlabs.amrita.aid.TrainBusInfo;
 import com.njlabs.amrita.aid.util.PagerSlidingTabStrip;
 
 public class Amrita extends ActionBarActivity {
@@ -33,6 +33,7 @@ public class Amrita extends ActionBarActivity {
         setContentView(R.layout.activity_about_campus);
         /** Getting a reference to action bar of this activity */
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setBackgroundColor(Color.parseColor("#03a9f4"));
         setSupportActionBar(toolbar);
 
         mActionBar = getSupportActionBar();
@@ -67,9 +68,6 @@ public class Amrita extends ActionBarActivity {
         // Bind the tabs to the ViewPager
         PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
         tabs.setViewPager(mPager);
-
-
-
     }
 
 
@@ -91,37 +89,20 @@ public class Amrita extends ActionBarActivity {
     }
 
     public void view_train_cbe(View view) {
-        final CharSequence[] items = {"From Coimbatore", "From Palakkad", "To Coimbatore", "To Palakkad"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(Amrita.this);
-        builder.setTitle("From / To ?");
-        builder.setItems(items, new DialogInterface.OnClickListener() {
+        final CharSequence[] items_t = {"Trains from Coimbatore", "Trains from Palghat", "Trains to Coimbatore", "Trains to Palghat", "Buses from Coimbatore", "Buses to Coimbatore"};
+        AlertDialog.Builder builder_t = new AlertDialog.Builder(Amrita.this);
+        builder_t.setTitle("View timings of ?");
+        builder_t.setItems(items_t, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-                Toast.makeText(Amrita.this, "Viewing all trains " + items[item], Toast.LENGTH_LONG).show();
-                if (items[item] == "From Coimbatore") {
-                    Intent it = new Intent(getBaseContext(), TrainInfo.class);
-                    it.putExtra("title", items[item]);
-                    it.putExtra("train", "from_coimbatore.htm");
-                    startActivity(it);
-                } else if (items[item] == "From Palakkad") {
-                    Intent it = new Intent(getBaseContext(), TrainInfo.class);
-                    it.putExtra("title", items[item]);
-                    it.putExtra("train", "from_palakkad.htm");
-                    startActivity(it);
-                } else if (items[item] == "To Coimbatore") {
-                    Intent it = new Intent(getBaseContext(), TrainInfo.class);
-                    it.putExtra("title", items[item]);
-                    it.putExtra("train", "to_coimbatore.htm");
-                    startActivity(it);
-                } else if (items[item] == "To Palakkad") {
-                    Intent it = new Intent(getBaseContext(), TrainInfo.class);
-                    it.putExtra("title", items[item]);
-                    it.putExtra("train", "to_palakkad.htm");
-                    startActivity(it);
-                }
+                // Showing Alert Message
+                Intent trainBusOpen = new Intent(Amrita.this, TrainBusInfo.class);
+                trainBusOpen.putExtra("type", items_t[item]);
+                startActivity(trainBusOpen);
+                overridePendingTransition(R.anim.fadein,R.anim.fadeout);
             }
         });
-        AlertDialog alert = builder.create();
-        alert.show();
+        AlertDialog alert_t = builder_t.create();
+        alert_t.show();
     }
 
     public void directions_cbe(View view) {

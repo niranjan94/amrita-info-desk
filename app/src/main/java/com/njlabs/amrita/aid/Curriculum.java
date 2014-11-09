@@ -1,5 +1,6 @@
 package com.njlabs.amrita.aid;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
@@ -36,6 +37,7 @@ public class Curriculum extends ActionBarActivity {
             webView.loadUrl("file:///android_asset/curriculum/eie.html");
         }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setBackgroundColor(Color.parseColor("#5e98e9"));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setSubtitle(department);

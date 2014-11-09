@@ -15,4 +15,6 @@
         <attr name="pstsTextAllCaps" format="boolean" />
     </declare-styleable>
 
+    <attr name="toolbarTheme" format="reference" />
+
 </resources>

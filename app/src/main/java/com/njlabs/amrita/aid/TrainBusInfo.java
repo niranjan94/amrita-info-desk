@@ -1,6 +1,6 @@
 package com.njlabs.amrita.aid;
 
-import android.graphics.Typeface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
@@ -32,6 +32,8 @@ public class TrainBusInfo extends ActionBarActivity {
         setContentView(R.layout.activity_train_bus_info);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setBackgroundColor(Color.parseColor("#9c27b0"));
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setSubtitle(type);

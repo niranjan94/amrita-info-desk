@@ -116,6 +116,7 @@ public class Aums extends ActionBarActivity {
         setContentView(R.layout.activity_aums);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setBackgroundColor(Color.parseColor("#e91e63"));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -530,6 +531,7 @@ public class Aums extends ActionBarActivity {
         StudentRollNoView.setText(StudentRollNo);
         StudentCurrentCGPAView.setText(StudentCurrentCGPA);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setBackgroundColor(Color.parseColor("#e91e63"));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setSubtitle("Welcome " + StudentName + " !");

@@ -1,5 +1,6 @@
 package com.njlabs.amrita.aid.about;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,6 +17,7 @@ public class App extends ActionBarActivity {
         setContentView(R.layout.activity_about_app);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setBackgroundColor(Color.parseColor("#5B96E7"));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }

@@ -38,7 +38,7 @@
                 android:textAllCaps="true"
                 android:hint="Your Full Roll Number ..."
                 val:testType="alphaNumeric"
-                android:inputType="text"  />
+                android:inputType="textCapCharacters|text|textNoSuggestions|textFilter"  />
 
             <TextView
                 android:layout_width="wrap_content"

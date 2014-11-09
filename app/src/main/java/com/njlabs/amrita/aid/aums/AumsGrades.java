@@ -1,6 +1,7 @@
 package com.njlabs.amrita.aid.aums;
 
 import android.app.ProgressDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
@@ -43,6 +44,7 @@ public class AumsGrades extends ActionBarActivity {
         setContentView(R.layout.activity_aums_data);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setBackgroundColor(Color.parseColor("#e91e63"));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 

@@ -1,6 +1,7 @@
 package com.njlabs.amrita.aid.aums;
 
 import android.app.ProgressDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
@@ -42,6 +43,7 @@ public class AumsAttendance extends ActionBarActivity {
         setContentView(R.layout.activity_aums_data);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setBackgroundColor(Color.parseColor("#e91e63"));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -69,9 +71,9 @@ public class AumsAttendance extends ActionBarActivity {
 
             adata.setCourseCode(dataHolders.get(0).text());
             adata.setCourseTitle(dataHolders.get(1).text());
-            adata.setTotal(dataHolders.get(3).text());
-            adata.setAttended(dataHolders.get(4).text());
-            adata.setPercentage(dataHolders.get(5).text());
+            adata.setTotal(dataHolders.get(5).text());
+            adata.setAttended(dataHolders.get(6).text());
+            adata.setPercentage(dataHolders.get(7).text());
 
             adata.save();
             attendanceData.add(adata);

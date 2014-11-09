@@ -26,7 +26,6 @@ import com.njlabs.amrita.aid.R;
 import com.onemarker.ark.ConnectionDetector;
 import com.onemarker.ark.logging.Ln;
 
-import org.acra.ACRA;
 import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -143,7 +142,7 @@ public class ExplorerSignup extends ActionBarActivity {
                     status = response.getString("status").trim();
                     message = response.getString("message").trim();
                 } catch (JSONException e) {
-                    ACRA.getErrorReporter().handleException(e);
+                    // TODO ACRA.getErrorReporter().handleException(e);
                 }
                 if (status.equals("success")) {
                     ////

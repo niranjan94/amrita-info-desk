@@ -8,6 +8,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
@@ -27,13 +28,15 @@ public class AttendanceManager extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_attendance_manager_login);
+        setContentView(R.layout.activity_under_construction);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setBackgroundColor(Color.parseColor("#009688"));
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        SharedPreferences preferences = getSharedPreferences("aums_prefs", Context.MODE_PRIVATE);
+       /* SharedPreferences preferences = getSharedPreferences("aums_prefs", Context.MODE_PRIVATE);
         String RollNo = preferences.getString("RollNo", "");
         String encodedPassword = preferences.getString("Password","");
 
@@ -42,7 +45,7 @@ public class AttendanceManager extends ActionBarActivity {
         }
         if(encodedPassword != null && encodedPassword != "") {
             ((FormEditText)findViewById(R.id.pwd)).setText(Security.decrypt(encodedPassword,MainApplication.key));
-        }
+        }*/
 
     }
 

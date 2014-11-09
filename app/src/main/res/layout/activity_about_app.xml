@@ -39,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="Version 2.0.2"
+                android:text="Version 2.0.5"
                 android:id="@+id/textView5"
                 android:layout_gravity="center_horizontal" />
 

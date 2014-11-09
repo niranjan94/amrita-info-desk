@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import org.acra.ACRA;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -50,7 +49,7 @@ private static final String TAG = "MyCustomReceiver";
       }
 
     } catch (JSONException e) {
-    	ACRA.getErrorReporter().handleException(e);
+        // TODO ACRA.getErrorReporter().handleException(e);
     }
   }
 

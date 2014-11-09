@@ -33,6 +33,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import com.joanzapata.android.iconify.IconDrawable;
 import com.joanzapata.android.iconify.Iconify;
 import com.loopj.android.http.AsyncHttpClient;
@@ -48,7 +49,6 @@ import com.njlabs.amrita.aid.settings.SettingsActivity;
 import com.onemarker.ark.ConnectionDetector;
 import com.orm.SugarRecord;
 
-import org.acra.ACRA;
 import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -72,6 +72,7 @@ public class Landing extends ActionBarActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_landing);
 
         mTitle = getTitle();
@@ -164,7 +165,7 @@ public class Landing extends ActionBarActivity{
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.container, MainFragment.newInstance(1)).commit();
+        fragmentManager.beginTransaction().replace(R.id.container, MainFragment.newInstance()).commit();
     }
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
@@ -184,7 +185,7 @@ public class Landing extends ActionBarActivity{
                 default:
                     mDrawerLayout.closeDrawer(mDrawerList);
                     FragmentManager fragmentManager = getSupportFragmentManager();
-                    fragmentManager.beginTransaction().replace(R.id.container, MainFragment.newInstance(position + 1)).commit();
+                    fragmentManager.beginTransaction().replace(R.id.container, MainFragment.newInstance()).commit();
             }
         }
     }
@@ -228,15 +229,18 @@ public class Landing extends ActionBarActivity{
     }
 
     public static class MainFragment extends Fragment {
-        private static final String ARG_SECTION_NUMBER = "section_number";
 
-        public static MainFragment newInstance(int sectionNumber) {
+        public static MainFragment newInstance(Bundle args) {
             MainFragment fragment = new MainFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
             return fragment;
         }
+
+        public static MainFragment newInstance() {
+            MainFragment fragment = new MainFragment();
+            return fragment;
+        }
+
 
         public MainFragment() {
 
@@ -382,7 +386,7 @@ public class Landing extends ActionBarActivity{
 
                 catch (JSONException e1)
                 {
-                    ACRA.getErrorReporter().handleSilentException(e1);
+                    // TODO ACRA.getErrorReporter().handleSilentException(e1);
                 }
                 if(Status.equals("ok"))
                 {
@@ -395,7 +399,7 @@ public class Landing extends ActionBarActivity{
                     }
                     catch (JSONException e)
                     {
-                        ACRA.getErrorReporter().handleSilentException(e);
+                        // TODO ACRA.getErrorReporter().handleSilentException(e);
                     }
                     if(Latest > MainApplication.currentVersion)
                     {

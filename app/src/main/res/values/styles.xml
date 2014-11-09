@@ -3,9 +3,14 @@
     <!-- Base application theme. -->
     <style name="Theme.Main" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/white</item>
-        <item name="colorPrimaryDark">@color/lighter_grey</item>
+        <item name="colorPrimaryDark">@color/njlabs_grey</item>
         <item name="colorAccent">@color/blue</item>
         <item name="android:typeface">sans</item>
+        <item name="toolbarTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+    </style>
+
+    <style name="Theme.Landing" parent="Theme.Main">
+        <item name="toolbarTheme">@style/ThemeOverlay.AppCompat.ActionBar</item>
     </style>
 
     <style name="Theme.Preference" parent="android:Theme.Holo.Light.NoActionBar">

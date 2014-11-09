@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
@@ -14,8 +15,6 @@ import android.view.View;
 
 import com.caldroid.CaldroidFragment;
 import com.caldroid.CaldroidListener;
-
-import org.acra.ACRA;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -37,7 +36,7 @@ public class Calender extends ActionBarActivity {
         try {
             dateStr = formatter.parse(date_str);
         } catch (ParseException e) {
-            ACRA.getErrorReporter().handleException(e);
+            // TODO ACRA.getErrorReporter().handleException(e);
         }
         return dateStr;
     }
@@ -336,6 +335,8 @@ public class Calender extends ActionBarActivity {
         final SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
         final Calender this_context = this;
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setBackgroundColor(Color.parseColor("#e51c23"));
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Academic Calender");

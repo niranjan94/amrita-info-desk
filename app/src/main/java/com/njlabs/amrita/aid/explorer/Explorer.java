@@ -2,6 +2,7 @@ package com.njlabs.amrita.aid.explorer;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -30,7 +31,6 @@ import com.loopj.android.http.RequestParams;
 import com.njlabs.amrita.aid.Landing;
 import com.njlabs.amrita.aid.R;
 
-import org.acra.ACRA;
 import org.apache.http.Header;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
@@ -95,6 +95,8 @@ public class Explorer extends ActionBarActivity implements LocationListener {
 
         // ACTIONBAR STUFF
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setBackgroundColor(Color.parseColor("#3f51b5"));
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -214,7 +216,7 @@ public class Explorer extends ActionBarActivity implements LocationListener {
             try {
                 timeStamp = URLEncoder.encode(timeStamp, "UTF-8");
             } catch (UnsupportedEncodingException e1) {
-                ACRA.getErrorReporter().handleException(e1);
+                // TODO ACRA.getErrorReporter().handleException(e1);
             }
             SuperActivityToast.cancelAllSuperActivityToasts();
             // ORIGINAL: String url = "http://njlabs.kovaideals.com/api/aid/explorer.php?type=get_data_spl&mobile=
@@ -233,13 +235,13 @@ public class Explorer extends ActionBarActivity implements LocationListener {
                     try {
                         data = response.getJSONObject("data");
                     } catch (JSONException e) {
-                        ACRA.getErrorReporter().handleException(e);
+                        // TODO ACRA.getErrorReporter().handleException(e);
                     }
                     JSONArray recs = null;
                     try {
                         recs = data.getJSONArray("records");
                     } catch (JSONException e) {
-                        ACRA.getErrorReporter().handleException(e);
+                        // TODO ACRA.getErrorReporter().handleException(e);
                     }
                     if (InitialUpdate) {
                         mMap.clear();
@@ -261,7 +263,7 @@ public class Explorer extends ActionBarActivity implements LocationListener {
                             s_lon = rec.getString("lon");
                             LastTime = rec.getString("datetime");
                         } catch (JSONException e) {
-                            ACRA.getErrorReporter().handleException(e);
+                            // TODO ACRA.getErrorReporter().handleException(e);
                         }
                         Log.d("LOC DEBUG", "lat=" + s_lat + ",lon=" + s_lon);
                         if (s_lat == "null" || s_lon == "null" || s_lat == null || s_lon == null || s_lat == "" || s_lon == "") {
@@ -308,7 +310,7 @@ public class Explorer extends ActionBarActivity implements LocationListener {
                                 }
 
                             } catch (Exception e) {
-                                ACRA.getErrorReporter().handleException(e);
+                                // TODO ACRA.getErrorReporter().handleException(e);
                             }
                             String FinalLastSeen = "";
                             if (LastSeen != "") {
