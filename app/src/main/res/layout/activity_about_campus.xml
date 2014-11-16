@@ -6,14 +6,21 @@
 
     <include layout="@layout/toolbar" android:id="@+id/toolbar"/>
 
-    <com.njlabs.amrita.aid.util.PagerSlidingTabStrip
+    <!--<com.njlabs.amrita.aid.util.PagerSlidingTabStrip
         android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_below="@+id/toolbar"
         android:layout_height="35dp"
         app:pstsIndicatorHeight="4dp"
         app:pstsUnderlineHeight="1dp"
-        app:pstsDividerPadding="7dp"/>
+        app:pstsDividerPadding="7dp"/>-->
+
+    <com.astuetz.PagerSlidingTabStrip
+        android:id="@+id/tabs"
+        android:layout_width="fill_parent"
+        android:layout_below="@+id/toolbar"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"/>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"

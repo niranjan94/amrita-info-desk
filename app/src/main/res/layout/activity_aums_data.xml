@@ -10,6 +10,17 @@
     android:background="@color/white">
     <include layout="@layout/toolbar" android:id="@+id/toolbar"/>
 
+    <WebView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/webView"
+        android:layout_alignTop="@+id/list"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

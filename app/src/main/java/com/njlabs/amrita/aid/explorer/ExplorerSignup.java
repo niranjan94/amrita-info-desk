@@ -1,6 +1,5 @@
 package com.njlabs.amrita.aid.explorer;
 
-import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -21,9 +20,7 @@ import android.widget.Toast;
 import com.github.johnpersano.supertoasts.SuperToast;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.njlabs.amrita.aid.Landing;
 import com.njlabs.amrita.aid.R;
-import com.onemarker.ark.ConnectionDetector;
 import com.onemarker.ark.logging.Ln;
 
 import org.apache.http.Header;
@@ -33,8 +30,6 @@ import org.json.JSONObject;
 public class ExplorerSignup extends ActionBarActivity {
 
     public String mobile_num = null;
-    Boolean isInternetPresent = false;
-    ConnectionDetector cd;
     public ProgressDialog dialog;
 
     @Override
@@ -42,13 +37,7 @@ public class ExplorerSignup extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_explorer_signup);
 
-        ConnectionDetector cd = new ConnectionDetector(getApplicationContext());
-        boolean isInternetPresent = cd.isConnectingToInternet();
 
-        // check for Internet status
-        if (isInternetPresent) {
-            // Internet Connection is Present
-            // proceed normally
             TelephonyManager mTelephonyMgr;
             mTelephonyMgr = (TelephonyManager)
                     getSystemService(Context.TELEPHONY_SERVICE);
@@ -65,26 +54,6 @@ public class ExplorerSignup extends ActionBarActivity {
                 mobile.setInputType(InputType.TYPE_NULL);
                 mobile.setFocusable(false);
             }
-        } else {
-
-            // Internet connection is not present
-            // Ask user to connect to Internet
-            Builder builder = new Builder(this);    // ALERT DIALOG
-            builder.setTitle("No Internet Connection")
-                    .setMessage("A working internet connection is required for using Amrita Explorer !")
-                    .setCancelable(false)
-                    .setIcon(R.drawable.warning)
-                    .setPositiveButton("Got it !", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            Intent intent = new Intent(getBaseContext(), Landing.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(intent);
-
-                        }
-                    });
-            AlertDialog alert = builder.create();
-            alert.show();
-        }
 
         dialog = new ProgressDialog(this);
         dialog.setIndeterminate(true);
@@ -128,7 +97,7 @@ public class ExplorerSignup extends ActionBarActivity {
                 superToast.setAnimations(SuperToast.Animations.FLYIN);
                 superToast.setBackground(SuperToast.Background.RED);
                 superToast.setTextColor(Color.WHITE);
-                superToast.setText("Server Error ! Please try again later.");
+                superToast.setText("Cannot connect to Server. Try again later.");
                 superToast.show();
             }
 

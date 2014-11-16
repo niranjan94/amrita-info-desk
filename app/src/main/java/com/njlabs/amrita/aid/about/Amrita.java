@@ -18,9 +18,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.astuetz.PagerSlidingTabStrip;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.TrainBusInfo;
-import com.njlabs.amrita.aid.util.PagerSlidingTabStrip;
 
 public class Amrita extends ActionBarActivity {
 
@@ -67,6 +67,7 @@ public class Amrita extends ActionBarActivity {
 
         // Bind the tabs to the ViewPager
         PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
+        tabs.setBackgroundColor(Color.parseColor("#03a9f4"));
         tabs.setViewPager(mPager);
     }
 

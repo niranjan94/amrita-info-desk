@@ -50,7 +50,7 @@ public class TrainBusInfo extends ActionBarActivity {
             transporters.add(new Transporter(
                     "56323 Coimbatore Mangalore Fast Passenger",
                     "All Days",
-                    "07:40 hours",
+                    "07:20 hours",
                     "08:09 hours",
                     "cbe",
                     "etmd",

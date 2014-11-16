@@ -31,7 +31,6 @@ import com.njlabs.amrita.aid.MainApplication;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.aums.classes.CourseAttendanceData;
 import com.njlabs.amrita.aid.aums.classes.CourseData;
-import com.onemarker.ark.ConnectionDetector;
 import com.onemarker.ark.Security;
 import com.onemarker.ark.Util;
 import com.onemarker.ark.logging.Ln;
@@ -56,8 +55,6 @@ import java.util.Map;
 public class Aums extends ActionBarActivity {
 
     private static long BackPress;
-
-    ConnectionDetector cd;
 
     ProgressDialog dialog = null;
     AumsClient client;
@@ -136,7 +133,7 @@ public class Aums extends ActionBarActivity {
         alert.requestWindowFeature(Window.FEATURE_NO_TITLE);
         alert.show();
         // check for Internet status
-        if ((new ConnectionDetector(getApplicationContext())).isConnectingToInternet()) {
+       /* if ((new ConnectionDetector(getApplicationContext())).isConnectingToInternet()) {
 
         } else {
             AlertDialog.Builder builder1 = new AlertDialog.Builder(serviceContext);    // ALERT DIALOG
@@ -151,7 +148,7 @@ public class Aums extends ActionBarActivity {
                     });
             AlertDialog alert1 = builder1.create();
             alert1.show();
-        }
+        }*/
         dialog = new ProgressDialog(serviceContext);
         dialog.setIndeterminate(true);
         dialog.setCancelable(false);
@@ -573,71 +570,82 @@ public class Aums extends ActionBarActivity {
 
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                    Ln.d("Start getAttendance stage 2");
-                    // GET ACTUAL ATTENDACE DATA
-                    RequestParams params = new RequestParams();
-                    params.put("htmlPageTopContainer_selectSem", semesterMapping.get(StudentCurrentSem));
-                    params.put("Page_refIndex_hidden", attendanceRefIndex++);
-                    params.put("htmlPageTopContainer_selectCourse", "0");
-                    params.put("htmlPageTopContainer_selectType", "1");
-                    params.put("htmlPageTopContainer_hiddentSummary", "");
-                    params.put("htmlPageTopContainer_status", "");
-                    params.put("htmlPageTopContainer_action", "UMS-ATD_SHOW_ATDSUMMARY_SCREEN");
-                    params.put("htmlPageTopContainer_notify", "");
-
-                    client.post("/aums/Jsp/Attendance/AttendanceReportStudent.jsp?action=UMS-ATD_INIT_ATDREPORTSTUD_SCREEN&isMenu=true&pagePostSerialID=0", params, new TextHttpResponseHandler() {
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                            Ln.e("Attendance Stage 2 ERROR. Code:%s Response:%s", statusCode, responseString);
-                            serverError();
-                        }
-
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                            Ln.d("Got attendence");
-                            dialog.dismiss();
-                            gotAttendance = true;
-                            getAttendanceResponse = responseString;
-                            if(calledBy.equals("activity")) {
-                                Intent i = new Intent(getApplicationContext(), AumsAttendance.class);
-                                i.putExtra("response", responseString);
-                                startActivity(i);
-                                overridePendingTransition(R.anim.fadein,R.anim.fadeout);
-                            }
-                            else {
-                                Ln.d("Storing");
-                                // STORE TO DATABASE AND SHOW NOTIFICATION
-                                Document doc = Jsoup.parse(responseString);
-
-                                Element table = doc.select("table[width=75%] > tbody").first();
-                                Elements rows = table.select("tr:gt(0)");
-
-                                CourseAttendanceData.deleteAll(CourseAttendanceData.class);
-
-                                for(Element row : rows) {
-                                    Elements dataHolders = row.select("td > span");
-
-                                    CourseAttendanceData adata = new CourseAttendanceData();
-
-                                    adata.setCourseCode(dataHolders.get(0).text());
-                                    adata.setCourseTitle(dataHolders.get(1).text());
-                                    Ln.d(dataHolders.get(1).text());
-                                    adata.setTotal(dataHolders.get(3).text());
-                                    adata.setAttended(dataHolders.get(4).text());
-                                    adata.setPercentage(dataHolders.get(5).text());
-
-                                    adata.save();
-                                }
-                                // SEND NOTIFICATIONS
-
-                            }
-
-                        }
-                    });
+                    getAttendanceStage2(StudentCurrentSem);
                 }
             });
         }
     }
+    public void getAttendanceStage2(String semester){
+        Ln.d("Start getAttendance stage 2");
+        // GET ACTUAL ATTENDACE DATA
+        RequestParams params = new RequestParams();
+        params.put("htmlPageTopContainer_selectSem", semesterMapping.get(semester));
+        params.put("Page_refIndex_hidden", attendanceRefIndex++);
+        params.put("htmlPageTopContainer_selectCourse", "0");
+        params.put("htmlPageTopContainer_selectType", "1");
+        params.put("htmlPageTopContainer_hiddentSummary", "");
+        params.put("htmlPageTopContainer_status", "");
+        params.put("htmlPageTopContainer_action", "UMS-ATD_SHOW_ATDSUMMARY_SCREEN");
+        params.put("htmlPageTopContainer_notify", "");
+
+        client.post("/aums/Jsp/Attendance/AttendanceReportStudent.jsp?action=UMS-ATD_INIT_ATDREPORTSTUD_SCREEN&isMenu=true&pagePostSerialID=0", params, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Ln.e("Attendance Stage 2 ERROR. Code:%s Response:%s", statusCode, responseString);
+                serverError();
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Ln.d("Got attendence");
+
+                gotAttendance = true;
+                getAttendanceResponse = responseString;
+
+                Document doc = Jsoup.parse(responseString);
+                Element table = doc.select("table[width=75%] > tbody").first();
+                Elements rows = table.select("tr:gt(0)");
+
+                if(rows.toString().equals(""))
+                {
+                    getAttendanceStage2(String.valueOf(Integer.parseInt(StudentCurrentSem)-1));
+                }
+                else {
+                    dialog.dismiss();
+                    if (calledBy.equals("activity")) {
+                        Intent i = new Intent(getApplicationContext(), AumsAttendance.class);
+                        i.putExtra("response", responseString);
+                        startActivity(i);
+                        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+                    } else {
+                        Ln.d("Storing");
+
+                        // STORE TO DATABASE AND SHOW NOTIFICATION
+                        CourseAttendanceData.deleteAll(CourseAttendanceData.class);
+
+                        for (Element row : rows) {
+                            Elements dataHolders = row.select("td > span");
+
+                            CourseAttendanceData adata = new CourseAttendanceData();
+
+                            adata.setCourseCode(dataHolders.get(0).text());
+                            adata.setCourseTitle(dataHolders.get(1).text());
+                            adata.setTotal(dataHolders.get(5).text());
+                            adata.setAttended(dataHolders.get(6).text());
+                            adata.setPercentage(dataHolders.get(7).text());
+
+                            adata.save();
+                        }
+                        // SEND NOTIFICATIONS
+
+                    }
+
+                }
+
+            }
+        });
+    }
+
 
     public void getRegisteredCourses() {
         Ln.d("Start getRegisteredCourses Stage 1");
@@ -772,7 +780,6 @@ public class Aums extends ActionBarActivity {
         });
     }
     public void OpenAttendance(View view) {
-
         dialog.setMessage("Getting your attendance summary");
         dialog.show();
         getAttendance();
@@ -842,7 +849,7 @@ public class Aums extends ActionBarActivity {
             superToast.setAnimations(SuperToast.Animations.FLYIN);
             superToast.setBackground(SuperToast.Background.RED);
             superToast.setTextColor(Color.WHITE);
-            superToast.setText("Server error ! Please try again after some time !");
+            superToast.setText("Cannot connect to Server. Try again later.");
             superToast.show();
             if (dialog != null)
                 dialog.dismiss();
@@ -856,14 +863,14 @@ public class Aums extends ActionBarActivity {
                 // need to cancel the toast here
                 toast.cancel();
                 closeSession(true);
-                Toast.makeText(getApplicationContext(), "You have successfully logged out !", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "You have successfully logged out.", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(serviceContext, Landing.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 overridePendingTransition(R.anim.fadein,R.anim.fadeout);
             } else {
                 // ask user to press back button one more time to close app
-                toast = Toast.makeText(getBaseContext(), "Press once again to Log Out of AUMS!", Toast.LENGTH_SHORT);
+                toast = Toast.makeText(getBaseContext(), "Press once again to Log Out of AUMS.", Toast.LENGTH_SHORT);
                 toast.show();
             }
             BackPress = System.currentTimeMillis();

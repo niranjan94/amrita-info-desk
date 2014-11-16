@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -77,6 +78,7 @@ public class Landing extends ActionBarActivity{
 
         mTitle = getTitle();
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+
         setSupportActionBar(toolbar);
 
         // DRAWER SETUP
@@ -143,6 +145,7 @@ public class Landing extends ActionBarActivity{
         });
 
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,                    /* host Activity */
                 mDrawerLayout,                    /* DrawerLayout object */
@@ -153,8 +156,6 @@ public class Landing extends ActionBarActivity{
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-
-                //getActivity().invalidateOptionsMenu(); // calls onPrepareOptionsMenu()
             }
 
             @Override
@@ -162,7 +163,15 @@ public class Landing extends ActionBarActivity{
                 super.onDrawerOpened(drawerView);
 
             }
+
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                int alpha = Math.round(255*(1-slideOffset));
+                toolbar.setBackgroundColor(Color.argb(alpha,255,255,255));
+                super.onDrawerSlide(drawerView, slideOffset);
+            }
         };
+
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.container, MainFragment.newInstance()).commit();
