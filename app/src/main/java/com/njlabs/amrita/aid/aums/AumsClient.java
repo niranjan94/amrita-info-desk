@@ -22,6 +22,14 @@ public class AumsClient {
         client.getHttpClient().getParams().setParameter(ClientPNames.ALLOW_CIRCULAR_REDIRECTS, true);
     }
 
+    public void setReferrer(String referrer){
+        client.addHeader("Referer",getAbsoluteUrl(referrer));
+    }
+
+    public void removeReferrer(){
+        client.removeHeader("Referer");
+    }
+
     public void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
         client.get(getAbsoluteUrl(url), params, responseHandler);
     }

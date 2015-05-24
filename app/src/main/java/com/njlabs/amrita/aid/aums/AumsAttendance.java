@@ -17,7 +17,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.aums.classes.CourseAttendanceData;
 
@@ -147,7 +146,7 @@ public class AumsAttendance extends ActionBarActivity {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyy HH:mm:ss");
                 String currentDateandTime = sdf.format(new Date());
                 Exception e = new Exception("AUMS Grades Error Reported - "+currentDateandTime);
-                Crashlytics.logException(e);
+                //Crashlytics.logException(e);
                 Toast.makeText(getBaseContext(),"The error has been reported.",Toast.LENGTH_SHORT).show();
                 return true;
             default:

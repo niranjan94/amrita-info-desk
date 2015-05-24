@@ -1,6 +1,5 @@
 package com.njlabs.amrita.aid;
 
-import com.crashlytics.android.Crashlytics;
 import com.njlabs.amrita.aid.util.FontsOverride;
 import com.orm.SugarApp;
 import com.parse.Parse;
@@ -12,7 +11,7 @@ public class MainApplication extends SugarApp {
     public void onCreate() 
     {
         super.onCreate();
-        Crashlytics.start(this);
+        //Crashlytics.start(this);
         Parse.initialize(this, "rh6SYwa5Gfxk9rBzIEZvXSloGRl50pMnockRYK5E", "DwA9WHCbzgXBfLMosxl32LPEhZGtEqe2jYVuXhCj");
         FontsOverride.setDefaultFont(this);
     }

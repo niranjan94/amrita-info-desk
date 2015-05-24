@@ -1,2 +1,0 @@
-configurations.create("default")
-artifacts.add("default", file('supertoasts-1.3.4.aar'))

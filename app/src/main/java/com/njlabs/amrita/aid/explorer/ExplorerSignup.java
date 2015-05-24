@@ -218,7 +218,7 @@ public class ExplorerSignup extends ActionBarActivity {
 
 
     }
-    public boolean onOptionsItemSelected(int featureId, MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item){
         if(item.getItemId() == android.R.id.home) {
             finish();
             overridePendingTransition(R.anim.fadein, R.anim.fadeout);

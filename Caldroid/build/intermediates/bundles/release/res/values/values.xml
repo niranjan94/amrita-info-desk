@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <!-- From: file:/G:/Android/StudioWorkspace/AID-AmritaInfoDesk/Caldroid/res/values/color.xml -->
-    <eat-comment />
-
+    <eat-comment/>
     <color name="caldroid_black">#000000</color>
     <color name="caldroid_darker_gray">#aaa</color>
     <color name="caldroid_gray">#CCC</color>
@@ -14,12 +12,10 @@
     <color name="caldroid_transparent">#00000000</color>
     <color name="caldroid_white">#FFFFFF</color>
     <!-- From: file:/G:/Android/StudioWorkspace/AID-AmritaInfoDesk/Caldroid/res/values/strings.xml -->
-    <eat-comment />
-
+    <eat-comment/>
     <string name="app_name">CalendarFragment</string>
     <!-- From: file:/G:/Android/StudioWorkspace/AID-AmritaInfoDesk/Caldroid/res/values/styles.xml -->
-    <eat-comment />
-
+    <eat-comment/>
     <style name="AppBaseTheme" parent="android:Theme.Light">
         <!--
             Theme customizations available in newer API levels can go in
@@ -27,9 +23,7 @@
             backward-compatibility can go here.
         -->
     </style>
-
     <style name="Theme.Main" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
-
 </resources>

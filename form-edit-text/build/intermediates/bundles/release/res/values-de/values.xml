@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <!-- From: file:/G:/Android/StudioWorkspace/AID-AmritaInfoDesk/form-edit-text/res/values-de/strings.xml -->
-    <eat-comment />
-
+    <eat-comment/>
     <string name="error_creditcard_number_not_valid">Kreditkartennummer ist nicht gültig</string>
     <string name="error_domain_not_valid">Domainname ist nicht gültig</string>
     <string name="error_email_address_not_valid">E-mail Adresse ist nicht gültig</string>
@@ -14,5 +12,4 @@
     <string name="error_phone_not_valid">Telefonnummer ist nicht gültig</string>
     <string name="error_this_field_cannot_contain_special_character">Bitte verwenden Sie keine Sonderzeichen</string>
     <string name="error_url_not_valid">URL Adresse is nicht gültig</string>
-
 </resources>

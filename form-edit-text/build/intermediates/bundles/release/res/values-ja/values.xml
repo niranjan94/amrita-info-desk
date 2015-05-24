@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <!-- From: file:/G:/Android/StudioWorkspace/AID-AmritaInfoDesk/form-edit-text/res/values-ja/strings.xml -->
-    <eat-comment />
-
+    <eat-comment/>
     <string name="error_creditcard_number_not_valid">有効なクレジットカード番号ではありません。</string>
     <string name="error_domain_not_valid">有効なドメイン名ではありません。</string>
     <string name="error_email_address_not_valid">有効な電子メールアドレスではありません。</string>
@@ -14,5 +12,4 @@
     <string name="error_phone_not_valid">有効な電話番号ではありません。</string>
     <string name="error_this_field_cannot_contain_special_character">特別な文字を含むことはできません。</string>
     <string name="error_url_not_valid">有効なURLではありません。</string>
-
 </resources>

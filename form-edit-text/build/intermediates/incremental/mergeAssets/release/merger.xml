@@ -1,11 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merger version="2" >
-
-    <dataSet config="main" >
-        <source path="G:\Android\StudioWorkspace\AID-AmritaInfoDesk\form-edit-text\assets" />
-    </dataSet>
-    <dataSet config="release" >
-        <source path="G:\Android\StudioWorkspace\AID-AmritaInfoDesk\form-edit-text\build-types\release\assets" />
-    </dataSet>
-
-</merger>
+<merger version="3"><dataSet config="main"><source path="G:\Android\StudioWorkspace\AID-AmritaInfoDesk\form-edit-text\assets"/></dataSet><dataSet config="release"><source path="G:\Android\StudioWorkspace\AID-AmritaInfoDesk\form-edit-text\build-types\release\assets"/></dataSet></merger>

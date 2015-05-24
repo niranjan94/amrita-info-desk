@@ -17,6 +17,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,7 +31,6 @@ import com.loopj.android.http.TextHttpResponseHandler;
 import com.njlabs.amrita.aid.Landing;
 import com.njlabs.amrita.aid.MainApplication;
 import com.njlabs.amrita.aid.R;
-import com.njlabs.amrita.aid.aums.classes.CourseAttendanceData;
 import com.njlabs.amrita.aid.aums.classes.CourseData;
 import com.onemarker.ark.Security;
 import com.onemarker.ark.Util;
@@ -483,7 +484,7 @@ public class Aums extends ActionBarActivity {
             client.get("/aums/FileUploadServlet", params, new FileAsyncHttpResponseHandler(serviceContext) {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, Throwable throwable, File file) {
-                    serverError();
+                    //serverError();
                     findViewById(studentProfilePicProgress).setVisibility(View.GONE);
                     ImageView myImage = (ImageView) findViewById(studentProfilePic);
                     myImage.setVisibility(View.VISIBLE);
@@ -587,7 +588,7 @@ public class Aums extends ActionBarActivity {
         params.put("htmlPageTopContainer_status", "");
         params.put("htmlPageTopContainer_action", "UMS-ATD_SHOW_ATDSUMMARY_SCREEN");
         params.put("htmlPageTopContainer_notify", "");
-
+        client.setReferrer("/aums/Jsp/Attendance/AttendanceReportStudent.jsp");
         client.post("/aums/Jsp/Attendance/AttendanceReportStudent.jsp?action=UMS-ATD_INIT_ATDREPORTSTUD_SCREEN&isMenu=true&pagePostSerialID=0", params, new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
@@ -597,14 +598,24 @@ public class Aums extends ActionBarActivity {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                client.removeReferrer();
                 Ln.d("Got attendence");
 
                 gotAttendance = true;
                 getAttendanceResponse = responseString;
+                Ln.d(responseString);
 
+                WebView wv = new WebView(getBaseContext());
+                WebSettings webSettings = wv.getSettings();
+                webSettings.setJavaScriptEnabled(true);
+                wv.loadData(responseString,"text/html","utf8");
+                setContentView(wv);
+                dialog.dismiss();
+                /*
                 Document doc = Jsoup.parse(responseString);
                 Element table = doc.select("table[width=75%] > tbody").first();
                 Elements rows = table.select("tr:gt(0)");
+
 
                 if(rows.toString().equals(""))
                 {
@@ -640,7 +651,7 @@ public class Aums extends ActionBarActivity {
 
                     }
 
-                }
+                }*/
 
             }
         });
