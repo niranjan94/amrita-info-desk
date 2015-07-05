@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.njlabs.amrita.aid" >
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.njlabs.amrita.aid">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -14,6 +15,12 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <permission android:protectionLevel="signature"
+        android:name="com.njlabs.amrita.aid.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.njlabs.amrita.aid.permission.C2D_MESSAGE" />
 
     <permission
         android:name="com.njlabs.amrita.aid.permission.MAPS_RECEIVE"
@@ -29,7 +36,8 @@
     <application
         android:name="com.njlabs.amrita.aid.MainApplication"
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        tools:replace="android:icon"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.Main" >
         <meta-data
@@ -139,19 +147,7 @@
                 android:value="com.njlabs.amrita.aid.Landing" />
         </activity>
 
-        <service android:name="com.parse.PushService" />
 
-        <receiver android:name="com.parse.ParseBroadcastReceiver" >
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.USER_PRESENT" />
-            </intent-filter>
-        </receiver>
-        <receiver android:name="com.njlabs.amrita.aid.push.GetPush" >
-            <intent-filter>
-                <action android:name="com.njlabs.amrita.aid.GET_PUSH" />
-            </intent-filter>
-        </receiver>
         <receiver android:name="com.njlabs.amrita.aid.explorer.ExplorerBackgroundLocation" >
         </receiver>
 
@@ -209,7 +205,29 @@
         </activity>
         <meta-data android:name="com.crashlytics.ApiKey" android:value="37243dbea20e385bdebdc999bef0715ef594e382"/>
 
-
+        <service android:name="com.parse.PushService" />
+        <receiver android:name="com.parse.ParseBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.parse.ParsePushBroadcastReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.parse.push.intent.RECEIVE" />
+                <action android:name="com.parse.push.intent.DELETE" />
+                <action android:name="com.parse.push.intent.OPEN" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.parse.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+                <category android:name="com.njlabs.amrita.aid" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

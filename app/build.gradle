@@ -1,4 +1,19 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.19.2'
+    }
+}
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
+
 android {
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
@@ -12,7 +27,11 @@ android {
     }
     buildTypes {
         release {
-
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+        debug {
+            debuggable true
         }
     }
     packagingOptions {
@@ -22,22 +41,26 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:22.0.0'
-    compile 'com.android.support:cardview-v7:21.0.3'
-    compile 'com.android.support:recyclerview-v7:21.0.3'
-    compile 'com.android.support:support-v4:22.0.0'
-    compile project(':Caldroid')
+    compile 'com.parse.bolts:bolts-android:1.2.0'
+    compile fileTree(dir: 'libs', include: 'Parse-*.jar')
+    compile 'com.android.support:appcompat-v7:22.2.0'
+    compile 'com.android.support:cardview-v7:22.2.0'
+    compile 'com.android.support:recyclerview-v7:22.2.0'
+    compile 'com.android.support:support-v4:22.2.0'
     compile 'org.apache.commons:commons-lang3:3.3.2'
     compile project(':ark-hacks')
-    compile project(':form-edit-text')
-    compile files('libs/Parse-1.2.5.jar')
     compile 'org.jsoup:jsoup:1.7.3'
     compile 'com.github.chrisbanes.photoview:library:1.2.3'
-    compile 'com.google.android.gms:play-services:7.0.0'
+    compile 'com.google.android.gms:play-services-maps:7.5.0'
     compile 'com.joanzapata.android:android-iconify:1.0.6'
     compile 'com.loopj.android:android-async-http:1.4.5'
     compile 'com.github.satyan:sugar:1.3'
     compile 'com.jpardogo.materialtabstrip:library:1.0.0'
     compile 'com.github.johnpersano:supertoasts:1.3.4@aar'
+    compile 'com.roomorama:caldroid:2.0.0'
+    compile 'com.andreabaccega:android-form-edittext:1.1.0@aar'
+    compile 'joda-time:joda-time:2.8.1'
+    compile('com.crashlytics.sdk.android:crashlytics:2.4.0@aar') {
+        transitive = true;
+    }
 }

@@ -1,1 +1,1 @@
-include ':app', ':ark-hacks', ':supertoasts-1.3.4', ':Caldroid', ':form-edit-text'
+include ':app', ':ark-hacks'
