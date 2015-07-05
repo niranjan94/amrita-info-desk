@@ -27,8 +27,8 @@ import java.io.File;
 
 public class AttendanceFlow extends Activity {
 
-    String username="CB.EN.U4AEE12029";
-    String password="asmi1995adminnasa1995admin";
+    String username="";
+    String password="";
     String semester="5";
 
     AumsClient client;

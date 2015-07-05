@@ -10,7 +10,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,7 +22,7 @@ import com.njlabs.amrita.aid.aums.Aums;
 import com.onemarker.ark.Security;
 import com.onemarker.ark.logging.Ln;
 
-public class AttendanceManager extends ActionBarActivity {
+public class AttendanceManager extends AppCompatActivity {
 
     Aums aums;
     @Override

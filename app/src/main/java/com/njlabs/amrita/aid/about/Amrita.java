@@ -13,7 +13,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,7 +22,7 @@ import com.astuetz.PagerSlidingTabStrip;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.TrainBusInfo;
 
-public class Amrita extends ActionBarActivity {
+public class Amrita extends AppCompatActivity {
 
     ActionBar mActionBar;
     ViewPager mPager;

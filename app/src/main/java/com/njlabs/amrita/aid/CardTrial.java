@@ -6,7 +6,7 @@ package com.njlabs.amrita.aid;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,7 +19,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 
-public class CardTrial extends ActionBarActivity {
+public class CardTrial extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;

@@ -2,14 +2,14 @@ package com.njlabs.amrita.aid.about;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.njlabs.amrita.aid.R;
 
 
-public class App extends ActionBarActivity {
+public class App extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -2,7 +2,7 @@ package com.njlabs.amrita.aid;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.view.MenuItem;
@@ -16,7 +16,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 
-public class TrainBusInfo extends ActionBarActivity {
+public class TrainBusInfo extends AppCompatActivity {
 
     private ListView listView = null;
     private ArrayList<Transporter> transporters;

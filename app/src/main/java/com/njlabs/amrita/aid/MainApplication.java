@@ -1,8 +1,12 @@
 package com.njlabs.amrita.aid;
 
+import com.crashlytics.android.Crashlytics;
 import com.njlabs.amrita.aid.util.FontsOverride;
 import com.orm.SugarApp;
 import com.parse.Parse;
+import com.parse.ParseInstallation;
+
+import io.fabric.sdk.android.Fabric;
 
 public class MainApplication extends SugarApp {
 
@@ -11,8 +15,9 @@ public class MainApplication extends SugarApp {
     public void onCreate() 
     {
         super.onCreate();
-        //Crashlytics.start(this);
+        Fabric.with(this, new Crashlytics());
         Parse.initialize(this, "rh6SYwa5Gfxk9rBzIEZvXSloGRl50pMnockRYK5E", "DwA9WHCbzgXBfLMosxl32LPEhZGtEqe2jYVuXhCj");
+        ParseInstallation.getCurrentInstallation().saveInBackground();
         FontsOverride.setDefaultFont(this);
     }
 }

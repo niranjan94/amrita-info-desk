@@ -10,7 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.MenuItem;
@@ -53,7 +53,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class Aums extends ActionBarActivity {
+@SuppressWarnings("ResultOfMethodCallIgnored")
+public class Aums extends AppCompatActivity {
 
     private static long BackPress;
 
@@ -133,23 +134,7 @@ public class Aums extends ActionBarActivity {
         AlertDialog alert = builder.create();
         alert.requestWindowFeature(Window.FEATURE_NO_TITLE);
         alert.show();
-        // check for Internet status
-       /* if ((new ConnectionDetector(getApplicationContext())).isConnectingToInternet()) {
 
-        } else {
-            AlertDialog.Builder builder1 = new AlertDialog.Builder(serviceContext);    // ALERT DIALOG
-            builder1.setTitle("No Internet Connection")
-                    .setMessage("A working internet connection is required for accessing Amrita UMS !")
-                    .setCancelable(false)
-                    .setIcon(R.drawable.warning)
-                    .setPositiveButton("Got it !", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            finish();
-                        }
-                    });
-            AlertDialog alert1 = builder1.create();
-            alert1.show();
-        }*/
         dialog = new ProgressDialog(serviceContext);
         dialog.setIndeterminate(true);
         dialog.setCancelable(false);
@@ -159,10 +144,10 @@ public class Aums extends ActionBarActivity {
         SharedPreferences preferences = serviceContext.getSharedPreferences("aums_prefs", Context.MODE_PRIVATE);
         String RollNo = preferences.getString("RollNo", "");
         String encodedPassword = preferences.getString("Password","");
-        if (RollNo != null && RollNo != "") {
+        if (!RollNo.equals("")) {
             ((FormEditText) findViewById(R.id.roll_no)).setText(RollNo);
         }
-        if(encodedPassword != null && encodedPassword != "") {
+        if(!encodedPassword.equals("")) {
             ((FormEditText)findViewById(R.id.pwd)).setText(Security.decrypt(encodedPassword,MainApplication.key));
         }
         loadSemesterMapping();
@@ -181,47 +166,20 @@ public class Aums extends ActionBarActivity {
 
         if (allValid) {
 
-            final CharSequence[] items = {"amritavidya.amrita.edu (recommended)","amritavidya1.amrita.edu","amritavidya2.amrita.edu"};
-            AlertDialog.Builder builder = new AlertDialog.Builder(serviceContext);
-            builder.setTitle("Select a server to use");
-            builder.setItems(items, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialogList, int item) {
+            SharedPreferences preferences = serviceContext.getSharedPreferences("aums_prefs", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("RollNo", RollNo.getText().toString());
+            editor.putString("Password", Security.encrypt(Password.getText().toString(), MainApplication.key));
+            editor.apply();
 
-                    SharedPreferences preferences = serviceContext.getSharedPreferences("aums_prefs", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putString("RollNo", RollNo.getText().toString());
-                    editor.putString("Password", Security.encrypt(Password.getText().toString(), MainApplication.key));
-                    editor.commit();
+            username = RollNo.getText().toString();
+            password = Password.getText().toString();
 
-                    username = RollNo.getText().toString();
-                    password = Password.getText().toString();
+            refreshSession();
 
-                    refreshSession();
-
-                    client = new AumsClient(serviceContext);
-
-                    switch(item)
-                    {
-                        case 0:
-                            GetSessionID("https://amritavidya.amrita.edu:8444",false);
-                            break;
-                        case 1:
-                            GetSessionID("https://amritavidya1.amrita.edu:8444",false);
-                            break;
-                        case 2:
-                            GetSessionID("https://amritavidya2.amrita.edu:8444",false);
-                            break;
-                        default:
-                            GetSessionID("https://amritavidya.amrita.edu:8444",false);
-                    }
-
-                    dialog.show();
-                }
-            });
-            AlertDialog alert_d = builder.create();
-            alert_d.show();
-
-        } else {
+            client = new AumsClient(serviceContext);
+            GetSessionID("https://amritavidya.amrita.edu:8444",false);
+            dialog.show();
 
         }
     }
@@ -230,12 +188,12 @@ public class Aums extends ActionBarActivity {
     public void GetSessionID(String baseURL, Boolean retry) {
 
         if(calledBy.equals("activity")||(calledBy.equals("data_hook")&&dialog!=null)) {
-            if (retry == true) {
+            if (retry) {
                 dialog.setMessage("Starting a new session with a different server");
             } else
                 dialog.setMessage("Starting a new Session !");
         }
-        if (retry == true) {
+        if (retry) {
             refreshSession();
             client = new AumsClient(serviceContext);
         }
@@ -251,18 +209,17 @@ public class Aums extends ActionBarActivity {
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 Ln.e("Session ERROR. Code:%s Response:%s", statusCode, responseString);
 
-                if(client.BASE_URL.equals("https://amritavidya.amrita.edu:8444"))
-                {
-                    GetSessionID("https://amritavidya1.amrita.edu:8444",true);
-                }
-                else if(client.BASE_URL.equals("https://amritavidya1.amrita.edu:8444"))
-                {
-                    GetSessionID("https://amritavidya2.amrita.edu:8444",true);
-                }
-                else
-                {
-                    serverError();
-                    closeSession(true);
+                switch (client.BASE_URL) {
+                    case "https://amritavidya.amrita.edu:8444":
+                        GetSessionID("https://amritavidya1.amrita.edu:8444", true);
+                        break;
+                    case "https://amritavidya1.amrita.edu:8444":
+                        GetSessionID("https://amritavidya2.amrita.edu:8444", true);
+                        break;
+                    default:
+                        serverError();
+                        closeSession(true);
+                        break;
                 }
             }
 
@@ -319,7 +276,7 @@ public class Aums extends ActionBarActivity {
                         Name = TableElement.text();
                     }
                 }
-                if (Name != null && Name != "") {
+                if (Name != null && !Name.equals("")) {
                     if(calledBy.equals("activity")||(calledBy.equals("data_hook")&&dialog!=null))
                         dialog.setMessage("Authorization successful");
                     Name = Name.replace("Welcome ", "");
@@ -361,13 +318,10 @@ public class Aums extends ActionBarActivity {
                                 GetSessionID("https://amritavidya2.amrita.edu:8444",true);
                             }
                         }
-                    } catch (UnsupportedEncodingException e) {
-
-                    } catch (MalformedURLException e) {
+                    } catch (UnsupportedEncodingException | MalformedURLException ignored) {
 
                     }
-                    if(retry==false && (calledBy.equals("activity")||(calledBy.equals("data_hook")&&dialog!=null))) {
-
+                    if(!retry && (calledBy.equals("activity")||(calledBy.equals("data_hook")&&dialog!=null))) {
                         SuperToast superToast = new SuperToast(serviceContext);
                         superToast.setDuration(SuperToast.Duration.LONG);
                         superToast.setAnimations(SuperToast.Animations.FLYIN);
@@ -446,28 +400,22 @@ public class Aums extends ActionBarActivity {
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putString("name", WordUtils.capitalizeFully(StudentName));
                     editor.putString("campus", "Coimbatore");
-                    editor.commit();
+                    editor.apply();
                     DiplayDataView(EncodedId);
                 }
                 if(methodToCall!=null) {
                     Method method = null;
                     try {
                         method = ((Object) Aums.this).getClass().getMethod(methodToCall);
-                    } catch (SecurityException e) {
-
-                    } catch (NoSuchMethodException e) {
+                    } catch (SecurityException | NoSuchMethodException ignored) {
 
                     }
                     try {
-                        method.invoke(Aums.this);
-                    } catch (IllegalArgumentException e) {
+                        if (method != null) {
+                            method.invoke(Aums.this);
+                        }
+                    } catch (IllegalArgumentException | NullPointerException | InvocationTargetException | IllegalAccessException ignored) {
                         
-                    } catch (IllegalAccessException e) {
-                        
-                    } catch (InvocationTargetException e) {
-                        
-                    } catch (NullPointerException e) {
-
                     }
                 }
             }
@@ -899,15 +847,16 @@ public class Aums extends ActionBarActivity {
         client.closeClient();
         if(clearAll) {
             serviceContext.getSharedPreferences("CookiePrefsFile", 0).edit().clear().commit();
-            File deletePrefFile = new File("/data/data/com.njlabs.amrita.aid/shared_prefs/CookiePrefsFile.xml");
+            String filePath = getApplicationContext().getFilesDir().getParent()+"/shared_prefs/CookiePrefsFile.xml";
+            File deletePrefFile = new File(filePath );
             deletePrefFile.delete();
         }
     }
 
     private void refreshSession()
     {
-        serviceContext.getSharedPreferences("CookiePrefsFile", 0).edit().clear().commit();
-        File deletePrefFile = new File("/data/data/com.njlabs.amrita.aid/shared_prefs/CookiePrefsFile.xml");
+        String filePath = getApplicationContext().getFilesDir().getParent()+"/shared_prefs/CookiePrefsFile.xml";
+        File deletePrefFile = new File(filePath );
         deletePrefFile.delete();
     }
 

@@ -18,6 +18,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -55,7 +56,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-public class Landing extends ActionBarActivity{
+public class Landing extends AppCompatActivity {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -443,7 +444,7 @@ public class Landing extends ActionBarActivity{
 
                         AlertDialog alert = alt_bld.create();
                         alert.setTitle("New Update Available (Version "+Latest+") !");
-                        alert.setIcon(R.drawable.ic_launcher);
+                        alert.setIcon(R.mipmap.ic_launcher);
                         alert.show();
                     }
                 }

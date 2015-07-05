@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -27,7 +27,7 @@ import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class ExplorerSignup extends ActionBarActivity {
+public class ExplorerSignup extends AppCompatActivity {
 
     public String mobile_num = null;
     public ProgressDialog dialog;

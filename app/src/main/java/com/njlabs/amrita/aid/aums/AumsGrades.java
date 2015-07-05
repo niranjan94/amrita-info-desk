@@ -3,7 +3,7 @@ package com.njlabs.amrita.aid.aums;
 import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -29,7 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class AumsGrades extends ActionBarActivity {
+public class AumsGrades extends AppCompatActivity {
 
     ProgressDialog dialog;
     ListView list;

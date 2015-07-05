@@ -8,13 +8,13 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.caldroid.CaldroidFragment;
-import com.caldroid.CaldroidListener;
+import com.roomorama.caldroid.CaldroidFragment;
+import com.roomorama.caldroid.CaldroidListener;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 @SuppressLint("SimpleDateFormat")
-public class Calender extends ActionBarActivity {
+public class Calender extends AppCompatActivity {
 
     private CaldroidFragment caldroidFragment;
     private CaldroidFragment dialogCaldroidFragment;
@@ -508,7 +508,6 @@ public class Calender extends ActionBarActivity {
             args.putInt(CaldroidFragment.MONTH, cal.get(Calendar.MONTH) + 1);
             args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR));
             args.putBoolean(CaldroidFragment.ENABLE_SWIPE, true);
-            args.putBoolean(CaldroidFragment.FIT_ALL_MONTHS, false);
 
             caldroidFragment.setArguments(args);
         }
