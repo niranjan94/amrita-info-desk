@@ -3,11 +3,12 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@color/white"
+    android:paddingBottom="48dp"
     android:focusable="false" >
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingBottom="@dimen/activity_vertical_margin"
         android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -23,22 +24,31 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="AMRITA VISHWA VIDYAPEETHAM( UNIVERSITY )\nAmritanagar\nCoimbatore-647 112\nTamilnadu, India\n"
+            android:text="Amrita Vishwa Vidyapeetham (University)\nAmritanagar\nCoimbatore - 647 112\nTamilnadu, India\n"
             android:textAppearance="?android:attr/textAppearanceSmall" />
         <Button
             android:layout_width="220dp"
             android:id="@+id/call_cbe_btn"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/call"
+            android:drawableLeft="@drawable/ic_action_call"
             android:gravity="left|center_vertical"
             android:onClick="call_cbe"
+            android:textAllCaps="false"
+            android:drawablePadding="5dp"
+            android:padding="10dp"
+            android:background="@drawable/matrial_button_bg"
             android:text="+91-422-2685000" />
         <Button
             android:layout_width="220dp"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/email"
+            android:layout_marginTop="8dp"
+            android:drawableLeft="@drawable/ic_action_email"
             android:gravity="left|center_vertical"
             android:onClick="email_cbe"
+            android:textAllCaps="false"
+            android:drawablePadding="5dp"
+            android:padding="10dp"
+            android:background="@drawable/matrial_button_bg"
             android:text="univhq@amrita.edu" />
 
         <TextView
@@ -62,9 +72,13 @@
         <Button
             android:layout_width="220dp"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/info"
+            android:drawableLeft="@drawable/ic_action_info_small"
             android:gravity="left|center_vertical"
             android:onClick="view_train_cbe"
+            android:textAllCaps="false"
+            android:drawablePadding="5dp"
+            android:padding="10dp"
+            android:background="@drawable/matrial_button_bg"
             android:text="View Train Info" />
         <TextView
             android:layout_width="wrap_content"
@@ -80,9 +94,14 @@
         <Button
             android:layout_width="220dp"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/map"
+            android:drawableLeft="@drawable/ic_action_directions"
             android:gravity="left|center_vertical"
             android:onClick="directions_cbe"
+            android:textAllCaps="false"
+            android:drawablePadding="5dp"
+            android:padding="10dp"
+            android:background="@drawable/matrial_button_bg"
+            android:layout_marginBottom="10dp"
             android:text=" Get Directions" />
 
     </LinearLayout>

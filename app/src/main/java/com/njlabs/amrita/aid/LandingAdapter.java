@@ -32,14 +32,14 @@ public class LandingAdapter extends BaseAdapter {
         this.context = context;
         inflater = LayoutInflater.from(context);
         items.clear();
-        items.add(new Item("#03a9f4", "About Amrita", Iconify.IconValue.fa_info_circle));
-        items.add(new Item("#3f51b5", "Amrita Explorer", Iconify.IconValue.fa_globe));
-        items.add(new Item("#e51c23", "Academic Calender", Iconify.IconValue.fa_calendar));
+        items.add(new Item("#ffc107", "News", Iconify.IconValue.fa_newspaper_o));
         items.add(new Item("#e91e63", "Amrita UMS Login", Iconify.IconValue.fa_lock));
+        items.add(new Item("#fe5352", "Academic Calender", Iconify.IconValue.fa_calendar));
+        items.add(new Item("#3f51b5", "Amrita Explorer", Iconify.IconValue.fa_globe));
         items.add(new Item("#9c27b0", "Train & Bus Timings", Iconify.IconValue.fa_clock_o));
         items.add(new Item("#009688", "Attendance Manager", Iconify.IconValue.fa_smile_o));
         items.add(new Item("#259b24", "Curriculum Info", Iconify.IconValue.fa_book));
-        items.add(new Item("#ffc107", "Photo Gallery", Iconify.IconValue.fa_photo));
+        items.add(new Item("#03a9f4", "About Amrita", Iconify.IconValue.fa_info_circle));
     }
 
     @Override
@@ -76,7 +76,6 @@ public class LandingAdapter extends BaseAdapter {
 
         Random rnd = new Random();
         int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
-
 
         // GOOGLE MATERIAL DESIGN COLOR PALETTE
         int colors[] = {

@@ -10,7 +10,6 @@ import io.fabric.sdk.android.Fabric;
 
 public class MainApplication extends SugarApp {
 
-    public static double currentVersion = 2.0;
     public static String key = "bdc0fabcbfa45a3506d1e66a6ff77596";
     public void onCreate() 
     {

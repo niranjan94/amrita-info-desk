@@ -7,6 +7,8 @@ package com.njlabs.amrita.aid.util;
 import android.content.Context;
 import android.graphics.Typeface;
 
+import com.crashlytics.android.Crashlytics;
+
 import java.lang.reflect.Field;
 
 public final class FontsOverride {
@@ -24,10 +26,8 @@ public final class FontsOverride {
                     .getDeclaredField(staticTypefaceFieldName);
             staticField.setAccessible(true);
             staticField.set(null, newTypeface);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            Crashlytics.logException(e);
         }
     }
 }

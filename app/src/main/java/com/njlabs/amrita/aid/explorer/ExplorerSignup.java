@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.design.widget.Snackbar;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -17,9 +17,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.github.johnpersano.supertoasts.SuperToast;
+import com.crashlytics.android.Crashlytics;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.R;
 import com.onemarker.ark.logging.Ln;
 
@@ -27,7 +28,7 @@ import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class ExplorerSignup extends AppCompatActivity {
+public class ExplorerSignup extends BaseActivity {
 
     public String mobile_num = null;
     public ProgressDialog dialog;
@@ -35,8 +36,7 @@ public class ExplorerSignup extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_explorer_signup);
-
+        setupLayout(R.layout.activity_explorer_signup, Color.parseColor("#3f51b5"));
 
             TelephonyManager mTelephonyMgr;
             mTelephonyMgr = (TelephonyManager)
@@ -92,13 +92,10 @@ public class ExplorerSignup extends AppCompatActivity {
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 dialog.dismiss();
                 Ln.e("ERROR: "+statusCode+" MESSAGE: "+responseString);
-                SuperToast superToast = new SuperToast(ExplorerSignup.this);
-                superToast.setDuration(SuperToast.Duration.LONG);
-                superToast.setAnimations(SuperToast.Animations.FLYIN);
-                superToast.setBackground(SuperToast.Background.RED);
-                superToast.setTextColor(Color.WHITE);
-                superToast.setText("Cannot connect to Server. Try again later.");
-                superToast.show();
+                Snackbar
+                        .make(parentView, "Cannot connect to Server. Try again later.", Snackbar.LENGTH_LONG)
+                        .show();
+
             }
 
             @Override
@@ -111,42 +108,41 @@ public class ExplorerSignup extends AppCompatActivity {
                     status = response.getString("status").trim();
                     message = response.getString("message").trim();
                 } catch (JSONException e) {
-                    // TODO ACRA.getErrorReporter().handleException(e);
+                    Crashlytics.logException(e);
                 }
-                if (status.equals("success")) {
-                    ////
-                    //// STORE DATA TO SHARED PREFERENCES
-                    ////
-                    SharedPreferences preferences = getSharedPreferences("pref", 0);
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putString("explorer_is_registered", "yes");
-                    editor.putString("mobile_number", mobile_num);
+                if (status != null) {
+                    switch (status) {
+                        case "success":
+                            ////
+                            //// STORE DATA TO SHARED PREFERENCES
+                            ////
+                            SharedPreferences preferences = getSharedPreferences("pref", 0);
+                            SharedPreferences.Editor editor = preferences.edit();
+                            editor.putString("explorer_is_registered", "yes");
+                            editor.putString("mobile_number", mobile_num);
 
-                    // commit the edits
-                    editor.commit();
-                    //// START INTENT
-                    Intent done = new Intent(ExplorerSignup.this, Explorer.class);
-                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-                    done.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(done);
+                            // commit the edits
+                            editor.apply();
+                            //// START INTENT
+                            Intent done = new Intent(ExplorerSignup.this, Explorer.class);
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                            done.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(done);
 
-                } else if (status.equals("noreg")) {
-                    SuperToast superToast = new SuperToast(ExplorerSignup.this);
-                    superToast.setDuration(SuperToast.Duration.LONG);
-                    superToast.setAnimations(SuperToast.Animations.FLYIN);
-                    superToast.setBackground(SuperToast.Background.RED);
-                    superToast.setTextColor(Color.WHITE);
-                    superToast.setText("You are not registered ! Please register now.");
-                    superToast.show();
-                } else {
+                            break;
+                        case "noreg":
+                            Snackbar
+                                    .make(parentView, "You have not yet registered. Please register now", Snackbar.LENGTH_LONG)
+                                    .show();
+                            break;
 
-                    SuperToast superToast = new SuperToast(ExplorerSignup.this);
-                    superToast.setDuration(SuperToast.Duration.LONG);
-                    superToast.setAnimations(SuperToast.Animations.FLYIN);
-                    superToast.setBackground(SuperToast.Background.RED);
-                    superToast.setTextColor(Color.WHITE);
-                    superToast.setText("Server Error ! Please try again later.");
-                    superToast.show();
+                        default:
+                            Snackbar
+                                    .make(parentView, "Cannot connect to Server. Try again later.", Snackbar.LENGTH_LONG)
+                                    .show();
+                            break;
+
+                    }
                 }
             }
 
@@ -170,21 +166,14 @@ public class ExplorerSignup extends AppCompatActivity {
 
         text = (EditText) findViewById(R.id.email_id);
         String email_id = text.getText().toString().trim();
-        // Check for any missed fields
-        if (name == null || name == "" || email_id == null || email_id == "" || mobile == null || mobile == "" || name.equals("") || email_id.equals("") || mobile.equals("")) {
-            // Missing feilds . Warn user
-            SuperToast superToast = new SuperToast(ExplorerSignup.this);
-            superToast.setDuration(SuperToast.Duration.LONG);
-            superToast.setAnimations(SuperToast.Animations.FLYIN);
-            superToast.setBackground(SuperToast.Background.BLACK);
-            superToast.setTextColor(Color.WHITE);
-            superToast.setText("Please fill in all the details.");
-            superToast.show();
+        if (name.equals("") || email_id.equals("") || mobile.equals("") || name.equals("") || email_id.equals("") || mobile.equals("")) {
+            Snackbar
+                    .make(parentView, "Please fill in all the details.", Snackbar.LENGTH_SHORT)
+                    .show();
         } else {
             mobile_num = mobile;
             signup(name,mobile,email_id,"new");
         }
-
     }
 
     @SuppressWarnings("unchecked")
@@ -198,18 +187,12 @@ public class ExplorerSignup extends AppCompatActivity {
         alert.setPositiveButton("Let's get started !", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String value = ((EditText)dialogEntryView.findViewById(R.id.mobile)).getText().toString().trim();
+                if (value.equals("") || value.equals(" ") || value.length() < 10) {
+                    Snackbar
+                            .make(parentView, "Please fill in your mobile number.", Snackbar.LENGTH_SHORT)
+                            .show();
 
-                if (value == null || value.equals("") || value.equals(" ") || value.length() < 10) {
-
-                        SuperToast superToast = new SuperToast(ExplorerSignup.this);
-                        superToast.setDuration(SuperToast.Duration.LONG);
-                        superToast.setAnimations(SuperToast.Animations.FLYIN);
-                        superToast.setBackground(SuperToast.Background.BLACK);
-                        superToast.setTextColor(Color.WHITE);
-                        superToast.setText("Please fill in your mobile number.");
-                        superToast.show();
-
-                    } else {
+                } else {
                         signup("name",value,"email","check");
                     }
                 }

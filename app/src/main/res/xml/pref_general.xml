@@ -5,7 +5,7 @@
 
         <EditTextPreference
             android:capitalize="words"
-            android:defaultValue="Your Name Please..."
+            android:defaultValue="Your name"
             android:inputType="textCapWords"
             android:key="name"
             android:maxLines="1"
@@ -14,31 +14,13 @@
             android:title="Your Name " />
 
         <ListPreference
-            android:defaultValue="Select a campus"
-            android:entries="@array/campuses"
-            android:entryValues="@array/campuses"
-            android:key="campus"
-            android:negativeButtonText="@null"
-            android:positiveButtonText="@null"
-            android:title="Your Campus" />
-
-        <ListPreference
-            android:defaultValue="Select a department"
+            android:defaultValue="Select department"
             android:entries="@array/departments"
             android:entryValues="@array/departments"
             android:key="department"
             android:negativeButtonText="@null"
             android:positiveButtonText="@null"
             android:title="Your Department" />
-
-        <ListPreference
-            android:defaultValue="Select a school"
-            android:entries="@array/schools"
-            android:entryValues="@array/schools"
-            android:key="school"
-            android:negativeButtonText="@null"
-            android:positiveButtonText="@null"
-            android:title="Your School" />
 
     </PreferenceCategory>
 
@@ -47,7 +29,7 @@
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="explorer_update"
-            android:summary="Auto Update your location for Amrita Explorer (NOTE: It will Work ONLY if you are near Amrita Campus) "
+            android:summary="Auto Update your location for Amrita Explorer whenever you are within the campus"
             android:title="Auto Update Your Location" />
 
     </PreferenceCategory>
@@ -55,7 +37,7 @@
     <PreferenceCategory android:title="Third Party Libraries">
         <Preference
             android:summary="Licensed under the Apache License 2.0"
-            android:title="Application Crash Reporting for Android (ACRA)"/>
+            android:title="Android Open Source Project (AOSP)"/>
         <Preference
             android:summary="Licensed under the Apache License 2.0"
             android:title="Joda Time"/>

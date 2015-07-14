@@ -10,67 +10,84 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.astuetz.PagerSlidingTabStrip;
+import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.TrainBusInfo;
 
-public class Amrita extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.List;
 
-    ActionBar mActionBar;
-    ViewPager mPager;
+public class Amrita extends BaseActivity {
+
+    ViewPager viewPager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_about_campus);
-        /** Getting a reference to action bar of this activity */
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setBackgroundColor(Color.parseColor("#03a9f4"));
-        setSupportActionBar(toolbar);
+        setupLayout(R.layout.activity_about_campus, Color.parseColor("#03a9f4"));
 
-        mActionBar = getSupportActionBar();
+        viewPager = (ViewPager) findViewById(R.id.pager);
+        setupViewPager(viewPager);
 
-        /** Set tab navigation mode */
-        mActionBar.setDisplayHomeAsUpEnabled(true);
-        /** Getting a reference to ViewPager from the layout */
-        mPager = (ViewPager) findViewById(R.id.pager);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setBackgroundColor(Color.parseColor("#03a9f4"));
 
-        /** Getting a reference to FragmentManager */
-        FragmentManager fm = getSupportFragmentManager();
 
-        /** Defining a listener for pageChange */
-        ViewPager.SimpleOnPageChangeListener pageChangeListener = new ViewPager.SimpleOnPageChangeListener() {
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected(position);
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
             }
-        };
-
-        /** Setting the pageChange listner to the viewPager */
-        mPager.setOnPageChangeListener(pageChangeListener);
-
-        /** Creating an instance of FragmentPagerAdapter */
-        CampusListener fragmentPagerAdapter = new CampusListener(fm);
-
-        /** Setting the FragmentPagerAdapter object to the viewPager object */
-        mPager.setAdapter(fragmentPagerAdapter);
-
-        mActionBar.setDisplayShowTitleEnabled(true);
-
-        // Bind the tabs to the ViewPager
-        PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
-        tabs.setBackgroundColor(Color.parseColor("#03a9f4"));
-        tabs.setViewPager(mPager);
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
+        });
     }
 
+    private void setupViewPager(ViewPager viewPager) {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        CampusAbout campusAbout = new CampusAbout();
+        CampusContact campusContact = new CampusContact();
+        adapter.addFrag(campusAbout, "About");
+        adapter.addFrag(campusContact, "Contact");
+        viewPager.setAdapter(adapter);
+    }
+
+    class ViewPagerAdapter extends FragmentPagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
+        public ViewPagerAdapter(FragmentManager manager) {
+            super(manager);
+        }
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
+        public void addFrag(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
+        }
+    }
 
     public void call_cbe(View view) {
         String num = "+914222685000";
@@ -95,7 +112,6 @@ public class Amrita extends AppCompatActivity {
         builder_t.setTitle("View timings of ?");
         builder_t.setItems(items_t, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-                // Showing Alert Message
                 Intent trainBusOpen = new Intent(Amrita.this, TrainBusInfo.class);
                 trainBusOpen.putExtra("type", items_t[item]);
                 startActivity(trainBusOpen);
@@ -138,7 +154,6 @@ public class Amrita extends AppCompatActivity {
             lon = -1.0;
         }
         Uri uri = Uri.parse("http://maps.google.com/maps?f=d&saddr=" + lat + "," + lon + "&daddr=10.900539,76.902806&hl=en");
-        //Uri uri = Uri.parse("http://maps.google.com/maps?f=d&daddr=10.900539,76.902806");
         Intent it = new Intent(Intent.ACTION_VIEW, uri);
         startActivity(it);
 

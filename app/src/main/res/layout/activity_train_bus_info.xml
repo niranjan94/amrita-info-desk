@@ -15,9 +15,11 @@
         android:clickable="false"
         android:choiceMode="none"
         android:background="@color/white"
+        android:divider="@null"
+        android:listSelector="@android:color/transparent"
+        android:cacheColorHint="@android:color/transparent"
         android:focusable="false"
         android:layout_below="@+id/toolbar">
 
     </ListView>
-
-    </RelativeLayout>
+</RelativeLayout>

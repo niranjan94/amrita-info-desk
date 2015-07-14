@@ -8,26 +8,18 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 
+import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.R;
 
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_settings);
+        setupLayout(R.layout.activity_settings, Color.parseColor("#5B96E7"));
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setBackgroundColor(Color.parseColor("#5B96E7"));
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        // Display the fragment as the main content.
         FragmentManager mFragmentManager = getFragmentManager();
         FragmentTransaction mFragmentTransaction = mFragmentManager.beginTransaction();
         PrefsFragment mPrefsFragment = new PrefsFragment();
@@ -40,24 +32,12 @@ public class SettingsActivity extends AppCompatActivity {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            // Load the preferences from an XML resource
             addPreferencesFromResource(R.xml.pref_general);
-
             bindPreferenceSummaryToValue(findPreference("name"));
-            bindPreferenceSummaryToValue(findPreference("campus"));
             bindPreferenceSummaryToValue(findPreference("department"));
-            bindPreferenceSummaryToValue(findPreference("school"));
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        if(item.getItemId() == android.R.id.home) {
-            finish();
-            overridePendingTransition(R.anim.fadein, R.anim.fadeout);
-        }
-        return true;
-    }
 
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
         @Override
@@ -65,12 +45,9 @@ public class SettingsActivity extends AppCompatActivity {
             String stringValue = value.toString();
 
             if (preference instanceof ListPreference) {
-                // For list preferences, look up the correct display value in
-                // the preference's 'entries' list.
                 ListPreference listPreference = (ListPreference) preference;
                 int index = listPreference.findIndexOfValue(stringValue);
 
-                // Set the summary to reflect the new value.
                 preference.setSummary(
                         index >= 0
                                 ? listPreference.getEntries()[index]

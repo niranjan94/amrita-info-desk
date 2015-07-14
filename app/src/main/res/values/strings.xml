@@ -23,5 +23,9 @@
     <string name="title_activity_attendance_manager">Attendance Manager</string>
     <string name="title_activity_card_trial">Card Trial</string>
     <string name="app_name_alt" translatable="false">Amrita Info Desk</string>
+    <string name="title_activity_base">BaseActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_news">News</string>
 
 </resources>

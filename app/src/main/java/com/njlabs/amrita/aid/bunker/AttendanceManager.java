@@ -4,37 +4,21 @@
 
 package com.njlabs.amrita.aid.bunker;
 
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 
-import com.andreabaccega.widget.FormEditText;
-import com.njlabs.amrita.aid.MainApplication;
+import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.aums.Aums;
-import com.onemarker.ark.Security;
-import com.onemarker.ark.logging.Ln;
 
-public class AttendanceManager extends AppCompatActivity {
+public class AttendanceManager extends BaseActivity {
 
     Aums aums;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_under_construction);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setBackgroundColor(Color.parseColor("#009688"));
-
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setupLayout(R.layout.activity_under_construction, Color.parseColor("#009688"));
 
        /* SharedPreferences preferences = getSharedPreferences("aums_prefs", Context.MODE_PRIVATE);
         String RollNo = preferences.getString("RollNo", "");
@@ -51,17 +35,7 @@ public class AttendanceManager extends AppCompatActivity {
 
     public void configureAuto(View v)
     {
-        final FormEditText RollNo = (FormEditText) findViewById(R.id.roll_no);
-        final FormEditText Password = (FormEditText) findViewById(R.id.pwd);
-        FormEditText[] allFields = {RollNo, Password};
-
-        boolean allValid = true;
-        for (FormEditText field : allFields) {
-            allValid = field.testValidity() && allValid;
-        }
-
-        if (allValid) {
-
+/*
             ProgressDialog dialog;
             dialog = new ProgressDialog(this);
             dialog.setIndeterminate(true);
@@ -74,7 +48,7 @@ public class AttendanceManager extends AppCompatActivity {
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString("RollNo", RollNo.getText().toString());
             editor.putString("Password", Security.encrypt(Password.getText().toString(), MainApplication.key));
-            editor.commit();
+            editor.apply();
 
             aums = new Aums(this,"data_hook",RollNo.getText().toString(),Password.getText().toString(),dialog,"getRegisteredCourses");
             aums.GetSessionID("https://amritavidya.amrita.edu:8444", true);
@@ -85,7 +59,7 @@ public class AttendanceManager extends AppCompatActivity {
                     Ln.d("Process over");
                 }
             });
-        }
+        }*/
     }
 
     public void exit(View v)
@@ -94,18 +68,4 @@ public class AttendanceManager extends AppCompatActivity {
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        if(item.getItemId() == android.R.id.home) {
-            finish();
-            overridePendingTransition(R.anim.fadein, R.anim.fadeout);
-        }
-        return true;
-    }
-
-    @Override
-    public void onBackPressed() {
-        finish(); //go back to the previous Activity
-        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
-    }
 }

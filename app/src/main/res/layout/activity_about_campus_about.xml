@@ -2,16 +2,17 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:background="@color/white"
+    android:paddingBottom="48dp"
     android:layout_height="match_parent" >
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingBottom="@dimen/activity_vertical_margin"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin" >
+        android:paddingTop="@dimen/activity_vertical_margin">
 
         <TextView
             android:layout_width="wrap_content"
@@ -23,11 +24,11 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="The beginnings of Amrita University can be traced to 1994 when a School of Engineering was started in an obscure village named Ettimadai, at the foothills of Bouluvampatty ranges of the Western Ghats in the Coimbatore district of Tamil Nadu.\n
-At that time there were 120 students and 13 faculty members. Today, Amrita Vishwa Vidyapeetham has five campuses in three different states of India. There is a student population of over 12,000 and faculty strength of nearly 1500. Over 120 UG, PG and doctoral programs are offered.\n
-When Amrita became a university in January 2003, it was the youngest group of institutions to be conferred this status. As Amrita&apos;s first campus, Coimbatore is home to the administrative headquarters of Amrita University.\n
-Schools of Engineering and Business in addition to Departments of Social Work and Communication are located on located on this campus. Research centers include AMBE, CEN, CES and Cybersecurity. The campus has nearly 3500 students and about 600 faculty and staff members.\n
-This sprawling 400-acre campus is often likened to an oasis in a desert. Massive tree-planting and forestation activities undertaken over the past decade have converted the once-barren land into a lush green and beautiful place.\n
+            android:text="The beginnings of Amrita University can be traced to 1994 when a School of Engineering was started in an obscure village named Ettimadai, at the foothills of Bouluvampatty ranges of the Western Ghats in the Coimbatore district of Tamil Nadu.\n\n
+At that time there were 120 students and 13 faculty members. Today, Amrita Vishwa Vidyapeetham has five campuses in three different states of India. There is a student population of over 12,000 and faculty strength of nearly 1500. Over 120 UG, PG and doctoral programs are offered.\n\n
+When Amrita became a university in January 2003, it was the youngest group of institutions to be conferred this status. As Amrita&apos;s first campus, Coimbatore is home to the administrative headquarters of Amrita University.\n\n
+Schools of Engineering and Business in addition to Departments of Social Work and Communication are located on located on this campus. Research centers include AMBE, CEN, CES and Cybersecurity. The campus has nearly 3500 students and about 600 faculty and staff members.\n\n
+This sprawling 400-acre campus is often likened to an oasis in a desert. Massive tree-planting and forestation activities undertaken over the past decade have converted the once-barren land into a lush green and beautiful place.\n\n
 A lot of emphasis is placed on eco-friendly and conservation practices. Waste water from the hostels and faculty and staff quarters is treated using EM; no chemicals are used in the process. Organic fertilizers are made using vermi-compost, pesticides have been avoided since the very beginning. The tranquil surroundings, away from the pollution and the bustle of city life, are home to several exotic birds, including parrots and peacocks."
             android:textAppearance="?android:attr/textAppearanceSmall" />
 

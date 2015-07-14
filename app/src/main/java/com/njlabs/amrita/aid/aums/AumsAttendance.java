@@ -3,8 +3,6 @@ package com.njlabs.amrita.aid.aums;
 import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,8 +15,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
+import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.R;
-import com.njlabs.amrita.aid.aums.classes.CourseAttendanceData;
+import com.njlabs.amrita.aid.classes.CourseAttendanceData;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -29,7 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class AumsAttendance extends AppCompatActivity {
+public class AumsAttendance extends BaseActivity {
 
     ProgressDialog dialog;
     ListView list;
@@ -45,13 +45,7 @@ public class AumsAttendance extends AppCompatActivity {
             responseString = extras.getString("response");
         }
 
-        setContentView(R.layout.activity_aums_data);
-
-        (findViewById(R.id.webView)).setVisibility(View.GONE);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setBackgroundColor(Color.parseColor("#e91e63"));
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setupLayout(R.layout.activity_aums_data, Color.parseColor("#e91e63"));
 
         dialog = new ProgressDialog(this);
         dialog.setIndeterminate(true);
@@ -59,33 +53,37 @@ public class AumsAttendance extends AppCompatActivity {
         dialog.setInverseBackgroundForced(false);
         dialog.setCanceledOnTouchOutside(false);
         dialog.setMessage("Parsing the received data ");
-        DataParser(responseString);
+
+        try {
+            DataParser(responseString);
+        } catch (Exception e) {
+            Toast.makeText(baseContext, "There has been a change in the AUMS Site. This has been reported to the developer", Toast.LENGTH_LONG).show();
+            Crashlytics.logException(e);
+        }
+
     }
 
     public void DataParser(String html) {
         Document doc = Jsoup.parse(html);
 
-        Element table = doc.select("table[width=75%] > tbody").first();
-        Elements rows = table.select("tr:gt(0)");
+            Element table = doc.select("table[width=75%] > tbody").first();
+            Elements rows = table.select("tr");
 
-        CourseAttendanceData.deleteAll(CourseAttendanceData.class);
-
-        for(Element row : rows) {
-            Elements dataHolders = row.select("td > span");
-
-            CourseAttendanceData adata = new CourseAttendanceData();
-
-            adata.setCourseCode(dataHolders.get(0).text());
-            adata.setCourseTitle(dataHolders.get(1).text());
-            adata.setTotal(dataHolders.get(5).text());
-            adata.setAttended(dataHolders.get(6).text());
-            adata.setPercentage(dataHolders.get(7).text());
-
-            adata.save();
-            attendanceData.add(adata);
-        }
-
-        setupList();
+            int index = 0;
+            for (Element row : rows) {
+                index++;
+                if ((index & 1) == 0) {
+                    Elements dataHolders = row.select("td > span");
+                    CourseAttendanceData adata = new CourseAttendanceData();
+                    adata.setCourseCode(dataHolders.get(0).text());
+                    adata.setCourseTitle(dataHolders.get(1).text());
+                    adata.setTotal(dataHolders.get(5).text());
+                    adata.setAttended(dataHolders.get(6).text());
+                    adata.setPercentage(dataHolders.get(7).text());
+                    attendanceData.add(adata);
+                }
+            }
+            setupList();
 
     }
     public void setupList() {
@@ -146,7 +144,7 @@ public class AumsAttendance extends AppCompatActivity {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyy HH:mm:ss");
                 String currentDateandTime = sdf.format(new Date());
                 Exception e = new Exception("AUMS Grades Error Reported - "+currentDateandTime);
-                //Crashlytics.logException(e);
+                Crashlytics.logException(e);
                 Toast.makeText(getBaseContext(),"The error has been reported.",Toast.LENGTH_SHORT).show();
                 return true;
             default:

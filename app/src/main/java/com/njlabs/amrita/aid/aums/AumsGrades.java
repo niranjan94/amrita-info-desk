@@ -3,8 +3,6 @@ package com.njlabs.amrita.aid.aums;
 import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,8 +15,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
+import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.R;
-import com.njlabs.amrita.aid.aums.classes.CourseGradeData;
+import com.njlabs.amrita.aid.classes.CourseGradeData;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -29,7 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class AumsGrades extends AppCompatActivity {
+public class AumsGrades extends BaseActivity {
 
     ProgressDialog dialog;
     ListView list;
@@ -46,12 +46,7 @@ public class AumsGrades extends AppCompatActivity {
             response = extras.getString("response");
         }
 
-        setContentView(R.layout.activity_aums_data);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setBackgroundColor(Color.parseColor("#e91e63"));
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setupLayout(R.layout.activity_aums_data, Color.parseColor("#e91e63"));
 
         dialog = new ProgressDialog(this);
         dialog.setIndeterminate(true);
@@ -88,7 +83,15 @@ public class AumsGrades extends AppCompatActivity {
                     attendanceData.add(adata);
                 }
                 else {
-                    sgpa=dataHolders.get(1).text();
+                    try {
+                        sgpa = dataHolders.get(1).text();
+                        if(sgpa == null || sgpa.trim().equals("null")){
+                            Toast.makeText(baseContext,"Results for the semester have not been published yet.", Toast.LENGTH_LONG).show();
+                            finish();
+                        }
+                    } catch(Exception e) {
+                        sgpa = "N/A";
+                    }
                 }
             }
         }
@@ -120,14 +123,22 @@ public class AumsGrades extends AppCompatActivity {
                 {
                     ((TextView)convertView.findViewById(R.id.attendance_status)).setText(data.courseCode+" - " + data.type);
                 }
-                if(grade.equals("A+") || grade.equals("A") || grade.equals("B+") || grade.equals("B") || grade.equals("C+")) {
-                    convertView.findViewById(R.id.indicator).setBackgroundResource(R.drawable.circle_green);
-                }
-                else if(grade.equals("C") || grade.equals("D+") || grade.equals("D")) {
-                    convertView.findViewById(R.id.indicator).setBackgroundResource(R.drawable.circle_yellow);
-                }
-                else {
-                    convertView.findViewById(R.id.indicator).setBackgroundResource(R.drawable.circle_red);
+                switch (grade) {
+                    case "A+":
+                    case "A":
+                    case "B+":
+                    case "B":
+                    case "C+":
+                        convertView.findViewById(R.id.indicator).setBackgroundResource(R.drawable.circle_green);
+                        break;
+                    case "C":
+                    case "D+":
+                    case "D":
+                        convertView.findViewById(R.id.indicator).setBackgroundResource(R.drawable.circle_yellow);
+                        break;
+                    default:
+                        convertView.findViewById(R.id.indicator).setBackgroundResource(R.drawable.circle_red);
+                        break;
                 }
                 ((TextView)convertView.findViewById(R.id.percentage)).setText(grade);
                 return convertView;
@@ -137,7 +148,11 @@ public class AumsGrades extends AppCompatActivity {
         TextView header = new TextView(this);
         header.setPadding(10,10,10,10);
         header.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
-        header.setText("This semester's GPA : "+sgpa);
+        header.setText("This semester's GPA : " + sgpa);
+        if(sgpa == null || sgpa.trim().equals("null") || header.getText().toString().trim().equals("This semester's GPA : null")){
+            Toast.makeText(baseContext,"Results for the semester have not been published yet.", Toast.LENGTH_LONG).show();
+            finish();
+        }
         list.setHeaderDividersEnabled(true);
         list.addHeaderView(header);
         list.setAdapter(dataAdapter);
@@ -154,7 +169,7 @@ public class AumsGrades extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater=getMenuInflater();
         inflater.inflate(R.menu.aums, menu);
-        return true;//return true so that the menu pop up is opened
+        return true;
 
     }
     @Override
@@ -169,7 +184,7 @@ public class AumsGrades extends AppCompatActivity {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyy HH:mm:ss");
                 String currentDateandTime = sdf.format(new Date());
                 Exception e = new Exception("AUMS Grades Error Reported - "+currentDateandTime);
-                //Crashlytics.logException(e);
+                Crashlytics.logException(e);
                 Toast.makeText(getBaseContext(), "The error has been reported.", Toast.LENGTH_SHORT).show();
                 return true;
             default:

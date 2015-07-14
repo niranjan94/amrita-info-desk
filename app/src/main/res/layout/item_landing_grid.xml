@@ -3,14 +3,14 @@
 	android:layout_width="match_parent"
 	android:id="@+id/landing_item_holder"
 	android:layout_height="match_parent"
-	android:background="@color/caldroid_blue" >
+	android:background="@color/calendar_blue" >
 
     <com.onemarker.ark.SquareImageView
         android:id="@+id/landing_picture"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="50dp"
-        android:background="@drawable/landing_grid_selector"
+		android:background="?attr/selectableItemBackground"
         android:scaleType="centerCrop"
         android:layout_gravity="center" />
 

@@ -1,14 +1,32 @@
 <resources>
-	<drawable name="ab_bg_black">#aa000000</drawable>
-    <color name="caldroid_green">#8FCC85</color>
-    <color name="caldroid_blue">#ff33b5e5</color>
+    <!-- APP STANDARD COLORS -->
+    <color name="colorPrimary">@color/blue</color>
+    <color name="colorPrimaryDark">@color/grey_900</color>
+    <color name="colorAccent">@color/blue</color>
+
+    <!-- SOME STANDARD COLORS -->
+    <color name="black">#000000</color>
+    <color name="grey_900">#212121</color>
+    <color name="grey_800">#424242</color>
+    <color name="grey_700">#616161</color>
+    <color name="grey_600">#757575</color>
+    <color name="grey_500">#9E9E9E</color>
+    <color name="grey_400">#BDBDBD</color>
+    <color name="grey_300">#E0E0E0</color>
+    <color name="grey_200">#EEEEEE</color>
+    <color name="grey_100">#F5F5F5</color>
     <color name="white">#ffffff</color>
-    <color name="caldroid_red">#fe5352</color>
-   	<color name="njlabs_grey">#333333</color>
-   	<color name="lighter_grey">#ffe6e6e6</color>
-   	<color name="transparent">#00000000</color>
+    <color name="transparent">#00000000</color>
+
+    <!-- COLORS FOR THE CALENDAR -->
+    <color name="calendar_green">#8FCC85</color>
+    <color name="calendar_blue">#ff33b5e5</color>
+    <color name="calendar_red">#fe5352</color>
+    <color name="calendar_anokha_orange">#F89C1F</color>
+
+    <!-- COLORS FOR VARIOUS ELEMENTS -->
+    <color name="blue">#5B96E7</color>
+    <color name="news_yellow">#ffc107</color>
     <color name="button_bar_grey">#fff5f5f5</color>
-    <color name="about_amrita_blue">#03a9f4</color>
-    <color name="blue">#5677fc</color>
-    <color name="indigo">#3f51b5</color>
+
 </resources>

@@ -10,8 +10,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.github.johnpersano.supertoasts.SuperActivityToast;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -81,7 +79,6 @@ public class ExplorerBackgroundLocationService extends IntentService {
             } catch (UnsupportedEncodingException e1) {
                 // TODO  ACRA.getErrorReporter().handleException(e1);
             }
-            SuperActivityToast.cancelAllSuperActivityToasts();
             String url = "http://njlabs.kovaideals.com/api/aid/explorer.php?type=location_ping&mobile=" + mobile_num + "&lat=" + latitude + "&lon=" + longitude + "&datetime=" + timeStamp;
             Map<String, Object> params = new HashMap<String, Object>();
             params.put("authkey", "bdc0fabcbfa45a3506d1e66a6ff77596");

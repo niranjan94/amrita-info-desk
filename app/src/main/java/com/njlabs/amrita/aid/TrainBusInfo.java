@@ -2,10 +2,7 @@ package com.njlabs.amrita.aid;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -16,7 +13,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 
-public class TrainBusInfo extends AppCompatActivity {
+public class TrainBusInfo extends BaseActivity {
 
     private ListView listView = null;
     private ArrayList<Transporter> transporters;
@@ -29,19 +26,11 @@ public class TrainBusInfo extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         String type = extras.getString("type");
 
-        setContentView(R.layout.activity_train_bus_info);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setBackgroundColor(Color.parseColor("#9c27b0"));
-
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setupLayout(R.layout.activity_train_bus_info,Color.parseColor("#9c27b0"));
         getSupportActionBar().setSubtitle(type);
 
         listView = (ListView) findViewById(R.id.list);
         transporters = new ArrayList<Transporter>();
-
-
 
         //
         // TODO TRAINS FROM CBE TO ETMD
@@ -459,7 +448,7 @@ public class TrainBusInfo extends AppCompatActivity {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 if (convertView == null) {
-                    convertView = getLayoutInflater().inflate(R.layout.list_transport_item, null);
+                    convertView = getLayoutInflater().inflate(R.layout.list_transport_card, null);
                 }
                 Transporter transporter = getItem(position);
                 ((TextView) convertView.findViewById(R.id.name)).setText(transporter.name);
@@ -516,18 +505,5 @@ public class TrainBusInfo extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        if(item.getItemId() == android.R.id.home) {
-            finish();
-            overridePendingTransition(R.anim.fadein, R.anim.fadeout);
-        }
-        return true;
-    }
 
-    @Override
-    public void onBackPressed() {
-        finish(); //go back to the previous Activity
-        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
-    }
 }

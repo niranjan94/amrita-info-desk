@@ -1,6 +1,5 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:val="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
@@ -17,7 +16,7 @@
         <LinearLayout
             android:id="@+id/aumsLinearView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical" >
 
             <TextView
@@ -28,16 +27,13 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:layout_marginTop="10dp" />
 
-            <com.andreabaccega.widget.FormEditText
+            <EditText
                 android:id="@+id/roll_no"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                val:emptyErrorString="You MUST enter your Roll Number"
-                val:testErrorString="Enter a proper Roll Number"
-                android:ems="10"
                 android:textAllCaps="true"
-                android:hint="Your Full Roll Number ..."
-                val:testType="alphaNumeric"
+                android:ems="10"
+                android:hint="Your full roll number"
                 android:inputType="textCapCharacters|text|textNoSuggestions|textFilter"  />
 
             <TextView
@@ -48,15 +44,11 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:layout_marginTop="5dp" />
 
-            <com.andreabaccega.widget.FormEditText
+            <EditText
                 android:id="@+id/pwd"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                val:emptyErrorString="You MUST enter your Password"
-                val:testErrorString="Enter a proper Password"
-                android:ems="10"
-                android:hint="Your secret password ..."
-                val:testType="nocheck"
+                android:hint="Your AUMS password"
                 android:inputType="textPassword"  />
 
             <LinearLayout
@@ -64,7 +56,6 @@
                 style="?android:attr/buttonBarStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
                 android:gravity="bottom|right"
                 android:layout_marginTop="15dp"
                 android:orientation="horizontal"

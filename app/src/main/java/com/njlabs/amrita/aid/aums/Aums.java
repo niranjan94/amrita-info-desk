@@ -10,28 +10,33 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.andreabaccega.widget.FormEditText;
-import com.github.johnpersano.supertoasts.SuperToast;
+import com.crashlytics.android.Crashlytics;
 import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
+import com.mobsandgeeks.saripaar.ValidationError;
+import com.mobsandgeeks.saripaar.Validator;
+import com.mobsandgeeks.saripaar.annotation.NotEmpty;
+import com.mobsandgeeks.saripaar.annotation.Size;
+import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.Landing;
 import com.njlabs.amrita.aid.MainApplication;
 import com.njlabs.amrita.aid.R;
-import com.njlabs.amrita.aid.aums.classes.CourseData;
+import com.njlabs.amrita.aid.classes.CourseData;
 import com.onemarker.ark.Security;
 import com.onemarker.ark.Util;
 import com.onemarker.ark.logging.Ln;
@@ -43,44 +48,44 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
-public class Aums extends AppCompatActivity {
+public class Aums extends BaseActivity {
 
     private static long BackPress;
 
-    ProgressDialog dialog = null;
-    AumsClient client;
+    private ProgressDialog dialog = null;
+    public AumsClient client;
 
     // STUDENT DETAILS VARIABLES
-    private String StudentName = null;
-    private String StudentRollNo = null;
-    private String StudentCurrentSem = null;
-    private String StudentCurrentBranch = null;
-    private String StudentCurrentProgram = null;
-    private String StudentCurrentCGPA = null;
+    private String studentName = null;
+    private String studentRollNo = null;
+    private String studentCurrentSem = null;
+    private String studentCurrentCGPA = null;
+
+    private String studentHashId = null;
 
     private String username = null;
     private String password = null;
 
-    private Boolean LoggedIn = false;
-    private Boolean gotAttendance = false;
-    private Boolean gradesOnce=false;
+    private Boolean loggedIn = false;
 
     private String methodToCall = null;
 
-    private String getAttendanceResponse;
 
-    private Map<String,String> semesterMapping = new HashMap<String, String>();
+    private Map<String,String> semesterMapping = new HashMap<>();
 
     int gradeRefIndex=1;
     int attendanceRefIndex=1;
@@ -88,7 +93,15 @@ public class Aums extends AppCompatActivity {
     private String calledBy = "activity";
     private Context serviceContext;
 
+    @NotEmpty(message = "Roll number is required")
+    @Size(min = 16, max = 16, message = "Invalid roll number")
+    EditText rollNoEditText;
+
+    @NotEmpty(message = "Password is required")
+    EditText passwordEditText;
+
     public Aums() {
+
     }
 
     public Aums(Context context, String calledBy, String username, String password) {
@@ -112,12 +125,11 @@ public class Aums extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_aums);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setBackgroundColor(Color.parseColor("#e91e63"));
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setupLayout(R.layout.activity_aums, Color.parseColor("#e91e63"));
+
+        rollNoEditText = (EditText) findViewById(R.id.roll_no);
+        passwordEditText = (EditText) findViewById(R.id.pwd);
 
         serviceContext = this;
 
@@ -125,7 +137,7 @@ public class Aums extends AppCompatActivity {
         builder .setMessage("Amrita University does not provide an API for accessing AUMS data. " +
                 "So, if any changes are made to the AUMS Website, please be patient while I try to catch up.")
                 .setCancelable(true)
-                .setIcon(R.drawable.info)
+                .setIcon(R.drawable.ic_action_info_small)
                 .setPositiveButton("Got it !", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
@@ -134,6 +146,7 @@ public class Aums extends AppCompatActivity {
         AlertDialog alert = builder.create();
         alert.requestWindowFeature(Window.FEATURE_NO_TITLE);
         alert.show();
+
 
         dialog = new ProgressDialog(serviceContext);
         dialog.setIndeterminate(true);
@@ -145,43 +158,57 @@ public class Aums extends AppCompatActivity {
         String RollNo = preferences.getString("RollNo", "");
         String encodedPassword = preferences.getString("Password","");
         if (!RollNo.equals("")) {
-            ((FormEditText) findViewById(R.id.roll_no)).setText(RollNo);
+            ((EditText) findViewById(R.id.roll_no)).setText(RollNo);
+            hideSoftKeyboard();
         }
         if(!encodedPassword.equals("")) {
-            ((FormEditText)findViewById(R.id.pwd)).setText(Security.decrypt(encodedPassword,MainApplication.key));
+            ((EditText)findViewById(R.id.pwd)).setText(Security.decrypt(encodedPassword,MainApplication.key));
+            hideSoftKeyboard();
         }
         loadSemesterMapping();
     }
 
     public void loginStart(View view) {
 
-        final FormEditText RollNo = (FormEditText) findViewById(R.id.roll_no);
-        final FormEditText Password = (FormEditText) findViewById(R.id.pwd);
-        FormEditText[] allFields = {RollNo, Password};
 
-        boolean allValid = true;
-        for (FormEditText field : allFields) {
-            allValid = field.testValidity() && allValid;
-        }
+        Validator validator = new Validator(this);
+        validator.setValidationListener(new Validator.ValidationListener() {
+            @Override
+            public void onValidationSucceeded() {
+                hideSoftKeyboard();
+                SharedPreferences preferences = serviceContext.getSharedPreferences("aums_prefs", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString("RollNo", rollNoEditText.getText().toString());
+                editor.putString("Password", Security.encrypt(passwordEditText.getText().toString(), MainApplication.key));
+                editor.apply();
 
-        if (allValid) {
+                username = rollNoEditText.getText().toString().trim();
+                password = passwordEditText.getText().toString().trim();
+                refreshSession();
 
-            SharedPreferences preferences = serviceContext.getSharedPreferences("aums_prefs", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putString("RollNo", RollNo.getText().toString());
-            editor.putString("Password", Security.encrypt(Password.getText().toString(), MainApplication.key));
-            editor.apply();
+                client = new AumsClient(serviceContext);
+                GetSessionID("https://amritavidya.amrita.edu:8444",false);
+                dialog.show();
+            }
 
-            username = RollNo.getText().toString();
-            password = Password.getText().toString();
+            @Override
+            public void onValidationFailed(List<ValidationError> errors) {
+                for (ValidationError error : errors) {
+                    View view = error.getView();
+                    String message = error.getCollatedErrorMessage(baseContext);
 
-            refreshSession();
+                    // Display error messages ;)
+                    if (view instanceof EditText) {
+                        ((EditText) view).setError(message);
+                    } else {
+                        Toast.makeText(baseContext, message, Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
 
-            client = new AumsClient(serviceContext);
-            GetSessionID("https://amritavidya.amrita.edu:8444",false);
-            dialog.show();
+        validator.validate();
 
-        }
     }
 
     // INITIAL SESSION RECEIVER
@@ -266,9 +293,22 @@ public class Aums extends AppCompatActivity {
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
 
                 Ln.d("Login Done.");
-                // VERIFY SUCCESSFUL AUTHENTICATION
                 Document doc = Jsoup.parse(responseString);
                 Elements TableElements = doc.getElementsByTag("td");
+
+                try{
+                    Elements scripts = doc.select("script[language=JavaScript]");
+                    String script = scripts.get(3).html();
+                    BufferedReader bufReader = new BufferedReader(new StringReader(script));
+                    String line = null;
+                    while( (line=bufReader.readLine()) != null ) {
+                        if(line.trim().startsWith("var myVar")){
+                            studentHashId = line.split("\"")[1];
+                        }
+                    }
+                } catch (Exception e){
+                    Crashlytics.logException(e);
+                }
 
                 String Name = null;
                 for (Element TableElement : TableElements) {
@@ -282,8 +322,8 @@ public class Aums extends AppCompatActivity {
                     Name = Name.replace("Welcome ", "");
                     Name = Name.replace(")", "");
                     String[] result = Name.split("\\(");
-                    StudentName = result[0];
-                    StudentRollNo = result[1].toUpperCase();
+                    studentName = result[0];
+                    studentRollNo = result[1].toUpperCase();
                     getCGPA();
                 }
                 else
@@ -318,17 +358,15 @@ public class Aums extends AppCompatActivity {
                                 GetSessionID("https://amritavidya2.amrita.edu:8444",true);
                             }
                         }
-                    } catch (UnsupportedEncodingException | MalformedURLException ignored) {
-
+                    } catch (UnsupportedEncodingException | MalformedURLException e) {
+                        Crashlytics.logException(e);
                     }
                     if(!retry && (calledBy.equals("activity")||(calledBy.equals("data_hook")&&dialog!=null))) {
-                        SuperToast superToast = new SuperToast(serviceContext);
-                        superToast.setDuration(SuperToast.Duration.LONG);
-                        superToast.setAnimations(SuperToast.Animations.FLYIN);
-                        superToast.setBackground(SuperToast.Background.RED);
-                        superToast.setTextColor(Color.WHITE);
-                        superToast.setText("Your credentials (Roll No (and/or) Password) were incorrect !");
-                        superToast.show();
+
+                        Snackbar
+                                .make(parentView, "Your credentials are incorrect.", Snackbar.LENGTH_LONG)
+                                .show();
+
                         dialog.dismiss();
                     }
                 }
@@ -354,85 +392,30 @@ public class Aums extends AppCompatActivity {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
-
                 Document doc = Jsoup.parse(responseString);
                 Element CGPA = doc.select("td[width=19%].rowBG1").last();
-                StudentCurrentCGPA = CGPA.text().trim();
+                studentCurrentCGPA = CGPA.text().trim();
                 getPhoto();
+                DiplayDataView();
             }
         });
     }
 
     public void getPhoto()
     {
-        RequestParams params = new RequestParams();
-        params.put("action", "UMS-SRM_INIT_STUDENTPROFILE_SCREEN");
 
-        client.get("/aums/Jsp/Student/Student.jsp", params, new TextHttpResponseHandler() {
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Ln.e("CGPA ERROR. Code:%s Response:%s",statusCode,responseString);
-                serverError();
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
-
-                Document doc = Jsoup.parse(responseString);
-                Elements InputElements = doc.getElementsByTag("input");
-
-                String EncodedId = null;
-                for (Element InputElement : InputElements) {
-                    if (InputElement.attr("name").equals("htmlPageTopContainer_encodedenrollmentId")) {
-                        EncodedId = InputElement.attr("value");
-                    }
-                }
-
-                Element Sem = doc.select("td[width=9%] > b").last();
-                StudentCurrentSem = Sem.text().trim();
-                Element Branch = doc.select("td[width=6%] > b").first();
-                StudentCurrentBranch = Branch.text().trim();
-                Element Program = doc.select("td[width=10%] > b").first();
-                StudentCurrentProgram = Program.text().trim();
-
-                if(calledBy.equals("activity")) {
-                    SharedPreferences preferences = serviceContext.getSharedPreferences("com.njlabs.amrita.aid_preferences", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putString("name", WordUtils.capitalizeFully(StudentName));
-                    editor.putString("campus", "Coimbatore");
-                    editor.apply();
-                    DiplayDataView(EncodedId);
-                }
-                if(methodToCall!=null) {
-                    Method method = null;
-                    try {
-                        method = ((Object) Aums.this).getClass().getMethod(methodToCall);
-                    } catch (SecurityException | NoSuchMethodException ignored) {
-
-                    }
-                    try {
-                        if (method != null) {
-                            method.invoke(Aums.this);
-                        }
-                    } catch (IllegalArgumentException | NullPointerException | InvocationTargetException | IllegalAccessException ignored) {
-                        
-                    }
-                }
-            }
-        });
     }
 
-    public void getPhotoFile(String encodedID, final int studentProfilePicProgress, final int studentProfilePic)
+    public void getPhotoFile(final int studentProfilePicProgress, final int studentProfilePic)
     {
         if(calledBy.equals("activity")) {
             RequestParams params = new RequestParams();
-            params.put("action", "SHOW_STUDENT_PHOTO");
-            params.put("encodedenrollmentId", encodedID);
+            params.put("action", "UMS-SRMHR_SHOW_PERSON_PHOTO");
+            params.put("personId", studentHashId);
 
             client.get("/aums/FileUploadServlet", params, new FileAsyncHttpResponseHandler(serviceContext) {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, Throwable throwable, File file) {
-                    //serverError();
                     findViewById(studentProfilePicProgress).setVisibility(View.GONE);
                     ImageView myImage = (ImageView) findViewById(studentProfilePic);
                     myImage.setVisibility(View.VISIBLE);
@@ -441,9 +424,7 @@ public class Aums extends AppCompatActivity {
 
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, File file) {
-
                     findViewById(studentProfilePicProgress).setVisibility(View.GONE);
-
                     if (file.exists()) {
                         Bitmap myBitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
                         ImageView myImage = (ImageView) findViewById(studentProfilePic);
@@ -455,14 +436,12 @@ public class Aums extends AppCompatActivity {
         }
     }
 
-    //
-    //
-    //
-    public void DiplayDataView(String EncodedId) {
+
+    public void DiplayDataView() {
 
         dialog.dismiss();
-        setContentView(R.layout.activity_aums_profile);
-        LoggedIn = true;
+        setupLayout(R.layout.activity_aums_profile, Color.parseColor("#e91e63"));
+        loggedIn = true;
 
         TextView StudentNameView = (TextView) findViewById(R.id.StudentName);
         TextView StudentRollNoView = (TextView) findViewById(R.id.StudentRollNo);
@@ -473,62 +452,45 @@ public class Aums extends AppCompatActivity {
             inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
 
-        StudentNameView.setText(WordUtils.capitalizeFully(StudentName));
-        StudentRollNoView.setText(StudentRollNo);
-        StudentCurrentCGPAView.setText(StudentCurrentCGPA);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setBackgroundColor(Color.parseColor("#e91e63"));
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setSubtitle("Welcome " + StudentName + " !");
+        StudentNameView.setText(WordUtils.capitalizeFully(studentName));
+        StudentRollNoView.setText(studentRollNo);
+        if(studentCurrentCGPA.equals("0.0")){
+            StudentCurrentCGPAView.setText("N/A");
+        } else {
+            StudentCurrentCGPAView.setText(studentCurrentCGPA);
+        }
+
+        getSupportActionBar().setSubtitle("Logged in as " + WordUtils.capitalizeFully(studentName));
 
         findViewById(R.id.StudentProfilePicProgress).setVisibility(View.VISIBLE);
-        getPhotoFile(EncodedId,R.id.StudentProfilePicProgress,R.id.StudentProfilePic);
-
+        getPhotoFile(R.id.StudentProfilePicProgress,R.id.StudentProfilePic);
 
     }
-
-    //
-    //
-    //
-
-    public void getAttendance()
+    public void getAttendance(final String semester)
     {
-        if(gotAttendance)
-        {
-            if(calledBy.equals("activity")) {
-                dialog.dismiss();
-                Intent i = new Intent(getApplicationContext(), AumsAttendance.class);
-                i.putExtra("response", getAttendanceResponse);
-                startActivity(i);
+        Ln.d("Start getAttendance Stage 1");
+        RequestParams params = new RequestParams();
+        params.put("action", "UMS-ATD_INIT_ATDREPORTSTUD_SCREEN");
+        params.put("isMenu", "true");
+        client.get("/aums/Jsp/Attendance/AttendanceReportStudent.jsp", params, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Ln.e("Attendance Stage 1 ERROR. Code:%s Response:%s", statusCode, responseString);
+                serverError();
             }
-        }
-        else {
 
-            Ln.d("Start getAttendance Stage 1");
-            RequestParams params = new RequestParams();
-            params.put("action", "UMS-ATD_INIT_ATDREPORTSTUD_SCREEN");
-            params.put("isMenu", "true");
-
-            client.get("/aums/Jsp/Attendance/AttendanceReportStudent.jsp", params, new TextHttpResponseHandler() {
-                @Override
-                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                    Ln.e("Attendance Stage 1 ERROR. Code:%s Response:%s", statusCode, responseString);
-                    serverError();
-                }
-
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                    getAttendanceStage2(StudentCurrentSem);
-                }
-            });
-        }
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                getAttendanceStage2(semester);
+            }
+        });
     }
     public void getAttendanceStage2(String semester){
         Ln.d("Start getAttendance stage 2");
         // GET ACTUAL ATTENDACE DATA
+        Log.d("SEMESTER","<"+semester+">");
         RequestParams params = new RequestParams();
-        params.put("htmlPageTopContainer_selectSem", semesterMapping.get(semester));
+        params.put("htmlPageTopContainer_selectSem", semester);
         params.put("Page_refIndex_hidden", attendanceRefIndex++);
         params.put("htmlPageTopContainer_selectCourse", "0");
         params.put("htmlPageTopContainer_selectType", "1");
@@ -543,68 +505,28 @@ public class Aums extends AppCompatActivity {
                 Ln.e("Attendance Stage 2 ERROR. Code:%s Response:%s", statusCode, responseString);
                 serverError();
             }
-
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
                 client.removeReferrer();
                 Ln.d("Got attendence");
 
-                gotAttendance = true;
-                getAttendanceResponse = responseString;
                 Ln.d(responseString);
 
-                WebView wv = new WebView(getBaseContext());
-                WebSettings webSettings = wv.getSettings();
-                webSettings.setJavaScriptEnabled(true);
-                wv.loadData(responseString,"text/html","utf8");
-                setContentView(wv);
-                dialog.dismiss();
-                /*
                 Document doc = Jsoup.parse(responseString);
                 Element table = doc.select("table[width=75%] > tbody").first();
                 Elements rows = table.select("tr:gt(0)");
-
-
-                if(rows.toString().equals(""))
-                {
-                    getAttendanceStage2(String.valueOf(Integer.parseInt(StudentCurrentSem)-1));
+                dialog.dismiss();
+                if(rows.toString().equals("")) {
+                    Snackbar.make(parentView,"No data available for the selected semester.",Snackbar.LENGTH_LONG).show();
+                } else {
+                    Intent i = new Intent(getApplicationContext(), AumsAttendance.class);
+                    i.putExtra("response", responseString);
+                    startActivity(i);
+                    overridePendingTransition(R.anim.fadein, R.anim.fadeout);
                 }
-                else {
-                    dialog.dismiss();
-                    if (calledBy.equals("activity")) {
-                        Intent i = new Intent(getApplicationContext(), AumsAttendance.class);
-                        i.putExtra("response", responseString);
-                        startActivity(i);
-                        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
-                    } else {
-                        Ln.d("Storing");
-
-                        // STORE TO DATABASE AND SHOW NOTIFICATION
-                        CourseAttendanceData.deleteAll(CourseAttendanceData.class);
-
-                        for (Element row : rows) {
-                            Elements dataHolders = row.select("td > span");
-
-                            CourseAttendanceData adata = new CourseAttendanceData();
-
-                            adata.setCourseCode(dataHolders.get(0).text());
-                            adata.setCourseTitle(dataHolders.get(1).text());
-                            adata.setTotal(dataHolders.get(5).text());
-                            adata.setAttended(dataHolders.get(6).text());
-                            adata.setPercentage(dataHolders.get(7).text());
-
-                            adata.save();
-                        }
-                        // SEND NOTIFICATIONS
-
-                    }
-
-                }*/
-
             }
         });
     }
-
 
     public void getRegisteredCourses() {
         Ln.d("Start getRegisteredCourses Stage 1");
@@ -624,7 +546,7 @@ public class Aums extends AppCompatActivity {
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
                 Ln.d("Start getRegisteredCourses stage 2");
                 RequestParams params = new RequestParams();
-                params.put("htmlPageTopContainer_selectStep", semesterMapping.get(StudentCurrentSem));
+                params.put("htmlPageTopContainer_selectStep", semesterMapping.get(studentCurrentSem));
                 params.put("Page_refIndex_hidden", attendanceRefIndex++);
                 params.put("htmlPageTopContainer_hidMaxMarks", "0");
                 params.put("htmlPageTopContainer_hidRowCount", "0");
@@ -641,9 +563,6 @@ public class Aums extends AppCompatActivity {
 
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, String responseString) {
-
-                        gotAttendance = true;
-                        getAttendanceResponse = responseString;
                         if(calledBy.equals("activity")) {
                             Intent i = new Intent(getApplicationContext(), AumsAttendance.class);
                             i.putExtra("response", responseString);
@@ -679,34 +598,7 @@ public class Aums extends AppCompatActivity {
             }
         });
     }
-   /* public void getGrades(final String semesterCode)
-    {
-        if(true)
-        {
-            Ln.d("Already pinged. Proceed to Stage 2 directly");
-            getGradesStage2(semesterCode);
-        }
-        else {
-            Ln.d("Start getGrades Stage 1");
-            RequestParams params = new RequestParams();
-            params.put("action", "UMS-EVAL_STUDPERFORMSURVEY_INIT_SCREEN");
-            params.put("isMenu", "true");
 
-            client.get("/aums/Jsp/StudentGrade/StudentPerformanceWithSurvey.jsp", params, new TextHttpResponseHandler() {
-                @Override
-                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                    Ln.e("getGrades Stage 1 ERROR. Code:%s Response:%s", statusCode, responseString);
-                    serverError();
-                }
-
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                    Ln.d(responseString);
-                    getGradesStage2(semesterCode);
-                }
-            });
-        }
-    }*/
 
     private void getGrades(String semesterCode)
     {
@@ -730,7 +622,6 @@ public class Aums extends AppCompatActivity {
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
                 dialog.dismiss();
-                gradesOnce = true;
                 Intent i = new Intent(getApplicationContext(), AumsGrades.class);
                 i.putExtra("response", responseString);
                 startActivity(i);
@@ -739,9 +630,20 @@ public class Aums extends AppCompatActivity {
         });
     }
     public void OpenAttendance(View view) {
-        dialog.setMessage("Getting your attendance summary");
-        dialog.show();
-        getAttendance();
+        final CharSequence[] items = {"1","2","Vacation 1","3","4","Vacation 2","5","6","Vacation 3","7","8","Vacation 4","9","10","Vacation 5","11","12","Vacation 6","13","14","15"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(serviceContext);
+        builder.setCancelable(true);
+        builder.setTitle("Select a Semester");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialogList, int item) {
+                dialog.setMessage("Getting your attendance");
+                dialog.show();
+                getAttendance(semesterMapping.get(items[item]));
+            }
+        });
+        AlertDialog alert_d = builder.create();
+        alert_d.show();
+
     }
 
     public void OpenGrades(View view) {
@@ -765,8 +667,8 @@ public class Aums extends AppCompatActivity {
     // FORM RESET
     //
     public void reset(View view) {
-        FormEditText RollNo = (FormEditText) findViewById(R.id.roll_no);
-        FormEditText Password = (FormEditText) findViewById(R.id.pwd);
+        EditText RollNo = (EditText) findViewById(R.id.roll_no);
+        EditText Password = (EditText) findViewById(R.id.pwd);
         RollNo.setText(null);
         Password.setText(null);
     }
@@ -774,11 +676,25 @@ public class Aums extends AppCompatActivity {
     private Toast toast;
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater=getMenuInflater();
+        inflater.inflate(R.menu.aums, menu);
+        return true;//return true so that the menu pop up is opened
+
+    }
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
             case android.R.id.home:
                 exitAums();
+                return true;
+            case R.id.action_bug_report:
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyy HH:mm:ss");
+                String currentDateandTime = sdf.format(new Date());
+                Exception e = new Exception("AUMS Error Reported by "+studentName+" ("+studentRollNo+") on "+currentDateandTime);
+                Crashlytics.logException(e);
+                Toast.makeText(getBaseContext(), "The error has been reported.", Toast.LENGTH_SHORT).show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -803,13 +719,11 @@ public class Aums extends AppCompatActivity {
     private void serverError()
     {
         if(calledBy.equals("activity")||(calledBy.equals("data_hook")&&dialog!=null)) {
-            SuperToast superToast = new SuperToast(serviceContext);
-            superToast.setDuration(SuperToast.Duration.LONG);
-            superToast.setAnimations(SuperToast.Animations.FLYIN);
-            superToast.setBackground(SuperToast.Background.RED);
-            superToast.setTextColor(Color.WHITE);
-            superToast.setText("Cannot connect to Server. Try again later.");
-            superToast.show();
+
+            Snackbar
+                    .make(parentView, "Cannot connect to Server. Try again later.", Snackbar.LENGTH_LONG)
+                    .show();
+
             if (dialog != null)
                 dialog.dismiss();
         }
@@ -817,7 +731,7 @@ public class Aums extends AppCompatActivity {
     }
     private void exitAums()
     {
-        if (LoggedIn) {
+        if (loggedIn) {
             if (BackPress + 2000 > System.currentTimeMillis()) {
                 // need to cancel the toast here
                 toast.cancel();
@@ -860,6 +774,14 @@ public class Aums extends AppCompatActivity {
         deletePrefFile.delete();
     }
 
+    private void hideSoftKeyboard(){
+        View view = this.getCurrentFocus();
+        InputMethodManager imm = (InputMethodManager)getSystemService(
+                Context.INPUT_METHOD_SERVICE);
+        if (view != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
     public void loadSemesterMapping() {
         semesterMapping.clear();
         semesterMapping.put("1","7");
