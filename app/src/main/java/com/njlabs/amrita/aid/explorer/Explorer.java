@@ -9,16 +9,13 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Toast;
 
-import com.github.johnpersano.supertoasts.SuperActivityToast;
-import com.github.johnpersano.supertoasts.SuperToast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.UiSettings;
@@ -28,6 +25,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.Landing;
 import com.njlabs.amrita.aid.R;
 
@@ -51,7 +49,7 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Explorer extends AppCompatActivity implements LocationListener {
+public class Explorer extends BaseActivity implements LocationListener {
 
     private LocationManager locationManager;
 
@@ -80,7 +78,7 @@ public class Explorer extends AppCompatActivity implements LocationListener {
         // REQUEST TO SHOW INDETERMINATE PROGRESS ON ACTION BAR
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_explorer);
+        setupLayout(R.layout.activity_explorer, Color.parseColor("#3f51b5"));
 
         // DECLARE LOCATION MANAGER AND DO RELATED STUFF
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -92,13 +90,6 @@ public class Explorer extends AppCompatActivity implements LocationListener {
         // GET MOBILE NUMBER FROM SHARED PREFS
         SharedPreferences preferences = getSharedPreferences("pref", 0);
         mobile_num = preferences.getString("mobile_number", "");
-
-        // ACTIONBAR STUFF
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setBackgroundColor(Color.parseColor("#3f51b5"));
-
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // FINAL MAP SETUPS AND AUTO UPDATE START
         setUpMapIfNeeded();
@@ -197,19 +188,21 @@ public class Explorer extends AppCompatActivity implements LocationListener {
         ////
         //// GET JSON STRING
         Log.d("DATALOG", "mobile=" + mobile_num + "&lat=" + latitude + "&lon=" + longitude);
-        if (latitude == "-1.0" || latitude == null || longitude == "-1.0" || longitude == null || Double.parseDouble(latitude) == 0 || Double.parseDouble(longitude) == 0 || Double.parseDouble(latitude) == -1.0 || Double.parseDouble(longitude) == -1.0) {
+        if (latitude == null || latitude.equals("-1.0")|| longitude ==null || longitude.equals("-1.0") || Double.parseDouble(latitude) == 0 || Double.parseDouble(longitude) == 0 || Double.parseDouble(latitude) == -1.0 || Double.parseDouble(longitude) == -1.0) {
             WaitingLocation = true;
-            SuperActivityToast superActivityToast = new SuperActivityToast(this, SuperToast.Type.PROGRESS);
-            superActivityToast.setDuration(SuperToast.Duration.LONG);
-            superActivityToast.setText("Waiting for location update ...");
-            superActivityToast.show();
+            Snackbar
+                    .make(parentView, "Waiting for location update.", Snackbar.LENGTH_LONG)
+                    .show();
+
         } else if (Double.parseDouble(latitude) < 10.896957 || Double.parseDouble(latitude) > 10.908957 || Double.parseDouble(longitude) < 76.891486 || Double.parseDouble(longitude) > 76.906486) {
             if (WaitingLocation) {
-                SuperActivityToast.cancelAllSuperActivityToasts();
                 WaitingLocation = false;
             }
-            SuperActivityToast.cancelAllSuperActivityToasts();
-            SuperActivityToast.create(this, "You must be near Amrita Campus to View the locations of Other Amritians !", SuperToast.Duration.LONG).show();
+
+            Snackbar
+                    .make(parentView, "You must be near Amrita Campus to View the locations of Other Amritians.", Snackbar.LENGTH_LONG)
+                    .show();
+
             ExitingCampus();
         } else {
             String timeStamp = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(Calendar.getInstance().getTime());
@@ -218,8 +211,6 @@ public class Explorer extends AppCompatActivity implements LocationListener {
             } catch (UnsupportedEncodingException e1) {
                 // TODO ACRA.getErrorReporter().handleException(e1);
             }
-            SuperActivityToast.cancelAllSuperActivityToasts();
-            // ORIGINAL: String url = "http://njlabs.kovaideals.com/api/aid/explorer.php?type=get_data_spl&mobile=
             RequestParams params = new RequestParams();
             params.put("authkey", "bdc0fabcbfa45a3506d1e66a6ff77596");
 
@@ -405,7 +396,6 @@ public class Explorer extends AppCompatActivity implements LocationListener {
         super.onPause();
         locationManager.removeUpdates(this);
         StopAutoUpdate();
-        SuperActivityToast.cancelAllSuperActivityToasts();
         ExitingCampus();
     }
 
