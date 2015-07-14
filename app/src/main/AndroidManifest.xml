@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.njlabs.amrita.aid">
+    package="com.njlabs.amrita.aid" >
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -18,8 +18,10 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
-    <permission android:protectionLevel="signature"
-        android:name="com.njlabs.amrita.aid.permission.C2D_MESSAGE" />
+    <permission
+        android:name="com.njlabs.amrita.aid.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
     <uses-permission android:name="com.njlabs.amrita.aid.permission.C2D_MESSAGE" />
 
     <permission
@@ -32,20 +34,18 @@
         android:glEsVersion="0x00020000"
         android:required="true" />
 
-
     <application
-        android:name="com.njlabs.amrita.aid.MainApplication"
-        android:allowBackup="true"
-        tools:replace="android:icon"
+        android:name=".MainApplication"
+        android:allowBackup = "true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Main" >
-        <meta-data
-            android:name="DATABASE"
-            android:value="datastore.db" />
-        <meta-data
-            android:name="DOMAIN_PACKAGE_NAME"
-            android:value="com.njlabs.amrita.aid.aums.classes" />
+        android:theme="@style/Theme.Main"
+        tools:replace="android:icon" >
+
+        <meta-data android:name="DATABASE" android:value="datastore.db" />
+        <meta-data android:name="VERSION" android:value="2" />
+        <meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="com.njlabs.amrita.aid.classes" />
+        <meta-data android:name="com.parse.push.notification_icon" android:resource="@drawable/ic_stat_news"/>
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyAQHOzuZSsCce18N5FAI8RCu4XWtojrYJU" />
@@ -54,9 +54,9 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name="com.njlabs.amrita.aid.Landing"
+            android:name=".Landing"
             android:label="@string/app_name_alt"
-            android:theme="@style/Theme.Landing">
+            android:theme="@style/Theme.Landing" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -64,171 +64,168 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.njlabs.amrita.aid.about.Amrita"
+            android:name=".about.Amrita"
             android:label="@string/title_activity_amrita"
-            android:parentActivityName="com.njlabs.amrita.aid.Landing" >
+            android:theme="@style/Theme.AboutAmrita"
+            android:parentActivityName=".Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.njlabs.amrita.aid.Landing" />
         </activity>
         <activity
-            android:name="com.njlabs.amrita.aid.TrainInfo"
+            android:name=".TrainInfo"
             android:label="@string/title_activity_traininfo"
-            android:parentActivityName="com.njlabs.amrita.aid.Landing" >
+            android:parentActivityName=".Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.njlabs.amrita.aid.Landing" />
         </activity>
         <activity
-            android:name="com.njlabs.amrita.aid.explorer.Explorer"
+            android:name=".explorer.Explorer"
             android:label="@string/title_activity_explorer"
-            android:parentActivityName="com.njlabs.amrita.aid.Landing"
+            android:parentActivityName=".Landing"
             android:theme="@style/Theme.Explorer" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.njlabs.amrita.aid.Landing" />
         </activity>
         <activity
-            android:name="com.njlabs.amrita.aid.explorer.ExplorerSignup"
+            android:name=".explorer.ExplorerSignup"
             android:label="@string/title_activity_explorer"
-            android:parentActivityName="com.njlabs.amrita.aid.Landing" >
+            android:parentActivityName=".Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.njlabs.amrita.aid.Landing" />
         </activity>
         <activity
-            android:name="com.njlabs.amrita.aid.Calender"
+            android:name=".Calender"
             android:label="@string/title_activity_academic_calender"
-            android:parentActivityName="com.njlabs.amrita.aid.Landing" >
+            android:parentActivityName=".Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.njlabs.amrita.aid.Landing" />
         </activity>
         <activity
-            android:name="com.njlabs.amrita.aid.aums.Aums"
+            android:name=".aums.Aums"
             android:label="@string/title_activity_aums"
-            android:parentActivityName="com.njlabs.amrita.aid.Landing" >
+            android:parentActivityName=".Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.njlabs.amrita.aid.Landing" />
         </activity>
         <activity
-            android:name="com.njlabs.amrita.aid.aums.AumsGrades"
+            android:name=".aums.AumsGrades"
             android:label="@string/title_activity_aums_grades" >
         </activity>
         <activity
-            android:name="com.njlabs.amrita.aid.aums.AumsAttendance"
+            android:name=".aums.AumsAttendance"
             android:label="@string/title_activity_aums_attendance" >
         </activity>
-
         <activity
-            android:name="com.njlabs.amrita.aid.Curriculum"
+            android:name=".Curriculum"
             android:label="@string/title_activity_curriculum"
-            android:parentActivityName="com.njlabs.amrita.aid.Landing" >
+            android:parentActivityName=".Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.njlabs.amrita.aid.Landing" />
         </activity>
         <activity
-            android:name="com.njlabs.amrita.aid.Gallery"
-            android:label="@string/title_activity_gallery"
-            android:parentActivityName="com.njlabs.amrita.aid.Landing"
-            android:theme="@style/Theme.Gallery" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.njlabs.amrita.aid.Landing" />
-        </activity>
-        <activity
-            android:name="com.njlabs.amrita.aid.TrainBusInfo"
+            android:name=".TrainBusInfo"
             android:label="@string/title_activity_train_bus_info"
-            android:parentActivityName="com.njlabs.amrita.aid.Landing" >
+            android:parentActivityName=".Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.njlabs.amrita.aid.Landing" />
         </activity>
 
-
-        <receiver android:name="com.njlabs.amrita.aid.explorer.ExplorerBackgroundLocation" >
+        <receiver android:name=".explorer.ExplorerBackgroundLocation" >
         </receiver>
 
-        <service android:name="com.njlabs.amrita.aid.explorer.ExplorerBackgroundLocationService" >
+        <service android:name=".explorer.ExplorerBackgroundLocationService" >
         </service>
 
         <activity
-            android:name="com.njlabs.amrita.aid.settings.SettingsActivity"
+            android:name=".settings.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName="com.njlabs.amrita.aid.Landing" >
+            android:parentActivityName=".Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.njlabs.amrita.aid.Landing" />
         </activity>
         <activity
-            android:name="com.njlabs.amrita.aid.about.App"
+            android:name=".about.App"
             android:label="@string/title_activity_about_app"
-            android:parentActivityName="com.njlabs.amrita.aid.Landing" >
+            android:parentActivityName=".Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.njlabs.amrita.aid.Landing" />
         </activity>
         <activity
-            android:name="com.njlabs.amrita.aid.aums.AttendanceFlow"
+            android:name=".aums.AttendanceFlow"
             android:label="@string/title_activity_attendance_flow"
-            android:parentActivityName="com.njlabs.amrita.aid.Landing" >
+            android:parentActivityName=".Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.njlabs.amrita.aid.Landing" />
         </activity>
         <activity
-            android:name="com.njlabs.amrita.aid.push.PushNotifications"
-            android:label="@string/title_activity_push_notifications"
-            android:parentActivityName="com.njlabs.amrita.aid.Landing" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.njlabs.amrita.aid.Landing" />
-        </activity>
-        <activity
-            android:name="com.njlabs.amrita.aid.bunker.AttendanceManager"
+            android:name=".bunker.AttendanceManager"
             android:label="@string/title_activity_attendance_manager"
-            android:parentActivityName="com.njlabs.amrita.aid.Landing" >
+            android:parentActivityName=".Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.njlabs.amrita.aid.Landing" />
         </activity>
         <activity
-            android:name="com.njlabs.amrita.aid.CardTrial"
-            android:label="@string/title_activity_card_trial" >
-            <!--<intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
+            android:name=".news.NewsActivity"
+            android:label="@string/title_activity_news"
+            android:parentActivityName=".Landing" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.njlabs.amrita.aid.Landing" />
         </activity>
-        <meta-data android:name="com.crashlytics.ApiKey" android:value="37243dbea20e385bdebdc999bef0715ef594e382"/>
+
+        <service
+            android:name=".news.NewsUpdateService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true" />
+
+        <meta-data
+            android:name="com.crashlytics.ApiKey"
+            android:value="37243dbea20e385bdebdc999bef0715ef594e382" />
 
         <service android:name="com.parse.PushService" />
-        <receiver android:name="com.parse.ParseBroadcastReceiver">
+
+        <receiver android:name="com.parse.ParseBroadcastReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.parse.ParsePushBroadcastReceiver"
-            android:exported="false">
+        <receiver
+            android:name="com.parse.ParsePushBroadcastReceiver"
+            android:exported="false" >
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE" />
                 <action android:name="com.parse.push.intent.DELETE" />
                 <action android:name="com.parse.push.intent.OPEN" />
             </intent-filter>
         </receiver>
-        <receiver android:name="com.parse.GcmBroadcastReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND">
+        <receiver
+            android:name="com.parse.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
                 <category android:name="com.njlabs.amrita.aid" />
             </intent-filter>
         </receiver>
 
+        <activity
+            android:name=".BaseActivity"
+            android:label="@string/title_activity_base" >
+        </activity>
     </application>
 
 </manifest>
