@@ -4,29 +4,44 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.content.res.AssetManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 @SuppressLint("SimpleDateFormat")
-public class Calender extends AppCompatActivity {
+public class Calender extends BaseActivity {
 
     private CaldroidFragment caldroidFragment;
-    private CaldroidFragment dialogCaldroidFragment;
     HashMap<String, String> desc;
 
 
@@ -36,317 +51,374 @@ public class Calender extends AppCompatActivity {
         try {
             dateStr = formatter.parse(date_str);
         } catch (ParseException e) {
-            // TODO ACRA.getErrorReporter().handleException(e);
+            Crashlytics.logException(e);
         }
         return dateStr;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void setCustomResourceForDates() {
-        // Create a hash map
-        HashMap hm = new HashMap();
-        // HOLIDAYS
-        hm.put(ParseDate("15-08-2014"), R.color.caldroid_green);
-        hm.put(ParseDate("16-08-2014"), R.color.caldroid_green);
-        hm.put(ParseDate("17-08-2014"), R.color.caldroid_green);
-        hm.put(ParseDate("29-08-2014"), R.color.caldroid_green);
-        hm.put(ParseDate("30-08-2014"), R.color.caldroid_green);
-        hm.put(ParseDate("31-08-2014"), R.color.caldroid_green);
-        hm.put(ParseDate("05-09-2014"), R.color.caldroid_green);
-        hm.put(ParseDate("06-09-2014"), R.color.caldroid_green);
-        hm.put(ParseDate("07-09-2014"), R.color.caldroid_green);
-        hm.put(ParseDate("27-09-2014"), R.color.caldroid_green);
-        hm.put(ParseDate("02-10-2014"), R.color.caldroid_green);
-        hm.put(ParseDate("03-10-2014"), R.color.caldroid_green);
-        hm.put(ParseDate("04-10-2014"), R.color.caldroid_green);
-        hm.put(ParseDate("05-10-2014"), R.color.caldroid_green);
-        hm.put(ParseDate("18-10-2014"), R.color.caldroid_green);
-        hm.put(ParseDate("19-10-2014"), R.color.caldroid_green);
-        hm.put(ParseDate("20-10-2014"), R.color.caldroid_green);
-        hm.put(ParseDate("21-10-2014"), R.color.caldroid_green);
-        hm.put(ParseDate("22-10-2014"), R.color.caldroid_green);
-        hm.put(ParseDate("03-12-2014"), R.color.caldroid_green);
-        hm.put(ParseDate("10-12-2014"), R.color.caldroid_green);
-        hm.put(ParseDate("25-12-2014"), R.color.caldroid_green);
-        hm.put(ParseDate("01-01-2015"), R.color.caldroid_green);
-        hm.put(ParseDate("14-01-2015"), R.color.caldroid_green);
-        hm.put(ParseDate("15-01-2015"), R.color.caldroid_green);
-        hm.put(ParseDate("16-01-2015"), R.color.caldroid_green);
-        hm.put(ParseDate("17-01-2015"), R.color.caldroid_green);
-        hm.put(ParseDate("18-01-2015"), R.color.caldroid_green);
-        hm.put(ParseDate("26-01-2015"), R.color.caldroid_green);
-        hm.put(ParseDate("15-02-2015"), R.color.caldroid_green);
-        hm.put(ParseDate("21-03-2015"), R.color.caldroid_green);
-        hm.put(ParseDate("03-04-2015"), R.color.caldroid_green);
-        hm.put(ParseDate("05-04-2015"), R.color.caldroid_green);
-        hm.put(ParseDate("13-04-2015"), R.color.caldroid_green);
-        hm.put(ParseDate("14-04-2015"), R.color.caldroid_green);
-        hm.put(ParseDate("15-04-2015"), R.color.caldroid_green);
-        hm.put(ParseDate("01-05-2015"), R.color.caldroid_green);
-        hm.put(ParseDate("21-05-2015"), R.color.caldroid_green);
+
+        final Handler dataHandler = new Handler();
+        (new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                // Create a hash map
+                final HashMap hm = new HashMap();
+                // HOLIDAYS
+                hm.put(ParseDate("18-07-2015"), R.color.calendar_green);
+                hm.put(ParseDate("15-08-2015"), R.color.calendar_green);
+                hm.put(ParseDate("27-08-2015"), R.color.calendar_green);
+                hm.put(ParseDate("28-08-2015"), R.color.calendar_green);
+                hm.put(ParseDate("29-08-2015"), R.color.calendar_green);
+                hm.put(ParseDate("30-08-2015"), R.color.calendar_green);
+                hm.put(ParseDate("17-09-2015"), R.color.calendar_green);
+                hm.put(ParseDate("24-09-2015"), R.color.calendar_green);
+                hm.put(ParseDate("27-09-2015"), R.color.calendar_green);
+                hm.put(ParseDate("02-10-2015"), R.color.calendar_green);
+                hm.put(ParseDate("03-10-2015"), R.color.calendar_green);
+                hm.put(ParseDate("04-10-2015"), R.color.calendar_green);
+                hm.put(ParseDate("21-10-2015"), R.color.calendar_green);
+                hm.put(ParseDate("22-10-2015"), R.color.calendar_green);
+                hm.put(ParseDate("23-10-2015"), R.color.calendar_green);
+                hm.put(ParseDate("09-11-2015"), R.color.calendar_green);
+                hm.put(ParseDate("10-11-2015"), R.color.calendar_green);
+                hm.put(ParseDate("23-12-2015"), R.color.calendar_green);
+                hm.put(ParseDate("25-12-2015"), R.color.calendar_green);
+                hm.put(ParseDate("01-01-2016"), R.color.calendar_green);
+                hm.put(ParseDate("14-01-2016"), R.color.calendar_green);
+                hm.put(ParseDate("15-01-2016"), R.color.calendar_green);
+                hm.put(ParseDate("16-01-2016"), R.color.calendar_green);
+                hm.put(ParseDate("17-01-2016"), R.color.calendar_green);
+                hm.put(ParseDate("26-01-2016"), R.color.calendar_green);
+                hm.put(ParseDate("07-03-2016"), R.color.calendar_green);
+                hm.put(ParseDate("25-03-2016"), R.color.calendar_green);
+                hm.put(ParseDate("08-04-2016"), R.color.calendar_green);
+                hm.put(ParseDate("13-04-2016"), R.color.calendar_green);
+                hm.put(ParseDate("14-04-2016"), R.color.calendar_green);
+                hm.put(ParseDate("01-05-2016"), R.color.calendar_green);
 
 
-        // EVENTS
-        hm.put(ParseDate("12-07-2014"), R.color.caldroid_blue);
-        hm.put(ParseDate("23-07-2014"), R.color.caldroid_blue);
-        hm.put(ParseDate("30-07-2014"), R.color.caldroid_blue);
-        hm.put(ParseDate("06-08-2014"), R.color.caldroid_blue);
-        hm.put(ParseDate("21-11-2014"), R.color.caldroid_blue);
-        hm.put(ParseDate("29-11-2014"), R.color.caldroid_blue);
-        hm.put(ParseDate("29-12-2014"), R.color.caldroid_blue);
-        hm.put(ParseDate("06-03-2015"), R.color.caldroid_blue);
-        hm.put(ParseDate("07-03-2015"), R.color.caldroid_blue);
-        hm.put(ParseDate("30-04-2015"), R.color.caldroid_blue);
-        hm.put(ParseDate("11-07-2015"), R.color.caldroid_blue);
-        hm.put(ParseDate("20-07-2015"), R.color.caldroid_blue);
-        hm.put(ParseDate("21-07-2015"), R.color.caldroid_blue);
-        hm.put(ParseDate("22-07-2015"), R.color.caldroid_blue);
-        hm.put(ParseDate("23-07-2015"), R.color.caldroid_blue);
-        hm.put(ParseDate("24-07-2015"), R.color.caldroid_blue);
-        hm.put(ParseDate("25-07-2015"), R.color.caldroid_blue);
+                // EVENTS
+                hm.put(ParseDate("15-07-2015"), R.color.calendar_blue);
+                hm.put(ParseDate("23-07-2015"), R.color.calendar_blue);
+                hm.put(ParseDate("25-07-2015"), R.color.calendar_blue);
+                hm.put(ParseDate("29-07-2015"), R.color.calendar_blue);
+                hm.put(ParseDate("31-07-2015"), R.color.calendar_blue);
+                hm.put(ParseDate("07-08-2015"), R.color.calendar_blue);
+                hm.put(ParseDate("08-08-2015"), R.color.calendar_blue);
+                hm.put(ParseDate("05-09-2015"), R.color.calendar_blue);
+                hm.put(ParseDate("19-09-2015"), R.color.calendar_blue);
+                hm.put(ParseDate("10-10-2015"), R.color.calendar_blue);
+                hm.put(ParseDate("31-10-2015"), R.color.calendar_blue);
+                hm.put(ParseDate("07-10-2015"), R.color.calendar_blue);
+                hm.put(ParseDate("20-11-2015"), R.color.calendar_blue);
+                hm.put(ParseDate("04-01-2016"), R.color.calendar_blue);
+                hm.put(ParseDate("09-01-2016"), R.color.calendar_blue);
+                hm.put(ParseDate("23-01-2016"), R.color.calendar_blue);
+                hm.put(ParseDate("26-02-2016"), R.color.calendar_blue);
+                hm.put(ParseDate("27-02-2016"), R.color.calendar_blue);
+                hm.put(ParseDate("05-03-2016"), R.color.calendar_blue);
+                hm.put(ParseDate("02-04-2016"), R.color.calendar_blue);
+                hm.put(ParseDate("16-04-2016"), R.color.calendar_blue);
+                hm.put(ParseDate("30-04-2016"), R.color.calendar_blue);
 
 
-        // EXAMS
-        hm.put(ParseDate("01-09-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("02-09-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("03-09-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("08-09-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("09-09-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("10-09-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("13-10-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("14-10-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("15-10-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("27-10-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("28-10-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("29-10-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("10-11-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("11-11-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("12-11-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("17-11-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("18-11-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("19-11-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("24-11-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("25-11-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("26-11-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("27-11-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("01-12-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("02-12-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("03-12-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("04-12-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("05-12-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("06-12-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("08-12-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("09-12-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("15-12-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("16-12-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("17-12-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("18-12-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("19-12-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("22-12-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("23-12-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("24-12-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("09-02-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("10-02-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("11-02-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("12-02-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("23-03-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("24-03-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("25-03-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("20-04-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("21-04-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("22-04-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("04-05-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("05-05-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("06-05-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("07-05-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("08-05-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("11-05-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("12-05-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("13-05-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("14-05-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("15-05-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("16-05-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("18-05-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("19-05-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("20-05-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("22-05-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("23-05-2014"), R.color.caldroid_red);
-        hm.put(ParseDate("01-06-2015"), R.color.caldroid_red);
-        hm.put(ParseDate("02-06-2015"), R.color.caldroid_red);
-        hm.put(ParseDate("03-06-2015"), R.color.caldroid_red);
-        hm.put(ParseDate("04-06-2015"), R.color.caldroid_red);
-        hm.put(ParseDate("05-06-2015"), R.color.caldroid_red);
-        hm.put(ParseDate("08-06-2015"), R.color.caldroid_red);
-        hm.put(ParseDate("09-06-2015"), R.color.caldroid_red);
-        hm.put(ParseDate("10-06-2015"), R.color.caldroid_red);
-        hm.put(ParseDate("11-06-2015"), R.color.caldroid_red);
-        hm.put(ParseDate("12-06-2015"), R.color.caldroid_red);
-        hm.put(ParseDate("15-06-2015"), R.color.caldroid_red);
-        hm.put(ParseDate("16-06-2015"), R.color.caldroid_red);
+                // EXAMS
+                hm.put(ParseDate("17-08-2015"), R.color.calendar_red);
+                hm.put(ParseDate("18-08-2015"), R.color.calendar_red);
+                hm.put(ParseDate("19-08-2015"), R.color.calendar_red);
+                hm.put(ParseDate("20-08-2015"), R.color.calendar_red);
+                hm.put(ParseDate("21-08-2015"), R.color.calendar_red);
+                hm.put(ParseDate("22-08-2015"), R.color.calendar_red);
+                hm.put(ParseDate("31-08-2015"), R.color.calendar_red);
+                hm.put(ParseDate("01-09-2015"), R.color.calendar_red);
+                hm.put(ParseDate("02-09-2015"), R.color.calendar_red);
+                hm.put(ParseDate("03-09-2015"), R.color.calendar_red);
+                hm.put(ParseDate("04-09-2015"), R.color.calendar_red);
+                hm.put(ParseDate("07-09-2015"), R.color.calendar_red);
+                hm.put(ParseDate("08-09-2015"), R.color.calendar_red);
+                hm.put(ParseDate("09-09-2015"), R.color.calendar_red);
+                hm.put(ParseDate("10-09-2015"), R.color.calendar_red);
+                hm.put(ParseDate("11-09-2015"), R.color.calendar_red);
+                hm.put(ParseDate("12-10-2015"), R.color.calendar_red);
+                hm.put(ParseDate("13-10-2015"), R.color.calendar_red);
+                hm.put(ParseDate("14-10-2015"), R.color.calendar_red);
+                hm.put(ParseDate("15-10-2015"), R.color.calendar_red);
+                hm.put(ParseDate("16-10-2015"), R.color.calendar_red);
+                hm.put(ParseDate("17-10-2015"), R.color.calendar_red);
+                hm.put(ParseDate("26-10-2015"), R.color.calendar_red);
+                hm.put(ParseDate("27-10-2015"), R.color.calendar_red);
+                hm.put(ParseDate("28-10-2015"), R.color.calendar_red);
+                hm.put(ParseDate("29-10-2015"), R.color.calendar_red);
+                hm.put(ParseDate("30-10-2015"), R.color.calendar_red);
+                hm.put(ParseDate("16-11-2015"), R.color.calendar_red);
+                hm.put(ParseDate("17-11-2015"), R.color.calendar_red);
+                hm.put(ParseDate("18-11-2015"), R.color.calendar_red);
+                hm.put(ParseDate("21-11-2015"), R.color.calendar_red);
+                hm.put(ParseDate("22-11-2015"), R.color.calendar_red);
+                hm.put(ParseDate("23-11-2015"), R.color.calendar_red);
+                hm.put(ParseDate("24-11-2015"), R.color.calendar_red);
+                hm.put(ParseDate("25-11-2015"), R.color.calendar_red);
+                hm.put(ParseDate("26-11-2015"), R.color.calendar_red);
+                hm.put(ParseDate("27-11-2015"), R.color.calendar_red);
+                hm.put(ParseDate("28-11-2015"), R.color.calendar_red);
+                hm.put(ParseDate("29-11-2015"), R.color.calendar_red);
+                hm.put(ParseDate("30-11-2015"), R.color.calendar_red);
+                hm.put(ParseDate("01-12-2015"), R.color.calendar_red);
+                hm.put(ParseDate("02-12-2015"), R.color.calendar_red);
+                hm.put(ParseDate("03-12-2015"), R.color.calendar_red);
+                hm.put(ParseDate("04-12-2015"), R.color.calendar_red);
+                hm.put(ParseDate("05-12-2015"), R.color.calendar_red);
+                hm.put(ParseDate("06-12-2015"), R.color.calendar_red);
+                hm.put(ParseDate("07-12-2015"), R.color.calendar_red);
+                hm.put(ParseDate("08-12-2015"), R.color.calendar_red);
+                hm.put(ParseDate("14-12-2015"), R.color.calendar_red);
+                hm.put(ParseDate("01-02-2016"), R.color.calendar_red);
+                hm.put(ParseDate("02-02-2016"), R.color.calendar_red);
+                hm.put(ParseDate("03-02-2016"), R.color.calendar_red);
+                hm.put(ParseDate("04-02-2016"), R.color.calendar_red);
+                hm.put(ParseDate("05-02-2016"), R.color.calendar_red);
+                hm.put(ParseDate("06-02-2016"), R.color.calendar_red);
+                hm.put(ParseDate("08-03-2016"), R.color.calendar_red);
+                hm.put(ParseDate("09-03-2016"), R.color.calendar_red);
+                hm.put(ParseDate("10-03-2016"), R.color.calendar_red);
+                hm.put(ParseDate("11-03-2016"), R.color.calendar_red);
+                hm.put(ParseDate("12-03-2016"), R.color.calendar_red);
+                hm.put(ParseDate("18-04-2016"), R.color.calendar_red);
+                hm.put(ParseDate("19-04-2016"), R.color.calendar_red);
+                hm.put(ParseDate("20-04-2016"), R.color.calendar_red);
+                hm.put(ParseDate("21-04-2016"), R.color.calendar_red);
+                hm.put(ParseDate("02-05-2016"), R.color.calendar_red);
+                hm.put(ParseDate("03-05-2016"), R.color.calendar_red);
+                hm.put(ParseDate("04-05-2016"), R.color.calendar_red);
+                hm.put(ParseDate("05-05-2016"), R.color.calendar_red);
+                hm.put(ParseDate("06-05-2016"), R.color.calendar_red);
+                hm.put(ParseDate("07-05-2016"), R.color.calendar_red);
+                hm.put(ParseDate("08-05-2016"), R.color.calendar_red);
+                hm.put(ParseDate("09-05-2016"), R.color.calendar_red);
+                hm.put(ParseDate("10-05-2016"), R.color.calendar_red);
+                hm.put(ParseDate("11-05-2016"), R.color.calendar_red);
+                hm.put(ParseDate("12-05-2016"), R.color.calendar_red);
+                hm.put(ParseDate("13-05-2016"), R.color.calendar_red);
+                hm.put(ParseDate("23-05-2016"), R.color.calendar_red);
+                hm.put(ParseDate("24-05-2016"), R.color.calendar_red);
+                hm.put(ParseDate("25-05-2016"), R.color.calendar_red);
+                hm.put(ParseDate("26-05-2016"), R.color.calendar_red);
+                hm.put(ParseDate("27-05-2016"), R.color.calendar_red);
+                hm.put(ParseDate("28-05-2016"), R.color.calendar_red);
+                hm.put(ParseDate("29-05-2016"), R.color.calendar_red);
+                hm.put(ParseDate("30-05-2016"), R.color.calendar_red);
+                hm.put(ParseDate("31-05-2016"), R.color.calendar_red);
+                hm.put(ParseDate("01-06-2016"), R.color.calendar_red);
+                hm.put(ParseDate("02-06-2016"), R.color.calendar_red);
+                hm.put(ParseDate("03-06-2016"), R.color.calendar_red);
+                hm.put(ParseDate("04-06-2016"), R.color.calendar_red);
+                hm.put(ParseDate("05-06-2016"), R.color.calendar_red);
+                hm.put(ParseDate("06-06-2016"), R.color.calendar_red);
+                hm.put(ParseDate("13-06-2016"), R.color.calendar_red);
+                hm.put(ParseDate("14-06-2016"), R.color.calendar_red);
+                hm.put(ParseDate("15-06-2016"), R.color.calendar_red);
+                hm.put(ParseDate("16-06-2016"), R.color.calendar_red);
+                hm.put(ParseDate("17-06-2016"), R.color.calendar_red);
+                hm.put(ParseDate("18-06-2016"), R.color.calendar_red);
+                hm.put(ParseDate("19-06-2016"), R.color.calendar_red);
+                hm.put(ParseDate("20-06-2016"), R.color.calendar_red);
+                hm.put(ParseDate("21-06-2016"), R.color.calendar_red);
 
+                // ANOKHA
+                hm.put(ParseDate("17-02-2016"), R.color.calendar_anokha_orange);
+                hm.put(ParseDate("18-02-2016"), R.color.calendar_anokha_orange);
+                hm.put(ParseDate("19-02-2016"), R.color.calendar_anokha_orange);
 
-        // TEXT HASH MAP
-        HashMap thm = new HashMap();
-        thm.put(ParseDate("15-08-2014"), R.color.white);
-        thm.put(ParseDate("16-08-2014"), R.color.white);
-        thm.put(ParseDate("17-08-2014"), R.color.white);
-        thm.put(ParseDate("29-08-2014"), R.color.white);
-        thm.put(ParseDate("30-08-2014"), R.color.white);
-        thm.put(ParseDate("31-08-2014"), R.color.white);
-        thm.put(ParseDate("05-09-2014"), R.color.white);
-        thm.put(ParseDate("06-09-2014"), R.color.white);
-        thm.put(ParseDate("07-09-2014"), R.color.white);
-        thm.put(ParseDate("27-09-2014"), R.color.white);
-        thm.put(ParseDate("02-10-2014"), R.color.white);
-        thm.put(ParseDate("03-10-2014"), R.color.white);
-        thm.put(ParseDate("04-10-2014"), R.color.white);
-        thm.put(ParseDate("05-10-2014"), R.color.white);
-        thm.put(ParseDate("18-10-2014"), R.color.white);
-        thm.put(ParseDate("19-10-2014"), R.color.white);
-        thm.put(ParseDate("20-10-2014"), R.color.white);
-        thm.put(ParseDate("21-10-2014"), R.color.white);
-        thm.put(ParseDate("22-10-2014"), R.color.white);
-        thm.put(ParseDate("03-12-2014"), R.color.white);
-        thm.put(ParseDate("10-12-2014"), R.color.white);
-        thm.put(ParseDate("25-12-2014"), R.color.white);
-        thm.put(ParseDate("01-01-2015"), R.color.white);
-        thm.put(ParseDate("14-01-2015"), R.color.white);
-        thm.put(ParseDate("15-01-2015"), R.color.white);
-        thm.put(ParseDate("16-01-2015"), R.color.white);
-        thm.put(ParseDate("17-01-2015"), R.color.white);
-        thm.put(ParseDate("18-01-2015"), R.color.white);
-        thm.put(ParseDate("26-01-2015"), R.color.white);
-        thm.put(ParseDate("15-02-2015"), R.color.white);
-        thm.put(ParseDate("21-03-2015"), R.color.white);
-        thm.put(ParseDate("03-04-2015"), R.color.white);
-        thm.put(ParseDate("05-04-2015"), R.color.white);
-        thm.put(ParseDate("13-04-2015"), R.color.white);
-        thm.put(ParseDate("14-04-2015"), R.color.white);
-        thm.put(ParseDate("15-04-2015"), R.color.white);
-        thm.put(ParseDate("01-05-2015"), R.color.white);
-        thm.put(ParseDate("21-05-2015"), R.color.white);
-        thm.put(ParseDate("12-07-2014"), R.color.white);
-        thm.put(ParseDate("23-07-2014"), R.color.white);
-        thm.put(ParseDate("30-07-2014"), R.color.white);
-        thm.put(ParseDate("06-08-2014"), R.color.white);
-        thm.put(ParseDate("21-11-2014"), R.color.white);
-        thm.put(ParseDate("29-11-2014"), R.color.white);
-        thm.put(ParseDate("29-12-2014"), R.color.white);
-        thm.put(ParseDate("06-03-2015"), R.color.white);
-        thm.put(ParseDate("07-03-2015"), R.color.white);
-        thm.put(ParseDate("30-04-2015"), R.color.white);
-        thm.put(ParseDate("11-07-2015"), R.color.white);
-        thm.put(ParseDate("20-07-2015"), R.color.white);
-        thm.put(ParseDate("21-07-2015"), R.color.white);
-        thm.put(ParseDate("22-07-2015"), R.color.white);
-        thm.put(ParseDate("23-07-2015"), R.color.white);
-        thm.put(ParseDate("24-07-2015"), R.color.white);
-        thm.put(ParseDate("25-07-2015"), R.color.white);
-        thm.put(ParseDate("01-09-2014"), R.color.white);
-        thm.put(ParseDate("02-09-2014"), R.color.white);
-        thm.put(ParseDate("03-09-2014"), R.color.white);
-        thm.put(ParseDate("08-09-2014"), R.color.white);
-        thm.put(ParseDate("09-09-2014"), R.color.white);
-        thm.put(ParseDate("10-09-2014"), R.color.white);
-        thm.put(ParseDate("13-10-2014"), R.color.white);
-        thm.put(ParseDate("14-10-2014"), R.color.white);
-        thm.put(ParseDate("15-10-2014"), R.color.white);
-        thm.put(ParseDate("27-10-2014"), R.color.white);
-        thm.put(ParseDate("28-10-2014"), R.color.white);
-        thm.put(ParseDate("29-10-2014"), R.color.white);
-        thm.put(ParseDate("10-11-2014"), R.color.white);
-        thm.put(ParseDate("11-11-2014"), R.color.white);
-        thm.put(ParseDate("12-11-2014"), R.color.white);
-        thm.put(ParseDate("17-11-2014"), R.color.white);
-        thm.put(ParseDate("18-11-2014"), R.color.white);
-        thm.put(ParseDate("19-11-2014"), R.color.white);
-        thm.put(ParseDate("24-11-2014"), R.color.white);
-        thm.put(ParseDate("25-11-2014"), R.color.white);
-        thm.put(ParseDate("26-11-2014"), R.color.white);
-        thm.put(ParseDate("27-11-2014"), R.color.white);
-        thm.put(ParseDate("01-12-2014"), R.color.white);
-        thm.put(ParseDate("02-12-2014"), R.color.white);
-        thm.put(ParseDate("03-12-2014"), R.color.white);
-        thm.put(ParseDate("04-12-2014"), R.color.white);
-        thm.put(ParseDate("05-12-2014"), R.color.white);
-        thm.put(ParseDate("06-12-2014"), R.color.white);
-        thm.put(ParseDate("08-12-2014"), R.color.white);
-        thm.put(ParseDate("09-12-2014"), R.color.white);
-        thm.put(ParseDate("15-12-2014"), R.color.white);
-        thm.put(ParseDate("16-12-2014"), R.color.white);
-        thm.put(ParseDate("17-12-2014"), R.color.white);
-        thm.put(ParseDate("18-12-2014"), R.color.white);
-        thm.put(ParseDate("19-12-2014"), R.color.white);
-        thm.put(ParseDate("22-12-2014"), R.color.white);
-        thm.put(ParseDate("23-12-2014"), R.color.white);
-        thm.put(ParseDate("24-12-2014"), R.color.white);
-        thm.put(ParseDate("09-02-2014"), R.color.white);
-        thm.put(ParseDate("10-02-2014"), R.color.white);
-        thm.put(ParseDate("11-02-2014"), R.color.white);
-        thm.put(ParseDate("12-02-2014"), R.color.white);
-        thm.put(ParseDate("23-03-2014"), R.color.white);
-        thm.put(ParseDate("24-03-2014"), R.color.white);
-        thm.put(ParseDate("25-03-2014"), R.color.white);
-        thm.put(ParseDate("20-04-2014"), R.color.white);
-        thm.put(ParseDate("21-04-2014"), R.color.white);
-        thm.put(ParseDate("22-04-2014"), R.color.white);
-        thm.put(ParseDate("04-05-2014"), R.color.white);
-        thm.put(ParseDate("05-05-2014"), R.color.white);
-        thm.put(ParseDate("06-05-2014"), R.color.white);
-        thm.put(ParseDate("07-05-2014"), R.color.white);
-        thm.put(ParseDate("08-05-2014"), R.color.white);
-        thm.put(ParseDate("11-05-2014"), R.color.white);
-        thm.put(ParseDate("12-05-2014"), R.color.white);
-        thm.put(ParseDate("13-05-2014"), R.color.white);
-        thm.put(ParseDate("14-05-2014"), R.color.white);
-        thm.put(ParseDate("15-05-2014"), R.color.white);
-        thm.put(ParseDate("16-05-2014"), R.color.white);
-        thm.put(ParseDate("18-05-2014"), R.color.white);
-        thm.put(ParseDate("19-05-2014"), R.color.white);
-        thm.put(ParseDate("20-05-2014"), R.color.white);
-        thm.put(ParseDate("22-05-2014"), R.color.white);
-        thm.put(ParseDate("23-05-2014"), R.color.white);
-        thm.put(ParseDate("01-06-2015"), R.color.white);
-        thm.put(ParseDate("02-06-2015"), R.color.white);
-        thm.put(ParseDate("03-06-2015"), R.color.white);
-        thm.put(ParseDate("04-06-2015"), R.color.white);
-        thm.put(ParseDate("05-06-2015"), R.color.white);
-        thm.put(ParseDate("08-06-2015"), R.color.white);
-        thm.put(ParseDate("09-06-2015"), R.color.white);
-        thm.put(ParseDate("10-06-2015"), R.color.white);
-        thm.put(ParseDate("11-06-2015"), R.color.white);
-        thm.put(ParseDate("12-06-2015"), R.color.white);
-        thm.put(ParseDate("15-06-2015"), R.color.white);
-        thm.put(ParseDate("16-06-2015"), R.color.white);
+                // TEXT HASH MAP
+                final HashMap thm = new HashMap();
+                thm.put(ParseDate("15-07-2015"), R.color.white);
+                thm.put(ParseDate("23-07-2015"), R.color.white);
+                thm.put(ParseDate("25-07-2015"), R.color.white);
+                thm.put(ParseDate("29-07-2015"), R.color.white);
+                thm.put(ParseDate("31-07-2015"), R.color.white);
+                thm.put(ParseDate("07-08-2015"), R.color.white);
+                thm.put(ParseDate("08-08-2015"), R.color.white);
+                thm.put(ParseDate("05-09-2015"), R.color.white);
+                thm.put(ParseDate("19-09-2015"), R.color.white);
+                thm.put(ParseDate("10-10-2015"), R.color.white);
+                thm.put(ParseDate("31-10-2015"), R.color.white);
+                thm.put(ParseDate("07-10-2015"), R.color.white);
+                thm.put(ParseDate("20-11-2015"), R.color.white);
+                thm.put(ParseDate("04-01-2016"), R.color.white);
+                thm.put(ParseDate("09-01-2016"), R.color.white);
+                thm.put(ParseDate("23-01-2016"), R.color.white);
+                thm.put(ParseDate("26-02-2016"), R.color.white);
+                thm.put(ParseDate("27-02-2016"), R.color.white);
+                thm.put(ParseDate("05-03-2016"), R.color.white);
+                thm.put(ParseDate("02-04-2016"), R.color.white);
+                thm.put(ParseDate("16-04-2016"), R.color.white);
+                thm.put(ParseDate("30-04-2016"), R.color.white);
+                thm.put(ParseDate("17-08-2015"), R.color.white);
+                thm.put(ParseDate("18-08-2015"), R.color.white);
+                thm.put(ParseDate("19-08-2015"), R.color.white);
+                thm.put(ParseDate("20-08-2015"), R.color.white);
+                thm.put(ParseDate("21-08-2015"), R.color.white);
+                thm.put(ParseDate("22-08-2015"), R.color.white);
+                thm.put(ParseDate("31-08-2015"), R.color.white);
+                thm.put(ParseDate("01-09-2015"), R.color.white);
+                thm.put(ParseDate("02-09-2015"), R.color.white);
+                thm.put(ParseDate("03-09-2015"), R.color.white);
+                thm.put(ParseDate("04-09-2015"), R.color.white);
+                thm.put(ParseDate("07-09-2015"), R.color.white);
+                thm.put(ParseDate("08-09-2015"), R.color.white);
+                thm.put(ParseDate("09-09-2015"), R.color.white);
+                thm.put(ParseDate("10-09-2015"), R.color.white);
+                thm.put(ParseDate("11-09-2015"), R.color.white);
+                thm.put(ParseDate("12-10-2015"), R.color.white);
+                thm.put(ParseDate("13-10-2015"), R.color.white);
+                thm.put(ParseDate("14-10-2015"), R.color.white);
+                thm.put(ParseDate("15-10-2015"), R.color.white);
+                thm.put(ParseDate("16-10-2015"), R.color.white);
+                thm.put(ParseDate("17-10-2015"), R.color.white);
+                thm.put(ParseDate("26-10-2015"), R.color.white);
+                thm.put(ParseDate("27-10-2015"), R.color.white);
+                thm.put(ParseDate("28-10-2015"), R.color.white);
+                thm.put(ParseDate("29-10-2015"), R.color.white);
+                thm.put(ParseDate("30-10-2015"), R.color.white);
+                thm.put(ParseDate("16-11-2015"), R.color.white);
+                thm.put(ParseDate("17-11-2015"), R.color.white);
+                thm.put(ParseDate("18-11-2015"), R.color.white);
+                thm.put(ParseDate("21-11-2015"), R.color.white);
+                thm.put(ParseDate("22-11-2015"), R.color.white);
+                thm.put(ParseDate("23-11-2015"), R.color.white);
+                thm.put(ParseDate("24-11-2015"), R.color.white);
+                thm.put(ParseDate("25-11-2015"), R.color.white);
+                thm.put(ParseDate("26-11-2015"), R.color.white);
+                thm.put(ParseDate("27-11-2015"), R.color.white);
+                thm.put(ParseDate("28-11-2015"), R.color.white);
+                thm.put(ParseDate("29-11-2015"), R.color.white);
+                thm.put(ParseDate("30-11-2015"), R.color.white);
+                thm.put(ParseDate("01-12-2015"), R.color.white);
+                thm.put(ParseDate("02-12-2015"), R.color.white);
+                thm.put(ParseDate("03-12-2015"), R.color.white);
+                thm.put(ParseDate("04-12-2015"), R.color.white);
+                thm.put(ParseDate("05-12-2015"), R.color.white);
+                thm.put(ParseDate("06-12-2015"), R.color.white);
+                thm.put(ParseDate("07-12-2015"), R.color.white);
+                thm.put(ParseDate("08-12-2015"), R.color.white);
+                thm.put(ParseDate("14-12-2015"), R.color.white);
+                thm.put(ParseDate("01-02-2016"), R.color.white);
+                thm.put(ParseDate("02-02-2016"), R.color.white);
+                thm.put(ParseDate("03-02-2016"), R.color.white);
+                thm.put(ParseDate("04-02-2016"), R.color.white);
+                thm.put(ParseDate("05-02-2016"), R.color.white);
+                thm.put(ParseDate("06-02-2016"), R.color.white);
+                thm.put(ParseDate("08-03-2016"), R.color.white);
+                thm.put(ParseDate("09-03-2016"), R.color.white);
+                thm.put(ParseDate("10-03-2016"), R.color.white);
+                thm.put(ParseDate("11-03-2016"), R.color.white);
+                thm.put(ParseDate("12-03-2016"), R.color.white);
+                thm.put(ParseDate("18-04-2016"), R.color.white);
+                thm.put(ParseDate("19-04-2016"), R.color.white);
+                thm.put(ParseDate("20-04-2016"), R.color.white);
+                thm.put(ParseDate("21-04-2016"), R.color.white);
+                thm.put(ParseDate("02-05-2016"), R.color.white);
+                thm.put(ParseDate("03-05-2016"), R.color.white);
+                thm.put(ParseDate("04-05-2016"), R.color.white);
+                thm.put(ParseDate("05-05-2016"), R.color.white);
+                thm.put(ParseDate("06-05-2016"), R.color.white);
+                thm.put(ParseDate("07-05-2016"), R.color.white);
+                thm.put(ParseDate("08-05-2016"), R.color.white);
+                thm.put(ParseDate("09-05-2016"), R.color.white);
+                thm.put(ParseDate("10-05-2016"), R.color.white);
+                thm.put(ParseDate("11-05-2016"), R.color.white);
+                thm.put(ParseDate("12-05-2016"), R.color.white);
+                thm.put(ParseDate("13-05-2016"), R.color.white);
+                thm.put(ParseDate("23-05-2016"), R.color.white);
+                thm.put(ParseDate("24-05-2016"), R.color.white);
+                thm.put(ParseDate("25-05-2016"), R.color.white);
+                thm.put(ParseDate("26-05-2016"), R.color.white);
+                thm.put(ParseDate("27-05-2016"), R.color.white);
+                thm.put(ParseDate("28-05-2016"), R.color.white);
+                thm.put(ParseDate("29-05-2016"), R.color.white);
+                thm.put(ParseDate("30-05-2016"), R.color.white);
+                thm.put(ParseDate("31-05-2016"), R.color.white);
+                thm.put(ParseDate("01-06-2016"), R.color.white);
+                thm.put(ParseDate("02-06-2016"), R.color.white);
+                thm.put(ParseDate("03-06-2016"), R.color.white);
+                thm.put(ParseDate("04-06-2016"), R.color.white);
+                thm.put(ParseDate("05-06-2016"), R.color.white);
+                thm.put(ParseDate("06-06-2016"), R.color.white);
+                thm.put(ParseDate("13-06-2016"), R.color.white);
+                thm.put(ParseDate("14-06-2016"), R.color.white);
+                thm.put(ParseDate("15-06-2016"), R.color.white);
+                thm.put(ParseDate("16-06-2016"), R.color.white);
+                thm.put(ParseDate("17-06-2016"), R.color.white);
+                thm.put(ParseDate("18-06-2016"), R.color.white);
+                thm.put(ParseDate("19-06-2016"), R.color.white);
+                thm.put(ParseDate("20-06-2016"), R.color.white);
+                thm.put(ParseDate("21-06-2016"), R.color.white);
+                thm.put(ParseDate("18-07-2015"), R.color.white);
+                thm.put(ParseDate("15-08-2015"), R.color.white);
+                thm.put(ParseDate("27-08-2015"), R.color.white);
+                thm.put(ParseDate("28-08-2015"), R.color.white);
+                thm.put(ParseDate("29-08-2015"), R.color.white);
+                thm.put(ParseDate("30-08-2015"), R.color.white);
+                thm.put(ParseDate("17-09-2015"), R.color.white);
+                thm.put(ParseDate("24-09-2015"), R.color.white);
+                thm.put(ParseDate("27-09-2015"), R.color.white);
+                thm.put(ParseDate("02-10-2015"), R.color.white);
+                thm.put(ParseDate("03-10-2015"), R.color.white);
+                thm.put(ParseDate("04-10-2015"), R.color.white);
+                thm.put(ParseDate("21-10-2015"), R.color.white);
+                thm.put(ParseDate("22-10-2015"), R.color.white);
+                thm.put(ParseDate("23-10-2015"), R.color.white);
+                thm.put(ParseDate("09-11-2015"), R.color.white);
+                thm.put(ParseDate("10-11-2015"), R.color.white);
+                thm.put(ParseDate("23-12-2015"), R.color.white);
+                thm.put(ParseDate("25-12-2015"), R.color.white);
+                thm.put(ParseDate("01-01-2016"), R.color.white);
+                thm.put(ParseDate("14-01-2016"), R.color.white);
+                thm.put(ParseDate("15-01-2016"), R.color.white);
+                thm.put(ParseDate("16-01-2016"), R.color.white);
+                thm.put(ParseDate("17-01-2016"), R.color.white);
+                thm.put(ParseDate("26-01-2016"), R.color.white);
+                thm.put(ParseDate("07-03-2016"), R.color.white);
+                thm.put(ParseDate("25-03-2016"), R.color.white);
+                thm.put(ParseDate("08-04-2016"), R.color.white);
+                thm.put(ParseDate("13-04-2016"), R.color.white);
+                thm.put(ParseDate("14-04-2016"), R.color.white);
+                thm.put(ParseDate("01-05-2016"), R.color.white);
+                thm.put(ParseDate("17-02-2016"), R.color.white);
+                thm.put(ParseDate("18-02-2016"), R.color.white);
+                thm.put(ParseDate("19-02-2016"), R.color.white);
 
-
-        if (caldroidFragment != null) {
-            //caldroidFragment.setBackgroundResourceForDate(R.color.blue, ParseDate("20/07/2013"));
-            caldroidFragment.setBackgroundResourceForDates(hm);
-            caldroidFragment.setTextColorForDates(thm);
-
-        }
+                dataHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (caldroidFragment != null) {
+                            caldroidFragment.setBackgroundResourceForDates(hm);
+                            caldroidFragment.setTextColorForDates(thm);
+                            caldroidFragment.refreshView();
+                        }
+                    }
+                });
+            }
+        })).start();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_calender);
+
+        setupLayout(R.layout.activity_calender, Color.parseColor("#fe5352"));
         final SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
         final Calender this_context = this;
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setBackgroundColor(Color.parseColor("#e51c23"));
 
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Academic Calender");
         SharedPreferences preferences = getSharedPreferences("app_extra", Context.MODE_PRIVATE);
         Boolean AgreeStatus = preferences.getBoolean("calender_agree", false);
-        if (AgreeStatus == true) {
 
-        } else {
+        if (!AgreeStatus) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this_context);
-            builder.setTitle("Academic Calender").setIcon(R.drawable.info)
+            builder.setTitle("Academic Calender").setIcon(R.drawable.ic_action_info_small)
                     .setMessage("Red denotes that it's an Exam day. Blue denotes an event (not a Holiday). Whereas Green denotes a Holiday. I'm not resposibile for the accuracy of the dates")
                     .setCancelable(false)
                     .setPositiveButton("I Agree", new DialogInterface.OnClickListener() {
@@ -354,7 +426,7 @@ public class Calender extends AppCompatActivity {
                             SharedPreferences preferences = getSharedPreferences("app_extra", Context.MODE_PRIVATE);
                             SharedPreferences.Editor editor = preferences.edit();
                             editor.putBoolean("calender_agree", true);
-                            editor.commit();
+                            editor.apply();
                         }
                     });
             AlertDialog alert = builder.create();
@@ -363,201 +435,205 @@ public class Calender extends AppCompatActivity {
 
         caldroidFragment = new CaldroidFragment();
         // DESCRIPTION FOR EACH DATE
-        desc = new HashMap<String, String>();
-        desc.put("15-08-2014", "Independence Day");
-        desc.put("16-08-2014", "Holiday");
-        desc.put("17-08-2014", "Sreekrishna Jayanthi Celebrations");
-        desc.put("29-08-2014", "Ganesh Chathurthi");
-        desc.put("30-08-2014", "Holiday");
-        desc.put("31-08-2014", "Holiday");
-        desc.put("05-09-2014", "Onam");
-        desc.put("06-09-2014", "First Onam");
-        desc.put("07-09-2014", "Thiruvonam");
-        desc.put("27-09-2014", "Amma's Birthday");
-        desc.put("02-10-2014", "Gandhi Jayanthi / Ayudhapooja");
-        desc.put("03-10-2014", "Vijayadasami");
-        desc.put("04-10-2014", "Pooja Holidays");
-        desc.put("05-10-2014", "Bakrid");
-        desc.put("18-10-2014", "Deepavali Holidays");
-        desc.put("19-10-2014", "Deepavali Holidays");
-        desc.put("20-10-2014", "Deepavali Holidays");
-        desc.put("21-10-2014", "Deepavali Eve");
-        desc.put("22-10-2014", "Deepavali");
-        desc.put("03-12-2014", "Winter Vacation for III, V & VII Sem. Of all UG & PG Programmes Starts");
-        desc.put("10-12-2014", "Winter Vacation for I Sem. Of all UG & PG Programmes Starts");
-        desc.put("25-12-2014", "Christmas");
-        desc.put("01-01-2015", "New Year 2015");
-        desc.put("14-01-2015", "Pongal");
-        desc.put("15-01-2015", "Mattu Pongal / Thiruvalluvar Day");
-        desc.put("16-01-2015", "Uzhavar Thirunal");
-        desc.put("17-01-2015", "Pongal Holidays");
-        desc.put("18-01-2015", "Pongal Holidays");
-        desc.put("26-01-2015", "Republic Day");
-        desc.put("15-02-2015", "Alumni Day");
-        desc.put("21-03-2015", "Ugadi");
-        desc.put("03-04-2015", "Good Friday");
-        desc.put("05-04-2015", "Easter");
-        desc.put("13-04-2015", "Tamil New Year Holiday");
-        desc.put("14-04-2015", "Dr. B.R. Ambedkar Jayanthi / Tamil New Year Day");
-        desc.put("15-04-2015", "Vishu");
-        desc.put("01-05-2015", "May Day");
-        desc.put("21-05-2015", "Summer Vacation Starts");
-        desc.put("12-07-2014", "Gurupoornima / Vyasa Poornima");
-        desc.put("23-07-2014", "Enrolment & Commencement of Classes for all III, V, VII Sem. Of all UG Programmes and III & V Sem of all PG programmes");
-        desc.put("30-07-2014", "Registration, Enrolment & Commencement of classes for I sem. Of all UG & Integrated PG programmes");
-        desc.put("06-08-2014", "Registration, Enrolment & Commencement of classes for I sem. Of all PG programmes");
-        desc.put("21-11-2014", "Last Instruction day for III, V & VII Sem. Of all UG & PG Programmes");
-        desc.put("29-11-2014", "Last Instruction day for I Sem. Of all UG & PG Programmes");
-        desc.put("29-12-2014", "Enrolment & Commencement of Classes for all UG & PG Programmes");
-        desc.put("06-03-2015", "Amritotsavam");
-        desc.put("07-03-2015", "Institution Day");
-        desc.put("30-04-2015", "Last instruction day for all UG & PG Programmes");
-        desc.put("11-07-2015", "M.Tech Submission of Thesis");
-        desc.put("20-07-2015", "M.Tech Viva-Voce");
-        desc.put("21-07-2015", "M.Tech Viva-Voce");
-        desc.put("22-07-2015", "M.Tech Viva-Voce");
-        desc.put("23-07-2015", "M.Tech Viva-Voce");
-        desc.put("24-07-2015", "M.Tech Viva-Voce");
-        desc.put("25-07-2015", "M.Tech Viva-Voce");
-        desc.put("01-09-2014", "First Assesment for III, V & VII Sem. Of all UG & PG Programmes");
-        desc.put("02-09-2014", "First Assesment for III, V & VII Sem. Of all UG & PG Programmes");
-        desc.put("03-09-2014", "First Assesment for III, V & VII Sem. Of all UG & PG Programmes");
-        desc.put("08-09-2014", "First Assesment for I Sem. Of all UG & PG Programmes");
-        desc.put("09-09-2014", "First Assesment for I Sem. Of all UG & PG Programmes");
-        desc.put("10-09-2014", "First Assesment for I Sem. Of all UG & PG Programmes");
-        desc.put("13-10-2014", "Second Assesment for III, V & VII Sem. Of all UG & PG Programmes");
-        desc.put("14-10-2014", "Second Assesment for III, V & VII Sem. Of all UG & PG Programmes");
-        desc.put("15-10-2014", "Second Assesment for III, V & VII Sem. Of all UG & PG Programmes");
-        desc.put("27-10-2014", "Second Assesment for I Sem. Of all UG & PG Programmes");
-        desc.put("28-10-2014", "Second Assesment for I Sem. Of all UG & PG Programmes");
-        desc.put("29-10-2014", "Second Assesment for I Sem. Of all UG & PG Programmes");
-        desc.put("10-11-2014", "Third Assesment for III, V & VII Sem. Of all UG & PG Programmes");
-        desc.put("11-11-2014", "Third Assesment for III, V & VII Sem. Of all UG & PG Programmes");
-        desc.put("12-11-2014", "Third Assesment for III, V & VII Sem. Of all UG & PG Programmes");
-        desc.put("17-11-2014", "Third Assesment for I Sem. Of all UG & PG Programmes");
-        desc.put("18-11-2014", "Third Assesment for I Sem. Of all UG & PG Programmes");
-        desc.put("19-11-2014", "Third Assesment for I Sem. Of all UG & PG Programmes");
-        desc.put("24-11-2014", "End Semester Examinations for  for III, V & VII Sem. Of all UG & PG Programmes (24.11.2014 to 02.12.2014)");
-        desc.put("25-11-2014", "End Semester Examinations for  for III, V & VII Sem. Of all UG & PG Programmes (24.11.2014 to 02.12.2014)");
-        desc.put("26-11-2014", "End Semester Examinations for  for III, V & VII Sem. Of all UG & PG Programmes (24.11.2014 to 02.12.2014)");
-        desc.put("27-11-2014", "End Semester Examinations for  for III, V & VII Sem. Of all UG & PG Programmes (24.11.2014 to 02.12.2014)");
-        desc.put("01-12-2014", "End Semester Examinations for  for III, V & VII Sem. Of all UG & PG Programmes (24.11.2014 to 02.12.2014) and End Semester Examinations for I Sem. Of all UG & PG Programmes (01.12.2014 to 09.12.2014)");
-        desc.put("02-12-2014", "End Semester Examinations for  for III, V & VII Sem. Of all UG & PG Programmes (24.11.2014 to 02.12.2014) and End Semester Examinations for I Sem. Of all UG & PG Programmes (01.12.2014 to 09.12.2014)");
-        desc.put("03-12-2014", "End Semester Examinations for I Sem. Of all UG & PG Programmes (01.12.2014 to 09.12.2014)");
-        desc.put("04-12-2014", "End Semester Examinations for I Sem. Of all UG & PG Programmes (01.12.2014 to 09.12.2014)");
-        desc.put("05-12-2014", "End Semester Examinations for I Sem. Of all UG & PG Programmes (01.12.2014 to 09.12.2014)");
-        desc.put("06-12-2014", "End Semester Examinations for I Sem. Of all UG & PG Programmes (01.12.2014 to 09.12.2014)");
-        desc.put("08-12-2014", "End Semester Examinations for I Sem. Of all UG & PG Programmes (01.12.2014 to 09.12.2014)");
-        desc.put("09-12-2014", "End Semester Examinations for I Sem. Of all UG & PG Programmes (01.12.2014 to 09.12.2014)");
-        desc.put("15-12-2014", "Second Chance Examination for all UG & PG Programmes (15.12.2014 to 24.12.2014)");
-        desc.put("16-12-2014", "Second Chance Examination for all UG & PG Programmes (15.12.2014 to 24.12.2014)");
-        desc.put("17-12-2014", "Second Chance Examination for all UG & PG Programmes (15.12.2014 to 24.12.2014)");
-        desc.put("18-12-2014", "Second Chance Examination for all UG & PG Programmes (15.12.2014 to 24.12.2014)");
-        desc.put("19-12-2014", "Second Chance Examination for all UG & PG Programmes (15.12.2014 to 24.12.2014)");
-        desc.put("22-12-2014", "Second Chance Examination for all UG & PG Programmes (15.12.2014 to 24.12.2014)");
-        desc.put("23-12-2014", "Second Chance Examination for all UG & PG Programmes (15.12.2014 to 24.12.2014)");
-        desc.put("24-12-2014", "Second Chance Examination for all UG & PG Programmes (15.12.2014 to 24.12.2014)");
-        desc.put("09-02-2014", "First Assessment for all UG & PG Programmes");
-        desc.put("10-02-2014", "First Assessment for all UG & PG Programmes");
-        desc.put("11-02-2014", "First Assessment for all UG & PG Programmes");
-        desc.put("12-02-2014", "First Assessment for all UG & PG Programmes");
-        desc.put("23-03-2014", "Second Assessment for all UG & PG Programmes");
-        desc.put("24-03-2014", "Second Assessment for all UG & PG Programmes");
-        desc.put("25-03-2014", "Second Assessment for all UG & PG Programmes");
-        desc.put("20-04-2014", "Third Assessment for all UG & PG Programmes");
-        desc.put("21-04-2014", "Third Assessment for all UG & PG Programmes");
-        desc.put("22-04-2014", "Third Assessment for all UG & PG Programmes");
-        desc.put("04-05-2014", "End Semester Examination for all UG & PG Programmes (04.05.2015 to 20.05.2015)");
-        desc.put("05-05-2014", "End Semester Examination for all UG & PG Programmes (04.05.2015 to 20.05.2015)");
-        desc.put("06-05-2014", "End Semester Examination for all UG & PG Programmes (04.05.2015 to 20.05.2015)");
-        desc.put("07-05-2014", "End Semester Examination for all UG & PG Programmes (04.05.2015 to 20.05.2015)");
-        desc.put("08-05-2014", "End Semester Examination for all UG & PG Programmes (04.05.2015 to 20.05.2015)");
-        desc.put("11-05-2014", "End Semester Examination for all UG & PG Programmes (04.05.2015 to 20.05.2015)");
-        desc.put("12-05-2014", "End Semester Examination for all UG & PG Programmes (04.05.2015 to 20.05.2015)");
-        desc.put("13-05-2014", "End Semester Examination for all UG & PG Programmes (04.05.2015 to 20.05.2015)");
-        desc.put("14-05-2014", "End Semester Examination for all UG & PG Programmes (04.05.2015 to 20.05.2015)");
-        desc.put("15-05-2014", "End Semester Examination for all UG & PG Programmes (04.05.2015 to 20.05.2015)");
-        desc.put("16-05-2014", "End Semester Examination for all UG & PG Programmes (04.05.2015 to 20.05.2015)");
-        desc.put("18-05-2014", "End Semester Examination for all UG & PG Programmes (04.05.2015 to 20.05.2015)");
-        desc.put("19-05-2014", "End Semester Examination for all UG & PG Programmes (04.05.2015 to 20.05.2015)");
-        desc.put("20-05-2014", "End Semester Examination for all UG & PG Programmes (04.05.2015 to 20.05.2015)");
-        desc.put("22-05-2014", "Supplementary Examinations (20.05.2015 to 23.05.2015)");
-        desc.put("23-05-2014", "Supplementary Examinations (20.05.2015 to 23.05.2015)");
-        desc.put("01-06-2015", "Second Chance Examination for all UG & PG Programmes (01.06.2015 to 16.06.2015)");
-        desc.put("02-06-2015", "Second Chance Examination for all UG & PG Programmes (01.06.2015 to 16.06.2015)");
-        desc.put("03-06-2015", "Second Chance Examination for all UG & PG Programmes (01.06.2015 to 16.06.2015)");
-        desc.put("04-06-2015", "Second Chance Examination for all UG & PG Programmes (01.06.2015 to 16.06.2015)");
-        desc.put("05-06-2015", "Second Chance Examination for all UG & PG Programmes (01.06.2015 to 16.06.2015)");
-        desc.put("08-06-2015", "Second Chance Examination for all UG & PG Programmes (01.06.2015 to 16.06.2015)");
-        desc.put("09-06-2015", "Second Chance Examination for all UG & PG Programmes (01.06.2015 to 16.06.2015)");
-        desc.put("10-06-2015", "Second Chance Examination for all UG & PG Programmes (01.06.2015 to 16.06.2015)");
-        desc.put("11-06-2015", "Second Chance Examination for all UG & PG Programmes (01.06.2015 to 16.06.2015)");
-        desc.put("12-06-2015", "Second Chance Examination for all UG & PG Programmes (01.06.2015 to 16.06.2015)");
-        desc.put("15-06-2015", "Second Chance Examination for all UG & PG Programmes (01.06.2015 to 16.06.2015)");
-        desc.put("16-06-2015", "Second Chance Examination for all UG & PG Programmes (01.06.2015 to 16.06.2015)");
-
+        desc = new HashMap<>();
+        desc.put("15-07-2015", "Enrolment Senior classes");
+        desc.put("23-07-2015", "Enrolment for I UG/Integrated programmes");
+        desc.put("25-07-2015", "THURSDAY’S TIME TABLE");
+        desc.put("29-07-2015", "Enrolment I PG programme");
+        desc.put("31-07-2015", "Gurupoornima");
+        desc.put("07-08-2015", "Talents Day");
+        desc.put("08-08-2015", "FRIDAY’S TIME TABLE");
+        desc.put("05-09-2015", "Janmashtami");
+        desc.put("19-09-2015", "THURSDAY’S TIME TABLE");
+        desc.put("10-10-2015", "FRIDAY’s TIME TABLE");
+        desc.put("31-10-2015", "WEDNESDAY’s TIME TABLE");
+        desc.put("07-10-2015", "THURSDAY’S TIME TABLE");
+        desc.put("20-11-2015", "Last instruction day for UG / PG");
+        desc.put("04-01-2016", "Enrolment and commencement of all UG and PG Programmes");
+        desc.put("09-01-2016", "THURSDAY’S TIME TABLE");
+        desc.put("23-01-2016", "FRIDAY’S TIME TABLE");
+        desc.put("26-02-2016", "Amritotsavam");
+        desc.put("27-02-2016", "Institution Day");
+        desc.put("05-03-2016", "THURSDAY’S TIME TABLE");
+        desc.put("02-04-2016", "FRIDAY’S TIME TABLE");
+        desc.put("16-04-2016", "FRIDAY’S TIME TABLE");
+        desc.put("30-04-2016", "Last instruction day for all UG & PG Programmes");
+        desc.put("17-08-2015", "First assesment for all higher semesters");
+        desc.put("18-08-2015", "First assesment for all higher semesters");
+        desc.put("19-08-2015", "First assesment for all higher semesters");
+        desc.put("20-08-2015", "First assesment for all higher semesters");
+        desc.put("21-08-2015", "First assesment for all higher semesters");
+        desc.put("22-08-2015", "First assesment for all higher semesters");
+        desc.put("31-08-2015", "First assesment for first year UG");
+        desc.put("01-09-2015", "First assesment for first year UG");
+        desc.put("02-09-2015", "First assesment for first year UG");
+        desc.put("03-09-2015", "First assesment for first year UG");
+        desc.put("04-09-2015", "First assesment for first year UG");
+        desc.put("07-09-2015", "First assesment for first year PG");
+        desc.put("08-09-2015", "First assesment for first year PG");
+        desc.put("09-09-2015", "First assesment for first year PG");
+        desc.put("10-09-2015", "First assesment for first year PG");
+        desc.put("11-09-2015", "First assesment for first year PG");
+        desc.put("12-10-2015", "Second assesment for all except first year PG");
+        desc.put("13-10-2015", "Second assesment for all except first year PG");
+        desc.put("14-10-2015", "Second assesment for all except first year PG");
+        desc.put("15-10-2015", "Second assesment for all except first year PG");
+        desc.put("16-10-2015", "Second assesment for all except first year PG");
+        desc.put("17-10-2015", "Second assesment for all except first year PG");
+        desc.put("26-10-2015", "Second assesment for first year PG");
+        desc.put("27-10-2015", "Second assesment for first year PG");
+        desc.put("28-10-2015", "Second assesment for first year PG");
+        desc.put("29-10-2015", "Second assesment for first year PG");
+        desc.put("30-10-2015", "Second assesment for first year PG");
+        desc.put("16-11-2015", "Third Assesment for all UG and PG");
+        desc.put("17-11-2015", "Third Assesment for all UG and PG");
+        desc.put("18-11-2015", "Third Assesment for all UG and PG");
+        desc.put("21-11-2015", "End semester examinations for all UG and PG");
+        desc.put("22-11-2015", "End semester examinations for all UG and PG");
+        desc.put("23-11-2015", "End semester examinations for all UG and PG");
+        desc.put("24-11-2015", "End semester examinations for all UG and PG");
+        desc.put("25-11-2015", "End semester examinations for all UG and PG");
+        desc.put("26-11-2015", "End semester examinations for all UG and PG");
+        desc.put("27-11-2015", "End semester examinations for all UG and PG");
+        desc.put("28-11-2015", "End semester examinations for all UG and PG");
+        desc.put("29-11-2015", "End semester examinations for all UG and PG");
+        desc.put("30-11-2015", "End semester examinations for all UG and PG");
+        desc.put("01-12-2015", "End semester examinations for all UG and PG");
+        desc.put("02-12-2015", "End semester examinations for all UG and PG");
+        desc.put("03-12-2015", "End semester examinations for all UG and PG");
+        desc.put("04-12-2015", "End semester examinations for all UG and PG");
+        desc.put("05-12-2015", "End semester examinations for all UG and PG");
+        desc.put("06-12-2015", "End semester examinations for all UG and PG");
+        desc.put("07-12-2015", "End semester examinations for all UG and PG");
+        desc.put("08-12-2015", "End semester examinations for all UG and PG");
+        desc.put("14-12-2015", "Commencement of Second Chance Examination");
+        desc.put("01-02-2016", "First Assesment for all UG and PG");
+        desc.put("02-02-2016", "First Assesment for all UG and PG");
+        desc.put("03-02-2016", "First Assesment for all UG and PG");
+        desc.put("04-02-2016", "First Assesment for all UG and PG");
+        desc.put("05-02-2016", "First Assesment for all UG and PG");
+        desc.put("06-02-2016", "First Assesment for all UG and PG");
+        desc.put("08-03-2016", "Second assesment for all UG and PG");
+        desc.put("09-03-2016", "Second assesment for all UG and PG");
+        desc.put("10-03-2016", "Second assesment for all UG and PG");
+        desc.put("11-03-2016", "Second assesment for all UG and PG");
+        desc.put("12-03-2016", "Second assesment for all UG and PG");
+        desc.put("18-04-2016", "Third Assesment for all UG and PG");
+        desc.put("19-04-2016", "Third Assesment for all UG and PG");
+        desc.put("20-04-2016", "Third Assesment for all UG and PG");
+        desc.put("21-04-2016", "Third Assesment for all UG and PG");
+        desc.put("02-05-2016", "End Semester for all UG and PG");
+        desc.put("03-05-2016", "End Semester for all UG and PG");
+        desc.put("04-05-2016", "End Semester for all UG and PG");
+        desc.put("05-05-2016", "End Semester for all UG and PG");
+        desc.put("06-05-2016", "End Semester for all UG and PG");
+        desc.put("07-05-2016", "End Semester for all UG and PG");
+        desc.put("08-05-2016", "End Semester for all UG and PG");
+        desc.put("09-05-2016", "End Semester for all UG and PG");
+        desc.put("10-05-2016", "End Semester for all UG and PG");
+        desc.put("11-05-2016", "End Semester for all UG and PG");
+        desc.put("12-05-2016", "End Semester for all UG and PG");
+        desc.put("13-05-2016", "End Semester for all UG and PG");
+        desc.put("23-05-2016", "Second Chance examinations for all UG and PG");
+        desc.put("24-05-2016", "Second Chance examinations for all UG and PG");
+        desc.put("25-05-2016", "Second Chance examinations for all UG and PG");
+        desc.put("26-05-2016", "Second Chance examinations for all UG and PG");
+        desc.put("27-05-2016", "Second Chance examinations for all UG and PG");
+        desc.put("28-05-2016", "Second Chance examinations for all UG and PG");
+        desc.put("29-05-2016", "Second Chance examinations for all UG and PG");
+        desc.put("30-05-2016", "Second Chance examinations for all UG and PG");
+        desc.put("31-05-2016", "Second Chance examinations for all UG and PG");
+        desc.put("01-06-2016", "Second Chance examinations for all UG and PG");
+        desc.put("02-06-2016", "Second Chance examinations for all UG and PG");
+        desc.put("03-06-2016", "Second Chance examinations for all UG and PG");
+        desc.put("04-06-2016", "Second Chance examinations for all UG and PG");
+        desc.put("05-06-2016", "Second Chance examinations for all UG and PG");
+        desc.put("06-06-2016", "Second Chance examinations for all UG and PG");
+        desc.put("13-06-2016", "Supplementary examinations");
+        desc.put("14-06-2016", "Supplementary examinations");
+        desc.put("15-06-2016", "Supplementary examinations");
+        desc.put("16-06-2016", "Supplementary examinations");
+        desc.put("17-06-2016", "Supplementary examinations");
+        desc.put("18-06-2016", "Supplementary examinations");
+        desc.put("19-06-2016", "Supplementary examinations");
+        desc.put("20-06-2016", "Supplementary examinations");
+        desc.put("21-06-2016", "Supplementary examinations");
+        desc.put("18-07-2015", "Ramzan");
+        desc.put("15-08-2015", "Independence day");
+        desc.put("27-08-2015", "Onam Holidays");
+        desc.put("28-08-2015", "Onam Holidays");
+        desc.put("29-08-2015", "Onam Holidays");
+        desc.put("30-08-2015", "Onam Holidays");
+        desc.put("17-09-2015", "Ganesh Chathurthi");
+        desc.put("24-09-2015", "Bakrid");
+        desc.put("27-09-2015", "Amma's Birthday");
+        desc.put("02-10-2015", "Gandhi Jayanthi");
+        desc.put("03-10-2015", "Gandhi Jayanthi");
+        desc.put("04-10-2015", "Gandhi Jayanthi");
+        desc.put("21-10-2015", "Mahanavami");
+        desc.put("22-10-2015", "Vijayadasami");
+        desc.put("23-10-2015", "Muharram");
+        desc.put("09-11-2015", "Deepavali Eve");
+        desc.put("10-11-2015", "Deepavali ");
+        desc.put("23-12-2015", "Milad-un-Nabi");
+        desc.put("25-12-2015", "Christmas");
+        desc.put("01-01-2016", "New Year");
+        desc.put("14-01-2016", "Pongal Holidays");
+        desc.put("15-01-2016", "Pongal Holidays");
+        desc.put("16-01-2016", "Pongal Holidays");
+        desc.put("17-01-2016", "Pongal Holidays");
+        desc.put("26-01-2016", "Republic day");
+        desc.put("07-03-2016", "Mahashivaratri");
+        desc.put("25-03-2016", "Good Friday");
+        desc.put("08-04-2016", "Ugadi");
+        desc.put("13-04-2016", "Vishu");
+        desc.put("14-04-2016", "Tamil New Year");
+        desc.put("01-05-2016", "May day");
+        desc.put("17-02-2016", "ANOKHA 2016");
+        desc.put("18-02-2016", "ANOKHA 2016");
+        desc.put("19-02-2016", "ANOKHA 2016");
 
         if (savedInstanceState != null) {
-            caldroidFragment.restoreStatesFromKey(savedInstanceState,
-                    "CALDROID_SAVED_STATE");
+            caldroidFragment.restoreStatesFromKey(savedInstanceState,"CALDROID_SAVED_STATE");
         }
-        // If activity is created from fresh
         else {
             Bundle args = new Bundle();
             Calendar cal = Calendar.getInstance();
             args.putInt(CaldroidFragment.MONTH, cal.get(Calendar.MONTH) + 1);
             args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR));
             args.putBoolean(CaldroidFragment.ENABLE_SWIPE, true);
-
             caldroidFragment.setArguments(args);
         }
 
         setCustomResourceForDates();
 
-        // Attach to the activity
         FragmentTransaction t = getSupportFragmentManager().beginTransaction();
         t.replace(R.id.calendar1, caldroidFragment);
         t.commit();
 
-        // Setup listener
         final CaldroidListener listener = new CaldroidListener() {
-
             @Override
             public void onSelectDate(Date date, View view) {
-                //Toast.makeText(getApplicationContext(), formatter.format(date),Toast.LENGTH_SHORT).show();
-                if (formatter.format(date) == null || formatter.format(date) == "" || formatter.format(date).equals("")) {
-                    // DO NOTHING
-                } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this_context);
-                    builder.setTitle(formatter.format(date)).setIcon(R.drawable.info)
-                            .setMessage(desc.get(formatter.format(date)))
-                            .setCancelable(true)
-                            .setPositiveButton("Close", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                }
-                            });
-                    AlertDialog alert = builder.create();
-                    alert.show();
+                if (!formatter.format(date).equals("")) {
+                    String description = desc.get(formatter.format(date));
+                    if(description!=null&&!description.equals("")){
+                        AlertDialog.Builder builder = new AlertDialog.Builder(this_context);
+                        builder .setMessage(description)
+                                .setCancelable(true)
+                                .setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                });
+                        AlertDialog alert = builder.create();
+                        alert.show();
+                    }
                 }
             }
-
-            @Override
-            public void onChangeMonth(int month, int year) {
-                /*String text = "month: " + month + " year: " + year;
-				Toast.makeText(getApplicationContext(), text,
-						Toast.LENGTH_SHORT).show();*/
-            }
-
         };
-
-        // Setup Caldroid
         caldroidFragment.setCaldroidListener(listener);
     }
 
-    /**
-     * Save current states of the Caldroid here
-     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -565,25 +641,106 @@ public class Calender extends AppCompatActivity {
         if (caldroidFragment != null) {
             caldroidFragment.saveStatesToKey(outState, "CALDROID_SAVED_STATE");
         }
-
-        if (dialogCaldroidFragment != null) {
-            dialogCaldroidFragment.saveStatesToKey(outState,
-                    "DIALOG_CALDROID_SAVED_STATE");
-        }
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        if(item.getItemId() == android.R.id.home) {
-            finish();
-            overridePendingTransition(R.anim.fadein, R.anim.fadeout);
-        }
+    public boolean onCreateOptionsMenu(Menu menu) {
+        /*if(isGoogleCalendarInstalled()){
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.calendar, menu);
+        }*/
         return true;
+
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+                return true;
+            case R.id.action_import:
+                Uri uri = copyICALFile();
+                Intent calendarIntent = new Intent(Intent.ACTION_MAIN, null);
+                calendarIntent.setPackage("com.google.android.calendar");
+                calendarIntent.setType("text/calendar");
+                try {
+                    startActivity(calendarIntent);
+                } catch (Exception e){
+                    Toast.makeText(baseContext,"Cannot open Google Calendar",Toast.LENGTH_SHORT).show();
+                    Crashlytics.logException(e);
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
-    @Override
-    public void onBackPressed() {
-        finish(); //go back to the previous Activity
-        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+    private boolean isGoogleCalendarInstalled() {
+        PackageManager pm = baseContext.getPackageManager();
+        try {
+            pm.getPackageInfo("com.google.android.calendar", PackageManager.GET_ACTIVITIES);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
+    }
+
+    private Intent getGoogleCalendarIntent() {
+        final String[] calendarApps = {"com.google.android.calendar"};
+        Intent tweetIntent = new Intent();
+        tweetIntent.setType("text/calendar");
+        final PackageManager packageManager = getPackageManager();
+        List<ResolveInfo> list = packageManager.queryIntentActivities(
+                tweetIntent, PackageManager.MATCH_DEFAULT_ONLY);
+
+        for (String calendarApp : calendarApps) {
+            for (ResolveInfo resolveInfo : list) {
+                String p = resolveInfo.activityInfo.packageName;
+                if (p != null && p.startsWith(calendarApp)) {
+                    tweetIntent.setPackage(p);
+                    return tweetIntent;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private Uri copyICALFile()
+    {
+        AssetManager assetManager = getAssets();
+
+        InputStream in;
+        OutputStream out;
+
+        File fileDir = ContextCompat.getExternalFilesDirs(baseContext,null)[0];
+        fileDir.mkdirs();
+        File file = new File(fileDir, "ASECalendar.ics");
+        if(!file.exists()){
+            try {
+                in = assetManager.open("ASECalendar.ics");
+                out = new BufferedOutputStream(new FileOutputStream(file));
+                copyFile(in, out);
+                in.close();
+                out.flush();
+                out.close();
+            } catch (Exception e) {
+                Log.e("tag", e.getMessage());
+            }
+        }
+        return Uri.parse(file.toURI().toString());
+    }
+
+    private void copyFile(InputStream in, OutputStream out) throws IOException
+    {
+        byte[] buffer = new byte[1024];
+        int read;
+        while ((read = in.read(buffer)) != -1)
+        {
+            out.write(buffer, 0, read);
+        }
     }
 }
