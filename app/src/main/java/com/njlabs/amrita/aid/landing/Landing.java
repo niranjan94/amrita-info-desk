@@ -1,7 +1,6 @@
-package com.njlabs.amrita.aid;
+package com.njlabs.amrita.aid.landing;
 
 import android.app.AlertDialog;
-import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,6 +18,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.gcm.GcmNetworkManager;
+import com.google.android.gms.gcm.PeriodicTask;
+import com.google.android.gms.gcm.Task;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.mikepenz.materialdrawer.Drawer;
@@ -29,6 +31,12 @@ import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.njlabs.amrita.aid.BaseActivity;
+import com.njlabs.amrita.aid.BuildConfig;
+import com.njlabs.amrita.aid.Calender;
+import com.njlabs.amrita.aid.Curriculum;
+import com.njlabs.amrita.aid.R;
+import com.njlabs.amrita.aid.TrainBusInfo;
 import com.njlabs.amrita.aid.about.Amrita;
 import com.njlabs.amrita.aid.about.App;
 import com.njlabs.amrita.aid.aums.Aums;
@@ -43,9 +51,6 @@ import com.onemarker.ark.ConnectionDetector;
 import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import me.tatarka.support.job.JobInfo;
-import me.tatarka.support.job.JobScheduler;
 
 
 public class Landing extends BaseActivity {
@@ -104,14 +109,20 @@ public class Landing extends BaseActivity {
 
         setupGrid();
 
-        JobScheduler jobScheduler = JobScheduler.getInstance(baseContext);
-        JobInfo job = new JobInfo.Builder(0, new ComponentName(baseContext, NewsUpdateService.class))
+        long periodSecs = 21600L;
+        long flexSecs = 30L;
+        String tag = "periodic  | NewsUpdateService: " + periodSecs + "s, f:" + flexSecs;
+        PeriodicTask periodic = new PeriodicTask.Builder()
+                .setService(NewsUpdateService.class)
+                .setPeriod(periodSecs)
+                .setFlex(flexSecs)
+                .setTag(tag)
                 .setPersisted(true)
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setPeriodic(43200)
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setRequiresCharging(false)
                 .build();
 
-        jobScheduler.schedule(job);
+        GcmNetworkManager.getInstance(this).schedule(periodic);
 
     }
 

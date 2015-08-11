@@ -1,4 +1,4 @@
-package com.njlabs.amrita.aid;
+package com.njlabs.amrita.aid.landing;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.joanzapata.android.iconify.IconDrawable;
 import com.joanzapata.android.iconify.Iconify;
+import com.njlabs.amrita.aid.R;
 
 import java.util.ArrayList;
 import java.util.List;

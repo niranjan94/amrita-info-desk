@@ -1,42 +1,28 @@
-package com.njlabs.amrita.aid;
+package com.njlabs.amrita.aid.info;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.content.res.AssetManager;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.njlabs.amrita.aid.BaseActivity;
+import com.njlabs.amrita.aid.R;
 import com.roomorama.caldroid.CaldroidFragment;
 import com.roomorama.caldroid.CaldroidListener;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 @SuppressLint("SimpleDateFormat")
 public class Calender extends BaseActivity {
@@ -645,102 +631,7 @@ public class Calender extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        /*if(isGoogleCalendarInstalled()){
-            MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.calendar, menu);
-        }*/
         return true;
 
-    }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                overridePendingTransition(R.anim.fadein, R.anim.fadeout);
-                return true;
-            case R.id.action_import:
-                Uri uri = copyICALFile();
-                Intent calendarIntent = new Intent(Intent.ACTION_MAIN, null);
-                calendarIntent.setPackage("com.google.android.calendar");
-                calendarIntent.setType("text/calendar");
-                try {
-                    startActivity(calendarIntent);
-                } catch (Exception e){
-                    Toast.makeText(baseContext,"Cannot open Google Calendar",Toast.LENGTH_SHORT).show();
-                    Crashlytics.logException(e);
-                }
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private boolean isGoogleCalendarInstalled() {
-        PackageManager pm = baseContext.getPackageManager();
-        try {
-            pm.getPackageInfo("com.google.android.calendar", PackageManager.GET_ACTIVITIES);
-            return true;
-        } catch (PackageManager.NameNotFoundException e) {
-            return false;
-        }
-    }
-
-    private Intent getGoogleCalendarIntent() {
-        final String[] calendarApps = {"com.google.android.calendar"};
-        Intent tweetIntent = new Intent();
-        tweetIntent.setType("text/calendar");
-        final PackageManager packageManager = getPackageManager();
-        List<ResolveInfo> list = packageManager.queryIntentActivities(
-                tweetIntent, PackageManager.MATCH_DEFAULT_ONLY);
-
-        for (String calendarApp : calendarApps) {
-            for (ResolveInfo resolveInfo : list) {
-                String p = resolveInfo.activityInfo.packageName;
-                if (p != null && p.startsWith(calendarApp)) {
-                    tweetIntent.setPackage(p);
-                    return tweetIntent;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private Uri copyICALFile()
-    {
-        AssetManager assetManager = getAssets();
-
-        InputStream in;
-        OutputStream out;
-
-        File fileDir = ContextCompat.getExternalFilesDirs(baseContext,null)[0];
-        fileDir.mkdirs();
-        File file = new File(fileDir, "ASECalendar.ics");
-        if(!file.exists()){
-            try {
-                in = assetManager.open("ASECalendar.ics");
-                out = new BufferedOutputStream(new FileOutputStream(file));
-                copyFile(in, out);
-                in.close();
-                out.flush();
-                out.close();
-            } catch (Exception e) {
-                Log.e("tag", e.getMessage());
-            }
-        }
-        return Uri.parse(file.toURI().toString());
-    }
-
-    private void copyFile(InputStream in, OutputStream out) throws IOException
-    {
-        byte[] buffer = new byte[1024];
-        int read;
-        while ((read = in.read(buffer)) != -1)
-        {
-            out.write(buffer, 0, read);
-        }
     }
 }

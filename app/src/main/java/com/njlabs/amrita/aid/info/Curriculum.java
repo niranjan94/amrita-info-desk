@@ -1,8 +1,11 @@
-package com.njlabs.amrita.aid;
+package com.njlabs.amrita.aid.info;
 
 import android.graphics.Color;
 import android.os.Bundle;
 import android.webkit.WebView;
+
+import com.njlabs.amrita.aid.BaseActivity;
+import com.njlabs.amrita.aid.R;
 
 public class Curriculum extends BaseActivity {
 
