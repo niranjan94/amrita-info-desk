@@ -1,6 +1,9 @@
 package com.njlabs.amrita.aid.aums;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -15,9 +18,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.R;
+import com.njlabs.amrita.aid.bugs.BugReport;
 import com.njlabs.amrita.aid.classes.CourseGradeData;
 
 import org.jsoup.Jsoup;
@@ -25,9 +28,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class AumsGrades extends BaseActivity {
 
@@ -181,11 +182,12 @@ public class AumsGrades extends BaseActivity {
                 overridePendingTransition(R.anim.fadein,R.anim.fadeout);
                 return true;
             case R.id.action_bug_report:
-                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyy HH:mm:ss");
-                String currentDateandTime = sdf.format(new Date());
-                Exception e = new Exception("AUMS Grades Error Reported - "+currentDateandTime);
-                Crashlytics.logException(e);
-                Toast.makeText(getBaseContext(), "The error has been reported.", Toast.LENGTH_SHORT).show();
+                SharedPreferences preferences = getSharedPreferences("aums_prefs", Context.MODE_PRIVATE);
+                String studentRollNo = preferences.getString("RollNo", "");
+                Intent intent = new Intent(getApplicationContext(), BugReport.class);
+                intent.putExtra("studentName","Anonymous");
+                intent.putExtra("studentRollNo", studentRollNo);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

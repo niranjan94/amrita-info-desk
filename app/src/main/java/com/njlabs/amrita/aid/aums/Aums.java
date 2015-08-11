@@ -33,10 +33,11 @@ import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.mobsandgeeks.saripaar.annotation.Size;
 import com.njlabs.amrita.aid.BaseActivity;
-import com.njlabs.amrita.aid.Landing;
 import com.njlabs.amrita.aid.MainApplication;
 import com.njlabs.amrita.aid.R;
+import com.njlabs.amrita.aid.bugs.BugReport;
 import com.njlabs.amrita.aid.classes.CourseData;
+import com.njlabs.amrita.aid.landing.Landing;
 import com.onemarker.ark.Security;
 import com.onemarker.ark.Util;
 import com.onemarker.ark.logging.Ln;
@@ -54,8 +55,6 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -159,6 +158,7 @@ public class Aums extends BaseActivity {
         String encodedPassword = preferences.getString("Password","");
         if (!RollNo.equals("")) {
             ((EditText) findViewById(R.id.roll_no)).setText(RollNo);
+            studentRollNo = RollNo;
             hideSoftKeyboard();
         }
         if(!encodedPassword.equals("")) {
@@ -690,11 +690,12 @@ public class Aums extends BaseActivity {
                 exitAums();
                 return true;
             case R.id.action_bug_report:
-                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyy HH:mm:ss");
-                String currentDateandTime = sdf.format(new Date());
-                Exception e = new Exception("AUMS Error Reported by "+studentName+" ("+studentRollNo+") on "+currentDateandTime);
-                Crashlytics.logException(e);
-                Toast.makeText(getBaseContext(), "The error has been reported.", Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(getApplicationContext(), BugReport.class);
+                intent.putExtra("studentName",(studentName!=null?studentName:"Anonymous"));
+                intent.putExtra("studentRollNo",(studentRollNo!=null?studentRollNo:"0"));
+                startActivity(intent);
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

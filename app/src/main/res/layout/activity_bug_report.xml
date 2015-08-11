@@ -1,0 +1,78 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.njlabs.amrita.aid.bugs.BugReport"
+    android:background="@color/white"
+    android:fillViewport="false">
+
+    <include layout="@layout/toolbar" android:id="@+id/toolbar"/>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:layout_below="@+id/toolbar"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="A system log has been collected."/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="You can add any additional info (optional):"/>
+
+        <EditText
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:inputType="textMultiLine"
+            android:ems="10"
+            android:hint="Additional information"
+            android:id="@+id/additional_info" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="left|center_vertical"
+            android:onClick="sendReport"
+            android:textAllCaps="false"
+            android:padding="10dp"
+            android:layout_marginLeft="1dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/material_button_bg"
+            android:text="Send the Bug Report" />
+
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Support &amp; Queries: niranjan94@yahoo.com"
+        android:paddingBottom="3dp"
+        android:layout_gravity="center_horizontal"
+        android:autoLink="email"
+        android:layout_above="@+id/install_id_view"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Installation ID: N/A"
+        android:id="@+id/install_id_view"
+        android:textColor="@color/grey_400"
+        android:textSize="10sp"
+        android:paddingBottom="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+</RelativeLayout>
