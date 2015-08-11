@@ -9,15 +9,15 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
+import com.google.android.gms.gcm.GcmNetworkManager;
+import com.google.android.gms.gcm.GcmTaskService;
+import com.google.android.gms.gcm.PeriodicTask;
+import com.google.android.gms.gcm.Task;
+import com.google.android.gms.gcm.TaskParams;
 import com.loopj.android.http.SyncHttpClient;
 import com.loopj.android.http.TextHttpResponseHandler;
 import com.njlabs.amrita.aid.R;
@@ -32,60 +32,45 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.tatarka.support.job.JobParameters;
-import me.tatarka.support.job.JobService;
-
-/**
- * Created by Niranjan on 07-07-2015.
- */
-public class NewsUpdateService extends JobService {
+public class NewsUpdateService extends GcmTaskService {
     Context mContext;
+    int status = GcmNetworkManager.RESULT_SUCCESS;
+
     @Override
-    public boolean onStartJob(JobParameters jobParameters) {
+    public int onRunTask(TaskParams taskParams) {
         mContext = this;
-        new JobTask(this).execute(jobParameters);
-        return true;
+        return new JobTask(this).execute();
     }
 
-    private class JobTask extends AsyncTask<JobParameters, Void, JobParameters> {
-        private final JobService jobService;
+    private class JobTask {
+        private final NewsUpdateService jobService;
         private List<NewsModel> oldArticles;
 
-        public JobTask(JobService jobService) {
+        public JobTask(NewsUpdateService jobService) {
             this.jobService = jobService;
         }
 
-        @Override
-        protected JobParameters doInBackground(JobParameters... params) {
+        public int execute() {
             oldArticles = NewsModel.listAll(NewsModel.class);
-            if(oldArticles != null && oldArticles.size()>0){
-                getNews(true,oldArticles);
+            if (oldArticles != null && oldArticles.size() > 0) {
+                getNews(true, oldArticles);
             } else {
-                getNews(false,oldArticles);
+                getNews(false, oldArticles);
             }
-            return params[0];
-        }
-
-        @Override
-        protected void onPostExecute(JobParameters jobParameters) {
-            jobService.jobFinished(jobParameters, false);
+            return status;
         }
     }
 
-    @Override
-    public boolean onStopJob(JobParameters jobParameters) {
-        return false;
-    }
 
     private void getNews(final Boolean refresh, final List<NewsModel> oldArticles){
-        SyncHttpClient client = new SyncHttpClient ();
+        SyncHttpClient client = new SyncHttpClient();
         client.get("https://www.amrita.edu/campus/Coimbatore/news", new TextHttpResponseHandler() {
 
             private List<NewsModel> currentArticles;
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
-
+                status = GcmNetworkManager.RESULT_SUCCESS;
                 currentArticles = new ArrayList<>();
                 if(refresh){
                     NewsModel.deleteAll(NewsModel.class);
@@ -108,13 +93,11 @@ public class NewsUpdateService extends JobService {
                     currentArticles.add(new NewsModel(imageUrl,title,url));
                 }
 
-                /* Creates an explicit intent for an Activity in your app */
                 Intent resultIntent = new Intent(mContext, NewsActivity.class);
 
                 TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
                 stackBuilder.addParentStack(NewsActivity.class);
 
-                /* Adds the Intent that starts the Activity to the top of the stack */
                 stackBuilder.addNextIntent(resultIntent);
                 PendingIntent resultPendingIntent =stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -152,35 +135,29 @@ public class NewsUpdateService extends JobService {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable e) {
-
-            }
-
-            @Override
-            public void onRetry(int retryNo) {
-
+                status = GcmNetworkManager.RESULT_RESCHEDULE;
             }
         });
     }
 
-    public static Bitmap drawableToBitmap (Drawable drawable) {
-        Bitmap bitmap = null;
+    @Override
+    public void onInitializeTasks() {
 
-        if (drawable instanceof BitmapDrawable) {
-            BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
-            if(bitmapDrawable.getBitmap() != null) {
-                return bitmapDrawable.getBitmap();
-            }
-        }
+        long periodSecs = 21600L;
+        long flexSecs = 30L;
+        String tag = "periodic  | NewsUpdateService: " + periodSecs + "s, f:" + flexSecs;
+        PeriodicTask periodic = new PeriodicTask.Builder()
+                .setService(NewsUpdateService.class)
+                .setPeriod(periodSecs)
+                .setFlex(flexSecs)
+                .setTag(tag)
+                .setPersisted(true)
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setRequiresCharging(false)
+                .build();
 
-        if(drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0) {
-            bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
-        } else {
-            bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        }
+        GcmNetworkManager.getInstance(this).schedule(periodic);
 
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-        return bitmap;
+        super.onInitializeTasks();
     }
 }

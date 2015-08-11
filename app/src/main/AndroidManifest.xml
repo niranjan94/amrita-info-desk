@@ -54,7 +54,7 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".Landing"
+            android:name=".landing.Landing"
             android:label="@string/app_name_alt"
             android:theme="@style/Theme.Landing" >
             <intent-filter>
@@ -67,51 +67,43 @@
             android:name=".about.Amrita"
             android:label="@string/title_activity_amrita"
             android:theme="@style/Theme.AboutAmrita"
-            android:parentActivityName=".Landing" >
+            android:parentActivityName=".landing.Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.njlabs.amrita.aid.Landing" />
-        </activity>
-        <activity
-            android:name=".TrainInfo"
-            android:label="@string/title_activity_traininfo"
-            android:parentActivityName=".Landing" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.njlabs.amrita.aid.Landing" />
+                android:value=".landing.Landing" />
         </activity>
         <activity
             android:name=".explorer.Explorer"
             android:label="@string/title_activity_explorer"
-            android:parentActivityName=".Landing"
+            android:parentActivityName=".landing.Landing"
             android:theme="@style/Theme.Explorer" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.njlabs.amrita.aid.Landing" />
+                android:value=".landing.Landing" />
         </activity>
         <activity
             android:name=".explorer.ExplorerSignup"
             android:label="@string/title_activity_explorer"
-            android:parentActivityName=".Landing" >
+            android:parentActivityName=".landing.Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.njlabs.amrita.aid.Landing" />
+                android:value=".landing.Landing" />
         </activity>
         <activity
-            android:name=".Calender"
+            android:name=".info.Calender"
             android:label="@string/title_activity_academic_calender"
-            android:parentActivityName=".Landing" >
+            android:parentActivityName=".landing.Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.njlabs.amrita.aid.Landing" />
+                android:value=".landing.Landing" />
         </activity>
         <activity
             android:name=".aums.Aums"
             android:label="@string/title_activity_aums"
-            android:parentActivityName=".Landing" >
+            android:parentActivityName=".landing.Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.njlabs.amrita.aid.Landing" />
+                android:value=".landing.Landing" />
         </activity>
         <activity
             android:name=".aums.AumsGrades"
@@ -122,73 +114,84 @@
             android:label="@string/title_activity_aums_attendance" >
         </activity>
         <activity
-            android:name=".Curriculum"
+            android:name=".info.Curriculum"
             android:label="@string/title_activity_curriculum"
-            android:parentActivityName=".Landing" >
+            android:parentActivityName=".landing.Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.njlabs.amrita.aid.Landing" />
+                android:value=".landing.Landing" />
         </activity>
         <activity
-            android:name=".TrainBusInfo"
+            android:name=".info.TrainBusInfo"
             android:label="@string/title_activity_train_bus_info"
-            android:parentActivityName=".Landing" >
+            android:parentActivityName=".landing.Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.njlabs.amrita.aid.Landing" />
+                android:value=".landing.Landing" />
         </activity>
 
-        <receiver android:name=".explorer.ExplorerBackgroundLocation" >
-        </receiver>
-
-        <service android:name=".explorer.ExplorerBackgroundLocationService" >
-        </service>
+        <receiver android:name=".explorer.ExplorerBackgroundLocation" />
+        <service android:name=".explorer.ExplorerBackgroundLocationService" />
 
         <activity
             android:name=".settings.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".Landing" >
+            android:parentActivityName=".landing.Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.njlabs.amrita.aid.Landing" />
+                android:value=".landing.Landing" />
         </activity>
         <activity
             android:name=".about.App"
             android:label="@string/title_activity_about_app"
-            android:parentActivityName=".Landing" >
+            android:parentActivityName=".landing.Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.njlabs.amrita.aid.Landing" />
+                android:value=".landing.Landing" />
         </activity>
         <activity
             android:name=".aums.AttendanceFlow"
             android:label="@string/title_activity_attendance_flow"
-            android:parentActivityName=".Landing" >
+            android:parentActivityName=".landing.Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.njlabs.amrita.aid.Landing" />
+                android:value=".landing.Landing" />
         </activity>
         <activity
             android:name=".bunker.AttendanceManager"
             android:label="@string/title_activity_attendance_manager"
-            android:parentActivityName=".Landing" >
+            android:parentActivityName=".landing.Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.njlabs.amrita.aid.Landing" />
+                android:value=".landing.Landing" />
         </activity>
+
         <activity
             android:name=".news.NewsActivity"
             android:label="@string/title_activity_news"
-            android:parentActivityName=".Landing" >
+            android:parentActivityName=".landing.Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.njlabs.amrita.aid.Landing" />
+                android:value=".landing.Landing" />
+        </activity>
+
+        <activity
+            android:name=".bugs.BugReport"
+            android:label="@string/title_activity_bug_report"
+            android:parentActivityName=".landing.Landing" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".landing.Landing" />
         </activity>
 
         <service
             android:name=".news.NewsUpdateService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:exported="true" />
+            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
+            </intent-filter>
+        </service>
 
         <meta-data
             android:name="com.crashlytics.ApiKey"
