@@ -36,7 +36,8 @@
             android:textAllCaps="false"
             android:drawablePadding="5dp"
             android:padding="10dp"
-            android:background="@drawable/matrial_button_bg"
+            android:layout_marginLeft="1dp"
+            android:background="@drawable/material_button_bg"
             android:text="+91-422-2685000" />
         <Button
             android:layout_width="220dp"
@@ -48,7 +49,8 @@
             android:textAllCaps="false"
             android:drawablePadding="5dp"
             android:padding="10dp"
-            android:background="@drawable/matrial_button_bg"
+            android:layout_marginLeft="1dp"
+            android:background="@drawable/material_button_bg"
             android:text="univhq@amrita.edu" />
 
         <TextView
@@ -78,7 +80,8 @@
             android:textAllCaps="false"
             android:drawablePadding="5dp"
             android:padding="10dp"
-            android:background="@drawable/matrial_button_bg"
+            android:layout_marginLeft="1dp"
+            android:background="@drawable/material_button_bg"
             android:text="View Train Info" />
         <TextView
             android:layout_width="wrap_content"
@@ -100,7 +103,8 @@
             android:textAllCaps="false"
             android:drawablePadding="5dp"
             android:padding="10dp"
-            android:background="@drawable/matrial_button_bg"
+            android:layout_marginLeft="1dp"
+            android:background="@drawable/material_button_bg"
             android:layout_marginBottom="10dp"
             android:text=" Get Directions" />
 
