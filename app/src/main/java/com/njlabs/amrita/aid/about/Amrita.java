@@ -20,7 +20,7 @@ import android.view.View;
 
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.R;
-import com.njlabs.amrita.aid.TrainBusInfo;
+import com.njlabs.amrita.aid.info.TrainBusInfo;
 
 import java.util.ArrayList;
 import java.util.List;

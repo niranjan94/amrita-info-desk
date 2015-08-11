@@ -26,7 +26,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.njlabs.amrita.aid.BaseActivity;
-import com.njlabs.amrita.aid.Landing;
+import com.njlabs.amrita.aid.landing.Landing;
 import com.njlabs.amrita.aid.R;
 
 import org.apache.http.Header;

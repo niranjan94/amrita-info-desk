@@ -20,19 +20,4 @@ public class App extends BaseActivity {
         ((TextView) findViewById(R.id.version)).setText("Version "+BuildConfig.VERSION_NAME);
         ((TextView) findViewById(R.id.install_id_view)).setText("Installation ID: "+ ParseInstallation.getCurrentInstallation().getInstallationId());
     }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        if(item.getItemId() == android.R.id.home) {
-            finish();
-            overridePendingTransition(R.anim.fadein, R.anim.fadeout);
-        }
-        return true;
-    }
-
-    @Override
-    public void onBackPressed() {
-        finish(); //go back to the previous Activity
-        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
-    }
 }
