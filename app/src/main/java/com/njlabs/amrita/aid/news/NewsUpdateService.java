@@ -9,6 +9,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -35,10 +36,12 @@ import java.util.List;
 public class NewsUpdateService extends GcmTaskService {
     Context mContext;
     int status = GcmNetworkManager.RESULT_SUCCESS;
-
+    boolean allowNotification = true;
     @Override
     public int onRunTask(TaskParams taskParams) {
         mContext = this;
+        SharedPreferences preferences = getSharedPreferences("com.njlabs.amrita.aid_preferences", Context.MODE_PRIVATE);
+        allowNotification = preferences.getBoolean("news_updates_notification", true);
         return new JobTask(this).execute();
     }
 
@@ -112,8 +115,11 @@ public class NewsUpdateService extends GcmTaskService {
                                     .setAutoCancel(true)
                     .setContentText(currentArticles.get(0).getTitle());
 
-                    NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                    mNotificationManager.notify(0, mBuilder.build());
+                    if(allowNotification){
+                        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                        mNotificationManager.notify(0, mBuilder.build());
+                    }
+
                 }
                 if(!refresh){
                     NotificationCompat.Builder  mBuilder = new NotificationCompat.Builder(mContext);
@@ -128,8 +134,11 @@ public class NewsUpdateService extends GcmTaskService {
                     mBuilder.setAutoCancel(true);
                     mBuilder.setStyle(inboxStyle);
 
-                    NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                    mNotificationManager.notify(0, mBuilder.build());
+                    if(allowNotification){
+                        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                        mNotificationManager.notify(0, mBuilder.build());
+                    }
+
                 }
             }
 
