@@ -10,8 +10,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.joanzapata.android.iconify.IconDrawable;
-import com.joanzapata.android.iconify.Iconify;
+import com.joanzapata.iconify.IconDrawable;
+import com.joanzapata.iconify.fonts.FontAwesomeIcons;
 import com.njlabs.amrita.aid.R;
 
 import java.util.ArrayList;
@@ -33,14 +33,14 @@ public class LandingAdapter extends BaseAdapter {
         this.context = context;
         inflater = LayoutInflater.from(context);
         items.clear();
-        items.add(new Item("#ffc107", "News", Iconify.IconValue.fa_newspaper_o));
-        items.add(new Item("#e91e63", "Amrita UMS Login", Iconify.IconValue.fa_lock));
-        items.add(new Item("#fe5352", "Academic Calender", Iconify.IconValue.fa_calendar));
-        items.add(new Item("#3f51b5", "Amrita Explorer", Iconify.IconValue.fa_globe));
-        items.add(new Item("#9c27b0", "Train & Bus Timings", Iconify.IconValue.fa_clock_o));
-        items.add(new Item("#009688", "Attendance Manager", Iconify.IconValue.fa_smile_o));
-        items.add(new Item("#259b24", "Curriculum Info", Iconify.IconValue.fa_book));
-        items.add(new Item("#03a9f4", "About Amrita", Iconify.IconValue.fa_info_circle));
+        items.add(new Item("#ffc107", "News", FontAwesomeIcons.fa_newspaper_o));
+        items.add(new Item("#e91e63", "Amrita UMS Login", FontAwesomeIcons.fa_lock));
+        items.add(new Item("#fe5352", "Academic Calender", FontAwesomeIcons.fa_calendar));
+        items.add(new Item("#3f51b5", "Amrita Explorer", FontAwesomeIcons.fa_globe));
+        items.add(new Item("#9c27b0", "Train & Bus Timings", FontAwesomeIcons.fa_clock_o));
+        items.add(new Item("#009688", "Attendance Manager", FontAwesomeIcons.fa_smile_o));
+        items.add(new Item("#259b24", "Curriculum Info", FontAwesomeIcons.fa_book));
+        items.add(new Item("#03a9f4", "About Amrita", FontAwesomeIcons.fa_info_circle));
     }
 
     @Override
@@ -106,8 +106,7 @@ public class LandingAdapter extends BaseAdapter {
         holder.setBackgroundColor(color);
 
         Item item = (Item) getItem(i);
-        picture.setImageDrawable(new IconDrawable(context, item.icon)
-                .colorRes(R.color.white));
+        picture.setImageDrawable(new IconDrawable(context, item.icon).colorRes(R.color.white));
         name.setText(item.name);
         holder.setBackgroundColor(Color.parseColor(item.color));
         return v;
@@ -117,9 +116,9 @@ public class LandingAdapter extends BaseAdapter {
 
         final String color;
         final String name;
-        final Iconify.IconValue icon;
+        final FontAwesomeIcons icon;
 
-        Item(String color, String name, Iconify.IconValue icon) {
+        Item(String color, String name, FontAwesomeIcons icon) {
             this.color = color;
             this.name = name;
             this.icon = icon;
