@@ -98,7 +98,7 @@ public class Calender extends BaseActivity {
                 hm.put(ParseDate("19-09-2015"), R.color.calendar_blue);
                 hm.put(ParseDate("10-10-2015"), R.color.calendar_blue);
                 hm.put(ParseDate("31-10-2015"), R.color.calendar_blue);
-                hm.put(ParseDate("07-10-2015"), R.color.calendar_blue);
+                hm.put(ParseDate("07-11-2015"), R.color.calendar_blue);
                 hm.put(ParseDate("20-11-2015"), R.color.calendar_blue);
                 hm.put(ParseDate("04-01-2016"), R.color.calendar_blue);
                 hm.put(ParseDate("09-01-2016"), R.color.calendar_blue);
@@ -231,7 +231,7 @@ public class Calender extends BaseActivity {
                 thm.put(ParseDate("19-09-2015"), R.color.white);
                 thm.put(ParseDate("10-10-2015"), R.color.white);
                 thm.put(ParseDate("31-10-2015"), R.color.white);
-                thm.put(ParseDate("07-10-2015"), R.color.white);
+                thm.put(ParseDate("07-11-2015"), R.color.white);
                 thm.put(ParseDate("20-11-2015"), R.color.white);
                 thm.put(ParseDate("04-01-2016"), R.color.white);
                 thm.put(ParseDate("09-01-2016"), R.color.white);
@@ -433,7 +433,7 @@ public class Calender extends BaseActivity {
         desc.put("19-09-2015", "THURSDAY’S TIME TABLE");
         desc.put("10-10-2015", "FRIDAY’s TIME TABLE");
         desc.put("31-10-2015", "WEDNESDAY’s TIME TABLE");
-        desc.put("07-10-2015", "THURSDAY’S TIME TABLE");
+        desc.put("07-11-2015", "THURSDAY’S TIME TABLE");
         desc.put("20-11-2015", "Last instruction day for UG / PG");
         desc.put("04-01-2016", "Enrolment and commencement of all UG and PG Programmes");
         desc.put("09-01-2016", "THURSDAY’S TIME TABLE");
