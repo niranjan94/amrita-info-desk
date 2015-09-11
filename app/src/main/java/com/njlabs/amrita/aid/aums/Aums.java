@@ -38,9 +38,9 @@ import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.bugs.BugReport;
 import com.njlabs.amrita.aid.classes.CourseData;
 import com.njlabs.amrita.aid.landing.Landing;
-import com.onemarker.ark.Security;
-import com.onemarker.ark.Util;
-import com.onemarker.ark.logging.Ln;
+import com.njlabs.amrita.aid.util.ark.Security;
+import com.njlabs.amrita.aid.util.ark.Util;
+import com.njlabs.amrita.aid.util.ark.logging.Ln;
 
 import org.apache.commons.lang3.text.WordUtils;
 import org.apache.http.Header;

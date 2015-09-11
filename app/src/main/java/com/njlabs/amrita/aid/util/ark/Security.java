@@ -1,4 +1,4 @@
-package com.onemarker.ark;
+package com.njlabs.amrita.aid.util.ark;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;

@@ -22,7 +22,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.R;
-import com.onemarker.ark.logging.Ln;
+import com.njlabs.amrita.aid.util.ark.logging.Ln;
 
 import org.apache.http.Header;
 import org.json.JSONException;

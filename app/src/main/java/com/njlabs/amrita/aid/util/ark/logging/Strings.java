@@ -2,7 +2,7 @@
  * Copyright (c) 2014. Niranjan Rajendran <niranjan94@yahoo.com>
  */
 
-package com.onemarker.ark.logging;
+package com.njlabs.amrita.aid.util.ark.logging;
 
 import java.io.IOException;
 import java.io.InputStream;

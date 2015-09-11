@@ -2,7 +2,7 @@
  * Copyright (c) 2014. Niranjan Rajendran <niranjan94@yahoo.com>
  */
 
-package com.onemarker.ark;
+package com.njlabs.amrita.aid.util.ark;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URL;

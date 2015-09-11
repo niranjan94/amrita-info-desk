@@ -1,4 +1,4 @@
-package com.onemarker.ark;
+package com.njlabs.amrita.aid.util.ark;
 
 import java.io.UnsupportedEncodingException;
 

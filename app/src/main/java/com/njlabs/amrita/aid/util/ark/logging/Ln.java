@@ -2,7 +2,7 @@
  * Copyright (c) 2014. Niranjan Rajendran <niranjan94@yahoo.com>
  */
 
-package com.onemarker.ark.logging;
+package com.njlabs.amrita.aid.util.ark.logging;
 
 /**
  * Created by Niranjan on 12-07-2014.

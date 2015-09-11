@@ -15,7 +15,7 @@ import android.widget.ProgressBar;
 
 import com.loopj.android.http.*;
 import com.njlabs.amrita.aid.R;
-import com.onemarker.ark.logging.Ln;
+import com.njlabs.amrita.aid.util.ark.logging.Ln;
 
 import org.apache.http.Header;
 import org.jsoup.Jsoup;

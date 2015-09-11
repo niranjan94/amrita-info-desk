@@ -1,4 +1,4 @@
-package com.onemarker.ark; /***************************************************************
+package com.njlabs.amrita.aid.util.ark; /***************************************************************
 
  Copyright (c) 1998, 1999 Nate Sammons <nate@protomatter.com>
  This library is free software; you can redistribute it and/or

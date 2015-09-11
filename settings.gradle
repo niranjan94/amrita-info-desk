@@ -1,1 +1,1 @@
-include ':app', ':ark-hacks'
+include ':app'
