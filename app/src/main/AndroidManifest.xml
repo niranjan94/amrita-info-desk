@@ -114,6 +114,14 @@
             android:label="@string/title_activity_aums_attendance" >
         </activity>
         <activity
+            android:name=".aums.AumsMarks"
+            android:label="@string/title_activity_aums_marks" >
+        </activity>
+        <activity
+            android:name=".aums.AumsDebugActivity"
+            android:label="@string/title_activity_aums_debug" >
+        </activity>
+        <activity
             android:name=".info.Curriculum"
             android:label="@string/title_activity_curriculum"
             android:parentActivityName=".landing.Landing" >

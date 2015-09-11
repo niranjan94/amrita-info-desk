@@ -28,5 +28,7 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_news">News</string>
+    <string name="title_activity_aums_debug">Debug Activity</string>
+    <string name="title_activity_aums_marks">Your Marks</string>
 
 </resources>
