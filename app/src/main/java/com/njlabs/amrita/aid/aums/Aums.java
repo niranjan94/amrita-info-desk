@@ -11,7 +11,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -60,7 +59,7 @@ import java.util.List;
 import java.util.Map;
 
 
-@SuppressWarnings("ResultOfMethodCallIgnored")
+@SuppressWarnings({"ResultOfMethodCallIgnored", "ConstantConditions"})
 public class Aums extends BaseActivity {
 
     private static long BackPress;
@@ -83,11 +82,11 @@ public class Aums extends BaseActivity {
 
     private String methodToCall = null;
 
-
     private Map<String,String> semesterMapping = new HashMap<>();
 
     int gradeRefIndex=1;
     int attendanceRefIndex=1;
+    int markRefIndex = 1;
 
     private String calledBy = "activity";
     private Context serviceContext;
@@ -170,7 +169,6 @@ public class Aums extends BaseActivity {
 
     public void loginStart(View view) {
 
-
         Validator validator = new Validator(this);
         validator.setValidationListener(new Validator.ValidationListener() {
             @Override
@@ -197,7 +195,6 @@ public class Aums extends BaseActivity {
                     View view = error.getView();
                     String message = error.getCollatedErrorMessage(baseContext);
 
-                    // Display error messages ;)
                     if (view instanceof EditText) {
                         ((EditText) view).setError(message);
                     } else {
@@ -227,23 +224,25 @@ public class Aums extends BaseActivity {
 
         client.setBaseURL(baseURL);
 
-        Ln.d("Starting Session");
+        Ln.d("Starting AUMS Session");
         RequestParams params = new RequestParams();
-        params.put("service", client.BASE_URL+"/aums/Jsp/Common/index.jsp");
+        params.put("service", client.BASE_URL + "/aums/Jsp/Common/index.jsp");
 
         client.get("/cas/login", params, new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Ln.e("Session ERROR. Code:%s Response:%s", statusCode, responseString);
-
+                Ln.e("Session Error. Check debug.");
                 switch (client.BASE_URL) {
                     case "https://amritavidya.amrita.edu:8444":
+                        Ln.d("Switching to amritavidya1");
                         GetSessionID("https://amritavidya1.amrita.edu:8444", true);
                         break;
                     case "https://amritavidya1.amrita.edu:8444":
+                        Ln.d("Switching to amritavidya2");
                         GetSessionID("https://amritavidya2.amrita.edu:8444", true);
                         break;
                     default:
+                        Ln.e("Session Error. Quitting.");
                         serverError();
                         closeSession(true);
                         break;
@@ -262,7 +261,7 @@ public class Aums extends BaseActivity {
                 Element hiddenInput = doc.select("input[name=lt]").first();
                 lt = hiddenInput.attr("value");
 
-                Ln.d("Session Done. action=%s lt=%s", formAction, lt);
+                Ln.d("Session authorized.");
                 login(formAction, lt);
             }
         });
@@ -273,7 +272,7 @@ public class Aums extends BaseActivity {
         if(calledBy.equals("activity")||(calledBy.equals("data_hook")&&dialog!=null)) {
             dialog.setMessage("Authenticating your credentials ...");
         }
-        Ln.d("Start Login");
+        Ln.d("Starting user authorization");
         RequestParams params = new RequestParams();
         params.put("username", username);
         params.put("password", password);
@@ -284,29 +283,28 @@ public class Aums extends BaseActivity {
         client.post(formAction, params, new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Ln.e("Login ERROR. Code:%s Response:%s",statusCode,responseString);
+                Ln.e("Login error. Code:%s Response:%s", statusCode, responseString);
                 serverError();
                 closeSession(true);
             }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
-
                 Ln.d("Login Done.");
                 Document doc = Jsoup.parse(responseString);
                 Elements TableElements = doc.getElementsByTag("td");
 
-                try{
+                try {
                     Elements scripts = doc.select("script[language=JavaScript]");
                     String script = scripts.get(3).html();
                     BufferedReader bufReader = new BufferedReader(new StringReader(script));
                     String line = null;
-                    while( (line=bufReader.readLine()) != null ) {
-                        if(line.trim().startsWith("var myVar")){
+                    while ((line = bufReader.readLine()) != null) {
+                        if (line.trim().startsWith("var myVar")) {
                             studentHashId = line.split("\"")[1];
                         }
                     }
-                } catch (Exception e){
+                } catch (Exception e) {
                     Crashlytics.logException(e);
                 }
 
@@ -317,7 +315,7 @@ public class Aums extends BaseActivity {
                     }
                 }
                 if (Name != null && !Name.equals("")) {
-                    if(calledBy.equals("activity")||(calledBy.equals("data_hook")&&dialog!=null))
+                    if (calledBy.equals("activity") || (calledBy.equals("data_hook") && dialog != null))
                         dialog.setMessage("Authorization successful");
                     Name = Name.replace("Welcome ", "");
                     Name = Name.replace(")", "");
@@ -325,43 +323,33 @@ public class Aums extends BaseActivity {
                     studentName = result[0];
                     studentRollNo = result[1].toUpperCase();
                     getCGPA();
-                }
-                else
-                {
+                } else {
                     Element form = doc.select("#fm1").first();
                     String formAction = form.attr("action");
                     Boolean retry = false;
                     try {
-                        Map<String,String> actionQuery = Util.splitQuery(new URL(client.BASE_URL + formAction));
+                        Map<String, String> actionQuery = Util.splitQuery(new URL(client.BASE_URL + formAction));
                         String service = actionQuery.get("service");
-                        if(service.contains("amritavidya.amrita.edu"))
-                        {
-                            if(!client.BASE_URL.equals("https://amritavidya.amrita.edu:8444"))
-                            {
+                        if (service.contains("amritavidya.amrita.edu")) {
+                            if (!client.BASE_URL.equals("https://amritavidya.amrita.edu:8444")) {
                                 retry = true;
-                                GetSessionID("https://amritavidya.amrita.edu:8444",true);
+                                GetSessionID("https://amritavidya.amrita.edu:8444", true);
                             }
-                        }
-                        else if(service.contains("amritavidya1.amrita.edu"))
-                        {
-                            if(!client.BASE_URL.equals("https://amritavidya1.amrita.edu:8444"))
-                            {
+                        } else if (service.contains("amritavidya1.amrita.edu")) {
+                            if (!client.BASE_URL.equals("https://amritavidya1.amrita.edu:8444")) {
                                 retry = true;
-                                GetSessionID("https://amritavidya1.amrita.edu:8444",true);
+                                GetSessionID("https://amritavidya1.amrita.edu:8444", true);
                             }
-                        }
-                        else if(service.contains("amritavidya2.amrita.edu"))
-                        {
-                            if(!client.BASE_URL.equals("https://amritavidya2.amrita.edu:8444"))
-                            {
+                        } else if (service.contains("amritavidya2.amrita.edu")) {
+                            if (!client.BASE_URL.equals("https://amritavidya2.amrita.edu:8444")) {
                                 retry = true;
-                                GetSessionID("https://amritavidya2.amrita.edu:8444",true);
+                                GetSessionID("https://amritavidya2.amrita.edu:8444", true);
                             }
                         }
                     } catch (UnsupportedEncodingException | MalformedURLException e) {
                         Crashlytics.logException(e);
                     }
-                    if(!retry && (calledBy.equals("activity")||(calledBy.equals("data_hook")&&dialog!=null))) {
+                    if (!retry && (calledBy.equals("activity") || (calledBy.equals("data_hook") && dialog != null))) {
 
                         Snackbar
                                 .make(parentView, "Your credentials are incorrect.", Snackbar.LENGTH_LONG)
@@ -419,7 +407,7 @@ public class Aums extends BaseActivity {
                     findViewById(studentProfilePicProgress).setVisibility(View.GONE);
                     ImageView myImage = (ImageView) findViewById(studentProfilePic);
                     myImage.setVisibility(View.VISIBLE);
-                    myImage.setImageResource(R.drawable.user_128);
+                    myImage.setImageResource(R.drawable.user);
                 }
 
                 @Override
@@ -466,8 +454,7 @@ public class Aums extends BaseActivity {
         getPhotoFile(R.id.StudentProfilePicProgress,R.id.StudentProfilePic);
 
     }
-    public void getAttendance(final String semester)
-    {
+    public void getAttendance(final String semester) {
         Ln.d("Start getAttendance Stage 1");
         RequestParams params = new RequestParams();
         params.put("action", "UMS-ATD_INIT_ATDREPORTSTUD_SCREEN");
@@ -485,10 +472,8 @@ public class Aums extends BaseActivity {
             }
         });
     }
-    public void getAttendanceStage2(String semester){
+    public void getAttendanceStage2(String semester) {
         Ln.d("Start getAttendance stage 2");
-        // GET ACTUAL ATTENDACE DATA
-        Log.d("SEMESTER","<"+semester+">");
         RequestParams params = new RequestParams();
         params.put("htmlPageTopContainer_selectSem", semester);
         params.put("Page_refIndex_hidden", attendanceRefIndex++);
@@ -505,6 +490,7 @@ public class Aums extends BaseActivity {
                 Ln.e("Attendance Stage 2 ERROR. Code:%s Response:%s", statusCode, responseString);
                 serverError();
             }
+
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
                 client.removeReferrer();
@@ -516,13 +502,13 @@ public class Aums extends BaseActivity {
                 Element table = doc.select("table[width=75%] > tbody").first();
                 Elements rows = table.select("tr:gt(0)");
                 dialog.dismiss();
-                if(rows.toString().equals("")) {
-                    Snackbar.make(parentView,"No data available for the selected semester.",Snackbar.LENGTH_LONG).show();
+                if (rows.toString().equals("")) {
+                    Snackbar.make(parentView, "No data available for the selected semester.", Snackbar.LENGTH_LONG).show();
                 } else {
                     Intent i = new Intent(getApplicationContext(), AumsAttendance.class);
                     i.putExtra("response", responseString);
                     startActivity(i);
-                    overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 }
             }
         });
@@ -563,13 +549,12 @@ public class Aums extends BaseActivity {
 
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                        if(calledBy.equals("activity")) {
+                        if (calledBy.equals("activity")) {
                             Intent i = new Intent(getApplicationContext(), AumsAttendance.class);
                             i.putExtra("response", responseString);
                             startActivity(i);
-                            overridePendingTransition(R.anim.fadein,R.anim.fadeout);
-                        }
-                        else {
+                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                        } else {
                             Ln.d("Storing");
                             // STORE TO DATABASE AND SHOW NOTIFICATION
                             Document doc = Jsoup.parse(responseString);
@@ -577,18 +562,16 @@ public class Aums extends BaseActivity {
                             Element table = doc.select("table[width=75%] > tbody").first();
                             Elements rows = table.select("tr:gt(0)");
 
-                            for(Element row : rows) {
+                            for (Element row : rows) {
                                 Elements dataHolders = row.select("td > span");
 
                                 CourseData adata = new CourseData();
 
-                                if(dataHolders.size()>2) {
+                                if (dataHolders.size() > 2) {
                                     adata.setCourseCode(dataHolders.get(0).text());
                                     adata.setCourseName(dataHolders.get(1).text());
                                     adata.setType(dataHolders.get(2).text());
                                     adata.setCredits(Float.valueOf(dataHolders.get(3).text()));
-
-                                    adata.save();
                                 }
                             }
                         }
@@ -600,10 +583,7 @@ public class Aums extends BaseActivity {
     }
 
 
-    private void getGrades(String semesterCode)
-    {
-        Ln.d("Start getGrades stage 2");
-        // GET ACTUAL ATTENDACE DATA
+    private void getGrades(String semesterCode) {
         RequestParams params = new RequestParams();
         params.put("htmlPageTopContainer_selectStep", semesterCode);
         params.put("Page_refIndex_hidden", gradeRefIndex++);
@@ -615,7 +595,7 @@ public class Aums extends BaseActivity {
         client.post("/aums/Jsp/StudentGrade/StudentPerformanceWithSurvey.jsp?action=UMS-EVAL_STUDPERFORMSURVEY_INIT_SCREEN&isMenu=true&pagePostSerialID=0", params, new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Ln.e("getGrades Stage 2 ERROR. Code:%s Response:%s", statusCode, responseString);
+                Ln.e("getGrades error. Code:%s Response:%s", statusCode, responseString);
                 serverError();
             }
 
@@ -625,12 +605,58 @@ public class Aums extends BaseActivity {
                 Intent i = new Intent(getApplicationContext(), AumsGrades.class);
                 i.putExtra("response", responseString);
                 startActivity(i);
-                overridePendingTransition(R.anim.fadein,R.anim.fadeout);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
     }
-    public void OpenAttendance(View view) {
-        final CharSequence[] items = {"1","2","Vacation 1","3","4","Vacation 2","5","6","Vacation 3","7","8","Vacation 4","9","10","Vacation 5","11","12","Vacation 6","13","14","15"};
+
+    private void getMarks(final String semesterCode) {
+        RequestParams params = new RequestParams();
+        params.put("action", "UMS-EVAL_STUDMARKVIEW_INIT_SCREEN");
+        params.put("isMenu", "true");
+        client.get("/aums/Jsp/Marks/ViewPublishedMark.jsp", params, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Ln.e("Marks stage 1 error. Code:%s Response:%s", statusCode, responseString);
+                serverError();
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                getMarksStage2(semesterCode);
+
+            }
+        });
+    }
+
+    private void getMarksStage2(String semesterCode) {
+        RequestParams params = new RequestParams();
+        params.put("htmlPageTopContainer_selectStep", semesterCode);
+        params.put("Page_refIndex_hidden", markRefIndex++);
+        params.put("htmlPageTopContainer_status", "");
+        params.put("htmlPageTopContainer_action", "UMS-EVAL_STUDMARKVIEW_SELSEM_SCREEN");
+        params.put("htmlPageTopContainer_notify", "I");
+
+        client.post("/aums/Jsp/Marks/ViewPublishedMark.jsp?action=UMS-EVAL_STUDMARKVIEW_INIT_SCREEN&isMenu=true", params, new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Ln.e("getMarks stage 2 error. Code:%s Response:%s", statusCode, responseString);
+                serverError();
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                dialog.dismiss();
+                Intent i = new Intent(getApplicationContext(), AumsMarks.class);
+                i.putExtra("response", responseString);
+                startActivity(i);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+            }
+        });
+    }
+
+    public void openAttendance(View view) {
+        final String[] items = {"1","2","Vacation 1","3","4","Vacation 2","5","6","Vacation 3","7","8","Vacation 4","9","10","Vacation 5","11","12","Vacation 6","13","14","15"};
         AlertDialog.Builder builder = new AlertDialog.Builder(serviceContext);
         builder.setCancelable(true);
         builder.setTitle("Select a Semester");
@@ -641,14 +667,14 @@ public class Aums extends BaseActivity {
                 getAttendance(semesterMapping.get(items[item]));
             }
         });
-        AlertDialog alert_d = builder.create();
-        alert_d.show();
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
 
     }
 
-    public void OpenGrades(View view) {
+    public void openGrades(View view) {
 
-        final CharSequence[] items = {"1","2","Vacation 1","3","4","Vacation 2","5","6","Vacation 3","7","8","Vacation 4","9","10","Vacation 5","11","12","Vacation 6","13","14","15"};
+        final String[] items = {"1","2","Vacation 1","3","4","Vacation 2","5","6","Vacation 3","7","8","Vacation 4","9","10","Vacation 5","11","12","Vacation 6","13","14","15"};
         AlertDialog.Builder builder = new AlertDialog.Builder(serviceContext);
         builder.setCancelable(true);
         builder.setTitle("Select a Semester");
@@ -659,8 +685,24 @@ public class Aums extends BaseActivity {
                 getGrades(semesterMapping.get(items[item]));
             }
         });
-        AlertDialog alert_d = builder.create();
-        alert_d.show();
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    public void openMarks(View view) {
+        final String[] items = {"1","2","Vacation 1","3","4","Vacation 2","5","6","Vacation 3","7","8","Vacation 4","9","10","Vacation 5","11","12","Vacation 6","13","14","15"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(serviceContext);
+        builder.setCancelable(true);
+        builder.setTitle("Select a Semester");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialogList, int item) {
+                dialog.setMessage("Getting your marks");
+                dialog.show();
+                getMarks(semesterMapping.get(items[item]));
+            }
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     //
@@ -741,7 +783,7 @@ public class Aums extends BaseActivity {
                 Intent intent = new Intent(serviceContext, Landing.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
-                overridePendingTransition(R.anim.fadein,R.anim.fadeout);
+                overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
             } else {
                 // ask user to press back button one more time to close app
                 toast = Toast.makeText(getBaseContext(), "Press once again to Log Out of AUMS.", Toast.LENGTH_SHORT);
@@ -753,7 +795,7 @@ public class Aums extends BaseActivity {
             Intent intent = new Intent(serviceContext, Landing.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
-            overridePendingTransition(R.anim.fadein,R.anim.fadeout);
+            overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
         }
     }
 
@@ -806,5 +848,9 @@ public class Aums extends BaseActivity {
         semesterMapping.put("13","177");
         semesterMapping.put("14","190");
         semesterMapping.put("15","219");
+    }
+
+    public void setMethodToCall(String methodToCall) {
+        this.methodToCall = methodToCall;
     }
 }
