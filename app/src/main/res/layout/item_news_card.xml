@@ -23,7 +23,6 @@
                 android:layout_width="fill_parent"
                 android:layout_height="160dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/temp"
                 android:id="@+id/image" />
 
             <LinearLayout
