@@ -5,7 +5,7 @@
 	android:layout_height="match_parent"
 	android:background="@color/calendar_blue" >
 
-    <com.onemarker.ark.SquareImageView
+    <com.njlabs.amrita.aid.util.ark.SquareImageView
         android:id="@+id/landing_picture"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
