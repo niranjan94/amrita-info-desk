@@ -65,7 +65,7 @@ public class AttendanceManager extends BaseActivity {
     public void exit(View v)
     {
         finish();
-        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 
 }

@@ -91,7 +91,7 @@ public class ExplorerSignup extends BaseActivity {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 dialog.dismiss();
-                Ln.e("ERROR: "+statusCode+" MESSAGE: "+responseString);
+                Ln.e("ERROR: " + statusCode + " MESSAGE: " + responseString);
                 Snackbar
                         .make(parentView, "Cannot connect to Server. Try again later.", Snackbar.LENGTH_LONG)
                         .show();
@@ -152,7 +152,7 @@ public class ExplorerSignup extends BaseActivity {
 
     public void goBack(View view) {
         finish();
-        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 
     @SuppressWarnings("unchecked")
@@ -204,14 +204,14 @@ public class ExplorerSignup extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item){
         if(item.getItemId() == android.R.id.home) {
             finish();
-            overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         }
         return true;
     }
     @Override
     public void onBackPressed() {
         finish(); //go back to the previous Activity
-        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 
 }

@@ -33,20 +33,20 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.BuildConfig;
-import com.njlabs.amrita.aid.info.Calender;
-import com.njlabs.amrita.aid.info.Curriculum;
 import com.njlabs.amrita.aid.R;
-import com.njlabs.amrita.aid.info.TrainBusInfo;
 import com.njlabs.amrita.aid.about.Amrita;
 import com.njlabs.amrita.aid.about.App;
 import com.njlabs.amrita.aid.aums.Aums;
 import com.njlabs.amrita.aid.bunker.AttendanceManager;
 import com.njlabs.amrita.aid.explorer.Explorer;
 import com.njlabs.amrita.aid.explorer.ExplorerSignup;
+import com.njlabs.amrita.aid.info.Calender;
+import com.njlabs.amrita.aid.info.Curriculum;
+import com.njlabs.amrita.aid.info.TrainBusInfo;
 import com.njlabs.amrita.aid.news.NewsActivity;
 import com.njlabs.amrita.aid.news.NewsUpdateService;
 import com.njlabs.amrita.aid.settings.SettingsActivity;
-import com.onemarker.ark.ConnectionDetector;
+import com.njlabs.amrita.aid.util.ark.ConnectionDetector;
 
 import org.apache.http.Header;
 import org.json.JSONException;
@@ -90,15 +90,15 @@ public class Landing extends BaseActivity {
                         switch (position) {
                             case 1:
                                 startActivity(new Intent(baseContext, NewsActivity.class));
-                                overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                                 break;
                             case 3:
                                 startActivity(new Intent(baseContext, App.class));
-                                overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                                 break;
                             case 4:
                                 startActivity(new Intent(baseContext, SettingsActivity.class));
-                                overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                                 break;
                         }
                         return false;
@@ -176,7 +176,7 @@ public class Landing extends BaseActivity {
                                 Intent trainBusOpen = new Intent(baseContext, TrainBusInfo.class);
                                 trainBusOpen.putExtra("type", transportationOptions[item]);
                                 startActivity(trainBusOpen);
-                                overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                             }
                         });
                         AlertDialog transportationDialog = transportationDialogBuilder.create();
@@ -198,7 +198,7 @@ public class Landing extends BaseActivity {
                                 Intent curriculum_open = new Intent(baseContext, Curriculum.class);
                                 curriculum_open.putExtra("department", items_c[item]);
                                 startActivity(curriculum_open);
-                                overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                             }
                         });
                         AlertDialog departmentDialog = departmentDialogBuilder.create();
@@ -212,7 +212,7 @@ public class Landing extends BaseActivity {
                     default:
                         Toast.makeText(baseContext, String.valueOf(i), Toast.LENGTH_SHORT).show();
                 }
-                overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
     }

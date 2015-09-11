@@ -424,7 +424,7 @@ public class Explorer extends BaseActivity implements LocationListener {
             Intent exit = new Intent(Explorer.this, Landing.class);
             exit.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(exit);
-            overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         }
         return true;
     }
@@ -433,6 +433,6 @@ public class Explorer extends BaseActivity implements LocationListener {
         Intent exit = new Intent(Explorer.this, Landing.class);
         exit.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(exit);
-        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 }

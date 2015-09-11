@@ -40,7 +40,7 @@ public class App extends BaseActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
-                overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 return true;
             case R.id.action_bug_report:
                 SharedPreferences preferences = getSharedPreferences("aums_prefs", Context.MODE_PRIVATE);
@@ -50,7 +50,7 @@ public class App extends BaseActivity {
                 intent.putExtra("studentName",("Anonymous"));
                 intent.putExtra("studentRollNo",RollNo);
                 startActivity(intent);
-                overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
