@@ -13,7 +13,9 @@ import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-import com.loopj.android.http.*;
+import com.loopj.android.http.FileAsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.TextHttpResponseHandler;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.util.ark.logging.Ln;
 
@@ -49,7 +51,7 @@ public class AttendanceFlow extends Activity {
         client.get("/cas/login", params, new TextHttpResponseHandler(){
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Ln.e("Session ERROR. Code:%s Response:%s",statusCode,responseString);
+                Ln.e("Session ERROR. Code:%s Response:%s", statusCode, responseString);
                 client.cookieStore.clear();
             }
 
