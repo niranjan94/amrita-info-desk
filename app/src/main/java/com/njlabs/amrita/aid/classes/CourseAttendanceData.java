@@ -5,13 +5,12 @@
 package com.njlabs.amrita.aid.classes;
 
 import com.crashlytics.android.Crashlytics;
-import com.orm.SugarRecord;
 
 /**
  * Created by Niranjan on 22-10-2014.
  */
 
-public class CourseAttendanceData extends SugarRecord<CourseAttendanceData> {
+public class CourseAttendanceData {
     public String courseCode;
     public String courseTitle;
     public int total;

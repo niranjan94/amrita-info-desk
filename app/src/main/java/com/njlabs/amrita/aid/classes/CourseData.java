@@ -4,12 +4,10 @@
 
 package com.njlabs.amrita.aid.classes;
 
-import com.orm.SugarRecord;
-
 /**
  * Created by Niranjan on 22-10-2014.
  */
-public class CourseData extends SugarRecord<CourseData> {
+public class CourseData {
     String courseCode;
     String courseName;
     String type;
