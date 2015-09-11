@@ -34,7 +34,7 @@ public class AumsGrades extends BaseActivity {
 
     ProgressDialog dialog;
     ListView list;
-    ArrayList<CourseGradeData> attendanceData = new ArrayList<CourseGradeData>();
+    ArrayList<CourseGradeData> attendanceData = new ArrayList<>();
     String sgpa;
 
     @Override
@@ -148,7 +148,7 @@ public class AumsGrades extends BaseActivity {
 
         TextView header = new TextView(this);
         header.setPadding(10,10,10,10);
-        header.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
+        header.setTextSize(TypedValue.COMPLEX_UNIT_SP, 26);
         header.setText("This semester's GPA : " + sgpa);
         if(sgpa == null || sgpa.trim().equals("null") || header.getText().toString().trim().equals("This semester's GPA : null")){
             Toast.makeText(baseContext,"Results for the semester have not been published yet.", Toast.LENGTH_LONG).show();
