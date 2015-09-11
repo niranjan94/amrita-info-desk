@@ -16,8 +16,8 @@ repositories {
 
 def versionMajor = 2
 def versionMinor = 1
-def versionPatch = 3
-def versionBuild = 1
+def versionPatch = 4
+def versionBuild = 2
 
 android {
     compileSdkVersion 23
