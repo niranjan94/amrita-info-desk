@@ -115,7 +115,7 @@ public class Amrita extends BaseActivity {
                 Intent trainBusOpen = new Intent(Amrita.this, TrainBusInfo.class);
                 trainBusOpen.putExtra("type", items_t[item]);
                 startActivity(trainBusOpen);
-                overridePendingTransition(R.anim.fadein,R.anim.fadeout);
+                overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
             }
         });
         AlertDialog alert_t = builder_t.create();
@@ -163,14 +163,14 @@ public class Amrita extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item){
         if(item.getItemId() == android.R.id.home) {
             finish();
-            overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         }
         return true;
     }
     @Override
     public void onBackPressed() {
         finish(); //go back to the previous Activity
-        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 
 }

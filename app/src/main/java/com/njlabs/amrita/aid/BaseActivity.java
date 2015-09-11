@@ -108,7 +108,7 @@ public class BaseActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item){
         if(item.getItemId() == android.R.id.home) {
             finish();
-            overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         }
         return true;
     }
@@ -116,6 +116,6 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         finish(); //go back to the previous Activity
-        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 }

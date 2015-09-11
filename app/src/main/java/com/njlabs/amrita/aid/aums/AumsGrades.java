@@ -179,7 +179,7 @@ public class AumsGrades extends BaseActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
-                overridePendingTransition(R.anim.fadein,R.anim.fadeout);
+                overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
                 return true;
             case R.id.action_bug_report:
                 SharedPreferences preferences = getSharedPreferences("aums_prefs", Context.MODE_PRIVATE);
@@ -196,6 +196,6 @@ public class AumsGrades extends BaseActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        overridePendingTransition(R.anim.fadein,R.anim.fadeout);
+        overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
     }
 }
