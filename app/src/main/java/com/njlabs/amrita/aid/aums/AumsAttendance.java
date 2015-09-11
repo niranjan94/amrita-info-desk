@@ -151,6 +151,7 @@ public class AumsAttendance extends BaseActivity {
                 intent.putExtra("studentName","Anonymous");
                 intent.putExtra("studentRollNo", studentRollNo);
                 startActivity(intent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

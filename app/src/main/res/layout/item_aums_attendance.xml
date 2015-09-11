@@ -55,7 +55,8 @@
             android:id="@+id/percentage"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
-            android:textColor="#FFFFFF"            android:textSize="25sp" />
+            android:textColor="#FFFFFF"
+            android:textSize="20sp" />
 
     </RelativeLayout>
 </RelativeLayout>

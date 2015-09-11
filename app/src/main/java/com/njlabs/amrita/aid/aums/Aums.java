@@ -732,12 +732,11 @@ public class Aums extends BaseActivity {
                 exitAums();
                 return true;
             case R.id.action_bug_report:
-
                 Intent intent = new Intent(getApplicationContext(), BugReport.class);
                 intent.putExtra("studentName",(studentName!=null?studentName:"Anonymous"));
                 intent.putExtra("studentRollNo",(studentRollNo!=null?studentRollNo:"0"));
                 startActivity(intent);
-
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
