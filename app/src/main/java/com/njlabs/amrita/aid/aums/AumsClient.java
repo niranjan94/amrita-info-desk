@@ -7,7 +7,6 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.PersistentCookieStore;
 import com.loopj.android.http.RequestParams;
 
-import org.apache.http.client.params.ClientPNames;
 
 public class AumsClient {
 
@@ -19,7 +18,7 @@ public class AumsClient {
         cookieStore = new PersistentCookieStore(context);
         client.setCookieStore(cookieStore);
         client.setUserAgent("Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.3) Gecko/20070309 Firefox/2.0.0.3");
-        client.getHttpClient().getParams().setParameter(ClientPNames.ALLOW_CIRCULAR_REDIRECTS, true);
+        client.setEnableRedirects(true, true, true);
     }
 
     public void setReferrer(String referrer){

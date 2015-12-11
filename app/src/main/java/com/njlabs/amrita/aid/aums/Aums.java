@@ -29,8 +29,8 @@ import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
+import com.mobsandgeeks.saripaar.annotation.Length;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
-import com.mobsandgeeks.saripaar.annotation.Size;
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.MainApplication;
 import com.njlabs.amrita.aid.R;
@@ -42,7 +42,6 @@ import com.njlabs.amrita.aid.util.ark.Util;
 import com.njlabs.amrita.aid.util.ark.logging.Ln;
 
 import org.apache.commons.lang3.text.WordUtils;
-import org.apache.http.Header;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -57,6 +56,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import cz.msebera.android.httpclient.Header;
 
 
 @SuppressWarnings({"ResultOfMethodCallIgnored", "ConstantConditions"})
@@ -92,7 +93,7 @@ public class Aums extends BaseActivity {
     private Context serviceContext;
 
     @NotEmpty(message = "Roll number is required")
-    @Size(min = 16, max = 16, message = "Invalid roll number")
+    @Length(min = 16, max = 16, message = "Invalid roll number")
     EditText rollNoEditText;
 
     @NotEmpty(message = "Password is required")

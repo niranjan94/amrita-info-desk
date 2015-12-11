@@ -27,7 +27,6 @@ import com.njlabs.amrita.aid.classes.NewsModel;
 import com.njlabs.amrita.aid.util.ExtendedSwipeRefreshLayout;
 import com.squareup.picasso.Picasso;
 
-import org.apache.http.Header;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -35,6 +34,8 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by Niranjan on 07-07-2015.

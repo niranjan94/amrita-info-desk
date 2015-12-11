@@ -19,13 +19,14 @@ import com.loopj.android.http.TextHttpResponseHandler;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.util.ark.logging.Ln;
 
-import org.apache.http.Header;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.File;
+
+import cz.msebera.android.httpclient.Header;
 
 public class AttendanceFlow extends Activity {
 

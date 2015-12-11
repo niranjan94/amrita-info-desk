@@ -24,9 +24,10 @@ import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.util.ark.logging.Ln;
 
-import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import cz.msebera.android.httpclient.Header;
 
 public class ExplorerSignup extends BaseActivity {
 
