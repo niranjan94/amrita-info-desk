@@ -22,11 +22,18 @@ import android.view.WindowManager;
 
 import com.crashlytics.android.Crashlytics;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 public class BaseActivity extends AppCompatActivity {
 
     public Context baseContext;
     public Toolbar toolbar;
     public View parentView;
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
