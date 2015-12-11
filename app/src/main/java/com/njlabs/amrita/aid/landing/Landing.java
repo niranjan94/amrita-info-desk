@@ -48,9 +48,10 @@ import com.njlabs.amrita.aid.news.NewsUpdateService;
 import com.njlabs.amrita.aid.settings.SettingsActivity;
 import com.njlabs.amrita.aid.util.ark.ConnectionDetector;
 
-import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import cz.msebera.android.httpclient.Header;
 
 
 public class Landing extends BaseActivity {

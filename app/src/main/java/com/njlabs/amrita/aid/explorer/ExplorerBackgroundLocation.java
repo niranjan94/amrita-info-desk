@@ -17,7 +17,7 @@ public class ExplorerBackgroundLocation extends BroadcastReceiver {
 
         Bundle bundle = intent.getExtras();
         String action = bundle.getString(ACTION_ALARM);
-        if (action.equals(ACTION_ALARM)) {
+        if (action != null && action.equals(ACTION_ALARM)) {
             //Log.i("Alarm Receiver", "If loop");
             SharedPreferences preferences = context.getSharedPreferences("pref", 0);
             String mobile_num = preferences.getString("mobile_number", "");
