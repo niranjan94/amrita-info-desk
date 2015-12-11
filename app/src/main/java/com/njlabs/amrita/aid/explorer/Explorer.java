@@ -1,7 +1,9 @@
 package com.njlabs.amrita.aid.explorer;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
@@ -10,6 +12,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,10 +29,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.njlabs.amrita.aid.BaseActivity;
-import com.njlabs.amrita.aid.landing.Landing;
 import com.njlabs.amrita.aid.R;
+import com.njlabs.amrita.aid.landing.Landing;
 
-import org.apache.http.Header;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Hours;
@@ -48,6 +50,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import cz.msebera.android.httpclient.Header;
 
 public class Explorer extends BaseActivity implements LocationListener {
 
@@ -85,6 +89,16 @@ public class Explorer extends BaseActivity implements LocationListener {
         Criteria crit = new Criteria();
         crit.setAccuracy(Criteria.ACCURACY_FINE);
         provider = locationManager.getBestProvider(crit, false);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         locationManager.requestLocationUpdates(provider, 0, 0, this);
 
         // GET MOBILE NUMBER FROM SHARED PREFS
@@ -129,6 +143,16 @@ public class Explorer extends BaseActivity implements LocationListener {
         }
         latitude = String.valueOf(lat);
         longitude = String.valueOf(lon);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         locationManager.removeUpdates(loc_listener);
     }
 
@@ -188,7 +212,7 @@ public class Explorer extends BaseActivity implements LocationListener {
         ////
         //// GET JSON STRING
         Log.d("DATALOG", "mobile=" + mobile_num + "&lat=" + latitude + "&lon=" + longitude);
-        if (latitude == null || latitude.equals("-1.0")|| longitude ==null || longitude.equals("-1.0") || Double.parseDouble(latitude) == 0 || Double.parseDouble(longitude) == 0 || Double.parseDouble(latitude) == -1.0 || Double.parseDouble(longitude) == -1.0) {
+        if (latitude == null || latitude.equals("-1.0") || longitude == null || longitude.equals("-1.0") || Double.parseDouble(latitude) == 0 || Double.parseDouble(longitude) == 0 || Double.parseDouble(latitude) == -1.0 || Double.parseDouble(longitude) == -1.0) {
             WaitingLocation = true;
             Snackbar
                     .make(parentView, "Waiting for location update.", Snackbar.LENGTH_LONG)
@@ -394,6 +418,9 @@ public class Explorer extends BaseActivity implements LocationListener {
     @Override
     protected void onPause() {
         super.onPause();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
         locationManager.removeUpdates(this);
         StopAutoUpdate();
         ExitingCampus();

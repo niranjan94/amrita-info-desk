@@ -1,12 +1,15 @@
 package com.njlabs.amrita.aid.explorer;
 
+import android.Manifest;
 import android.app.IntentService;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -17,6 +20,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 public class ExplorerBackgroundLocationService extends IntentService {
 
@@ -37,6 +41,16 @@ public class ExplorerBackgroundLocationService extends IntentService {
         locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         String bestProvider = locationManager.getBestProvider(criteria, false);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         Location location = locationManager.getLastKnownLocation(bestProvider);
 
         LocationListener loc_listener = new LocationListener() {
@@ -68,7 +82,7 @@ public class ExplorerBackgroundLocationService extends IntentService {
         String latitude = String.valueOf(lat);
         String longitude = String.valueOf(lon);
         locationManager.removeUpdates(loc_listener);
-        if (latitude == "-1.0" || latitude == null || longitude == "-1.0" || longitude == null || Double.parseDouble(latitude) == 0 || Double.parseDouble(longitude) == 0 || Double.parseDouble(latitude) == -1.0 || Double.parseDouble(longitude) == -1.0) {
+        if (latitude.equals("-1.0") || latitude == null || longitude == "-1.0" || longitude == null || Double.parseDouble(latitude) == 0 || Double.parseDouble(longitude) == 0 || Double.parseDouble(latitude) == -1.0 || Double.parseDouble(longitude) == -1.0) {
 
         } else if (Double.parseDouble(latitude) < 10.896957 || Double.parseDouble(latitude) > 10.908957 || Double.parseDouble(longitude) < 76.891486 || Double.parseDouble(longitude) > 76.906486) {
 
