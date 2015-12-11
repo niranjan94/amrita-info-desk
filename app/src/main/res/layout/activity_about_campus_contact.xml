@@ -18,7 +18,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Basic Contact Details\n"
+            android:text="Contact Details\n"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <TextView
