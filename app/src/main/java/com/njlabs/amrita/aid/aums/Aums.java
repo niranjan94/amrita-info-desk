@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.analytics.HitBuilders;
 import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
@@ -436,6 +437,13 @@ public class Aums extends BaseActivity {
 
         findViewById(R.id.StudentProfilePicProgress).setVisibility(View.VISIBLE);
         getPhotoFile(R.id.StudentProfilePicProgress,R.id.StudentProfilePic);
+
+        tracker.send(new HitBuilders.EventBuilder()
+                .setCategory("AUMS")
+                .setAction("Login")
+                .setLabel(studentName + " - " + studentRollNo)
+                .build());
+
 
     }
     public void getAttendance(final String semester) {

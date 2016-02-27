@@ -1,6 +1,8 @@
 package com.njlabs.amrita.aid;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.Tracker;
 import com.joanzapata.iconify.Iconify;
 import com.joanzapata.iconify.fonts.FontAwesomeModule;
 import com.orm.SugarApp;
@@ -11,6 +13,8 @@ import io.fabric.sdk.android.Fabric;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 public class MainApplication extends SugarApp {
+
+    private Tracker mTracker;
 
     public static String key = "bdc0fabcbfa45a3506d1e66a6ff77596";
     public void onCreate() {
@@ -27,5 +31,13 @@ public class MainApplication extends SugarApp {
                 .setDefaultFontPath("fonts/bariol_regular-webfont.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build());
+    }
+
+    synchronized public Tracker getDefaultTracker() {
+        if (mTracker == null) {
+            GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
+            mTracker = analytics.newTracker(R.xml.global_tracker);
+        }
+        return mTracker;
     }
 }

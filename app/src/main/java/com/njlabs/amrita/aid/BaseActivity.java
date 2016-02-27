@@ -21,6 +21,8 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -29,6 +31,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     public Context baseContext;
     public Toolbar toolbar;
     public View parentView;
+    public Tracker tracker;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -37,6 +40,9 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        MainApplication application = (MainApplication) getApplication();
+        tracker = application.getDefaultTracker();
+
         super.onCreate(savedInstanceState);
         baseContext = this;
         init(savedInstanceState);
@@ -100,9 +106,22 @@ public abstract class BaseActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if(title!=null){
             getSupportActionBar().setTitle(title);
+            tracker.setScreenName(title);
+            tracker.send(new HitBuilders.ScreenViewBuilder().build());
+        } else {
+            ActivityInfo activityInfo = null;
+            try {
+                activityInfo = getPackageManager().getActivityInfo(getComponentName(), PackageManager.GET_META_DATA);
+                String defaultTitle = activityInfo.loadLabel(getPackageManager()).toString();
+                tracker.setScreenName(defaultTitle);
+                tracker.send(new HitBuilders.ScreenViewBuilder().build());
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
         }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
     }
 
     public void setStatusbarColor(int color){
@@ -135,5 +154,10 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         finish(); //go back to the previous Activity
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 }

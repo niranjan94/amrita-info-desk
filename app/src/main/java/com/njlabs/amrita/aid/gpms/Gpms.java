@@ -50,6 +50,14 @@ public class Gpms {
         studentName = cookiePrefFile.getString("gpms_name", null);
     }
 
+    public String getStudentName() {
+        return studentName;
+    }
+
+    public String getStudentRollNo() {
+        return studentRollNo;
+    }
+
     public void setStudentRollNo(String studentRollNo) {
         cookiePrefFile.edit().putString("gpms_roll_no", studentRollNo).apply();
         this.studentRollNo = studentRollNo;

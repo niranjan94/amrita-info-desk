@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
 import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter;
 import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
+import com.google.android.gms.analytics.HitBuilders;
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.gpms.responses.SuccessResponse;
@@ -98,6 +99,12 @@ public class PassApplyActivity extends BaseActivity {
                         dialog.dismiss();
                         Toast.makeText(baseContext, "Your pass has been applied.", Toast.LENGTH_LONG).show();
                         finish();
+
+                        tracker.send(new HitBuilders.EventBuilder()
+                                .setCategory("GPMS")
+                                .setAction("Day Pass")
+                                .setLabel(gpms.getStudentName() + " - " + gpms.getStudentRollNo())
+                                .build());
                     }
 
                     @Override
@@ -123,6 +130,13 @@ public class PassApplyActivity extends BaseActivity {
                         dialog.dismiss();
                         Toast.makeText(baseContext, "Your pass has been applied.", Toast.LENGTH_LONG).show();
                         finish();
+
+                        tracker.send(new HitBuilders.EventBuilder()
+                                .setCategory("GPMS")
+                                .setAction("Home Pass")
+                                .setLabel(gpms.getStudentName() + " - " + gpms.getStudentRollNo())
+                                .build());
+
                     }
 
                     @Override

@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.MainApplication;
 import com.njlabs.amrita.aid.R;
@@ -160,6 +161,13 @@ public class GpmsActivity extends BaseActivity {
                     picasso.load(photoUrl).into(profilePic);
                     hideProgress();
                     loggedIn = true;
+
+                    tracker.send(new HitBuilders.EventBuilder()
+                            .setCategory("GPMS")
+                            .setAction("Login")
+                            .setLabel(name + " - " + regNo)
+                            .build());
+
                 }
 
                 @Override
