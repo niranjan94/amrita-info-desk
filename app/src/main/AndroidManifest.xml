@@ -45,7 +45,8 @@
         <meta-data android:name="DATABASE" android:value="datastore.db" />
         <meta-data android:name="VERSION" android:value="2" />
         <meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="com.njlabs.amrita.aid.classes" />
-        <meta-data android:name="com.parse.push.notification_icon" android:resource="@drawable/ic_stat_news"/>
+        <meta-data android:name="com.parse.push.notification_icon" android:resource="@drawable/ic_stat_news"
+                   tools:ignore="ManifestResource"/>
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyAQHOzuZSsCce18N5FAI8RCu4XWtojrYJU" />
@@ -166,13 +167,42 @@
                 android:value=".landing.Landing" />
         </activity>
         <activity
-            android:name=".bunker.AttendanceManager"
-            android:label="@string/title_activity_attendance_manager"
+            android:name=".gpms.GpmsActivity"
+            android:label="@string/title_activity_gpms"
             android:parentActivityName=".landing.Landing" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".landing.Landing" />
         </activity>
+
+        <activity
+            android:name=".gpms.PassApplyActivity"
+            android:label="@string/title_activity_gpms"
+            android:parentActivityName=".gpms.GpmsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".gpms.GpmsActivity" />
+        </activity>
+
+
+        <activity
+            android:name=".gpms.PendingPassActivity"
+            android:label="@string/title_activity_gpms_pending_pass"
+            android:parentActivityName=".gpms.GpmsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".gpms.GpmsActivity" />
+        </activity>
+
+        <activity
+            android:name=".gpms.PassHistoryActivity"
+            android:label="@string/title_activity_gpms_pass_history"
+            android:parentActivityName=".gpms.GpmsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".gpms.GpmsActivity" />
+        </activity>
+
 
         <activity
             android:name=".news.NewsActivity"
@@ -233,10 +263,6 @@
             </intent-filter>
         </receiver>
 
-        <activity
-            android:name=".BaseActivity"
-            android:label="@string/title_activity_base" >
-        </activity>
     </application>
 
 </manifest>

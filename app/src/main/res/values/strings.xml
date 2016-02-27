@@ -30,5 +30,8 @@
     <string name="title_activity_news">News</string>
     <string name="title_activity_aums_debug">Debug Activity</string>
     <string name="title_activity_aums_marks">Your Marks</string>
+    <string name="title_activity_gpms">Gate Pass Management System</string>
+    <string name="title_activity_gpms_pending_pass">Pass Status</string>
+    <string name="title_activity_gpms_pass_history">Passes History</string>
 
 </resources>

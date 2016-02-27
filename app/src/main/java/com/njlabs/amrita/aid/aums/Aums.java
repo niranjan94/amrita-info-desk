@@ -27,10 +27,6 @@ import com.crashlytics.android.Crashlytics;
 import com.loopj.android.http.FileAsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
-import com.mobsandgeeks.saripaar.ValidationError;
-import com.mobsandgeeks.saripaar.Validator;
-import com.mobsandgeeks.saripaar.annotation.Length;
-import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.MainApplication;
 import com.njlabs.amrita.aid.R;
@@ -41,6 +37,7 @@ import com.njlabs.amrita.aid.util.ark.Security;
 import com.njlabs.amrita.aid.util.ark.Util;
 import com.njlabs.amrita.aid.util.ark.logging.Ln;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -54,7 +51,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import cz.msebera.android.httpclient.Header;
@@ -92,11 +88,7 @@ public class Aums extends BaseActivity {
     private String calledBy = "activity";
     private Context serviceContext;
 
-    @NotEmpty(message = "Roll number is required")
-    @Length(min = 16, max = 16, message = "Invalid roll number")
     EditText rollNoEditText;
-
-    @NotEmpty(message = "Password is required")
     EditText passwordEditText;
 
     public Aums() {
@@ -122,9 +114,7 @@ public class Aums extends BaseActivity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    public void init(Bundle savedInstanceState) {
         setupLayout(R.layout.activity_aums, Color.parseColor("#e91e63"));
 
         rollNoEditText = (EditText) findViewById(R.id.roll_no);
@@ -170,42 +160,35 @@ public class Aums extends BaseActivity {
 
     public void loginStart(View view) {
 
-        Validator validator = new Validator(this);
-        validator.setValidationListener(new Validator.ValidationListener() {
-            @Override
-            public void onValidationSucceeded() {
-                hideSoftKeyboard();
-                SharedPreferences preferences = serviceContext.getSharedPreferences("aums_prefs", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString("RollNo", rollNoEditText.getText().toString());
-                editor.putString("Password", Security.encrypt(passwordEditText.getText().toString(), MainApplication.key));
-                editor.apply();
+        boolean hasError = false;
+        username = rollNoEditText.getText().toString().trim();
+        password = passwordEditText.getText().toString().trim();
 
-                username = rollNoEditText.getText().toString().trim();
-                password = passwordEditText.getText().toString().trim();
-                refreshSession();
+        if(StringUtils.isEmpty(username)) {
+            hasError = true;
+            rollNoEditText.setError("Your Roll Number is required");
+        }
 
-                client = new AumsClient(serviceContext);
-                GetSessionID("https://amritavidya.amrita.edu:8444",false);
-                dialog.show();
-            }
+        if(StringUtils.isEmpty(password)) {
+            hasError = true;
+            passwordEditText.setError("Your AUMS password is required");
+        }
 
-            @Override
-            public void onValidationFailed(List<ValidationError> errors) {
-                for (ValidationError error : errors) {
-                    View view = error.getView();
-                    String message = error.getCollatedErrorMessage(baseContext);
+        if(!hasError) {
+            hideSoftKeyboard();
+            SharedPreferences preferences = serviceContext.getSharedPreferences("aums_prefs", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("RollNo", rollNoEditText.getText().toString());
+            editor.putString("Password", Security.encrypt(passwordEditText.getText().toString(), MainApplication.key));
+            editor.apply();
 
-                    if (view instanceof EditText) {
-                        ((EditText) view).setError(message);
-                    } else {
-                        Toast.makeText(baseContext, message, Toast.LENGTH_LONG).show();
-                    }
-                }
-            }
-        });
+            refreshSession();
 
-        validator.validate();
+            client = new AumsClient(serviceContext);
+            GetSessionID("https://amritavidya.amrita.edu:8444",false);
+            dialog.show();
+        }
+
 
     }
 
@@ -509,7 +492,6 @@ public class Aums extends BaseActivity {
                     Intent i = new Intent(getApplicationContext(), AumsAttendance.class);
                     i.putExtra("response", responseString);
                     startActivity(i);
-                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 }
             }
         });
@@ -554,7 +536,6 @@ public class Aums extends BaseActivity {
                             Intent i = new Intent(getApplicationContext(), AumsAttendance.class);
                             i.putExtra("response", responseString);
                             startActivity(i);
-                            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                         } else {
                             Ln.d("Storing");
                             // STORE TO DATABASE AND SHOW NOTIFICATION
@@ -606,7 +587,6 @@ public class Aums extends BaseActivity {
                 Intent i = new Intent(getApplicationContext(), AumsGrades.class);
                 i.putExtra("response", responseString);
                 startActivity(i);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
     }
@@ -651,7 +631,6 @@ public class Aums extends BaseActivity {
                 Intent i = new Intent(getApplicationContext(), AumsMarks.class);
                 i.putExtra("response", responseString);
                 startActivity(i);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
     }
@@ -737,7 +716,6 @@ public class Aums extends BaseActivity {
                 intent.putExtra("studentName",(studentName!=null?studentName:"Anonymous"));
                 intent.putExtra("studentRollNo",(studentRollNo!=null?studentRollNo:"0"));
                 startActivity(intent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -747,7 +725,6 @@ public class Aums extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
         exitAums();
     }
 
@@ -783,7 +760,6 @@ public class Aums extends BaseActivity {
                 Intent intent = new Intent(serviceContext, Landing.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
-                overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
             } else {
                 // ask user to press back button one more time to close app
                 toast = Toast.makeText(getBaseContext(), "Press once again to Log Out of AUMS.", Toast.LENGTH_SHORT);
@@ -795,12 +771,10 @@ public class Aums extends BaseActivity {
             Intent intent = new Intent(serviceContext, Landing.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
-            overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
         }
     }
 
-    private void closeSession(boolean clearAll)
-    {
+    private void closeSession(boolean clearAll) {
         client.closeClient();
         if(clearAll) {
             serviceContext.getSharedPreferences("CookiePrefsFile", 0).edit().clear().commit();
@@ -810,8 +784,7 @@ public class Aums extends BaseActivity {
         }
     }
 
-    private void refreshSession()
-    {
+    private void refreshSession() {
         String filePath = getApplicationContext().getFilesDir().getParent()+"/shared_prefs/CookiePrefsFile.xml";
         File deletePrefFile = new File(filePath );
         deletePrefFile.delete();
@@ -853,4 +826,5 @@ public class Aums extends BaseActivity {
     public void setMethodToCall(String methodToCall) {
         this.methodToCall = methodToCall;
     }
+
 }

@@ -39,9 +39,7 @@ public class AumsAttendance extends BaseActivity {
     ArrayList<CourseAttendanceData> attendanceData = new ArrayList<CourseAttendanceData>();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    public void init(Bundle savedInstanceState) {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             responseString = extras.getString("response");
@@ -64,6 +62,7 @@ public class AumsAttendance extends BaseActivity {
             Toast.makeText(baseContext, "There has been a change in the AUMS Site. This has been reported to the developer", Toast.LENGTH_LONG).show();
             Crashlytics.logException(e);
         }
+
 
     }
 
@@ -142,7 +141,6 @@ public class AumsAttendance extends BaseActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
-                overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
                 return true;
             case R.id.action_bug_report:
                 SharedPreferences preferences = getSharedPreferences("aums_prefs", Context.MODE_PRIVATE);
@@ -151,7 +149,6 @@ public class AumsAttendance extends BaseActivity {
                 intent.putExtra("studentName","Anonymous");
                 intent.putExtra("studentRollNo", studentRollNo);
                 startActivity(intent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -160,6 +157,5 @@ public class AumsAttendance extends BaseActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
     }
 }

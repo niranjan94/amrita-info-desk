@@ -2,6 +2,7 @@ package com.njlabs.amrita.aid.info;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.webkit.WebView;
 
 import com.njlabs.amrita.aid.BaseActivity;
@@ -10,12 +11,14 @@ import com.njlabs.amrita.aid.R;
 public class Curriculum extends BaseActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void init(Bundle savedInstanceState) {
         Bundle extras = getIntent().getExtras();
         String department = extras.getString("department");
 
-        setupLayout(R.layout.activity_curriculum, Color.parseColor("#5e98e9"));
+        setupLayout(R.layout.activity_curriculum, department, Color.parseColor("#5e98e9"));
+
+        Snackbar.make(parentView, "The curriculum may be outdated", Snackbar.LENGTH_LONG).show();
+
         WebView webView = (WebView) findViewById(R.id.CurriculumWeb);
 
         if (department != null) {
@@ -49,6 +52,5 @@ public class Curriculum extends BaseActivity {
                     break;
             }
         }
-        getSupportActionBar().setSubtitle(department);
     }
 }

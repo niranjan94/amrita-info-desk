@@ -21,15 +21,13 @@ public class TrainBusInfo extends BaseActivity {
     private ListView listView = null;
     private ArrayList<Transporter> transporters;
 
-
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void init(Bundle savedInstanceState) {
 
         Bundle extras = getIntent().getExtras();
         String type = extras.getString("type");
 
-        setupLayout(R.layout.activity_train_bus_info,Color.parseColor("#9c27b0"));
+        setupLayout(R.layout.activity_train_bus_info, Color.parseColor("#9c27b0"));
         getSupportActionBar().setSubtitle(type);
 
         listView = (ListView) findViewById(R.id.list);
@@ -38,12 +36,12 @@ public class TrainBusInfo extends BaseActivity {
         //
         // TODO TRAINS FROM CBE TO ETMD
         //
-        if (type.equals("Trains from Coimbatore")) {
+        if (type != null && type.equals("Trains from Coimbatore")) {
             transporters.add(new Transporter(
                     "56323 Coimbatore Mangalore Fast Passenger",
                     "All Days",
-                    "07:20 hours",
-                    "08:09 hours",
+                    "07:30 hours",
+                    "08:00 hours",
                     "cbe",
                     "etmd",
                     "train"
@@ -61,7 +59,7 @@ public class TrainBusInfo extends BaseActivity {
                     "66609 Erode Palakkad MEMU",
                     "Except Thursdays",
                     "10:30 hours",
-                    "11:14 hours",
+                    "11:04 hours",
                     "cbe",
                     "etmd",
                     "train"
@@ -79,7 +77,7 @@ public class TrainBusInfo extends BaseActivity {
                     "56605 Coimbatore Thrissur Passenger ",
                     "All Days",
                     "16:40 hours",
-                    "17:08 hours",
+                    "17:07 hours",
                     "cbe",
                     "etmd",
                     "train"
@@ -88,16 +86,16 @@ public class TrainBusInfo extends BaseActivity {
                     "66607 Coimbatore Palakkad Town Passenger",
                     "Except Sundays",
                     "18:10 hours",
-                    "18:38 hours",
+                    "18:37 hours",
                     "cbe",
                     "etmd",
                     "train"
             ));
             transporters.add(new Transporter(
-                    "56847 Trichy - Palakkad Town Fast Passenger ",
+                    "56713 Trichy - Palakkad Town Fast Passenger ",
                     "All Days",
-                    "18:25 hours",
-                    "19:26 hours",
+                    "18:30 hours",
+                    "19:03 hours",
                     "cbe",
                     "etmd",
                     "train"
@@ -106,12 +104,12 @@ public class TrainBusInfo extends BaseActivity {
         ///
         /// TODO TRAINS FROM PGT TO ETMD
         ///
-        if (type.equals("Trains from Palghat")) {
+        if (type != null && type.equals("Trains from Palghat")) {
             transporters.add(new Transporter(
-                    "56848 Palghat Town Tiruchchirapalli Fast Passenger",
+                    "56712 Palghat Town Tiruchchirapalli Fast Passenger",
                     "All Days",
-                    "06:45 hours",
-                    "07:29 hours",
+                    "06:43 hours",
+                    "07:24 hours",
                     "pgt",
                     "etmd",
                     "train"
@@ -120,7 +118,7 @@ public class TrainBusInfo extends BaseActivity {
                     "66606 Palghat Town Coimbatore Passenger",
                     "Except Sundays",
                     "07:33 hours",
-                    "08:18 hours",
+                    "08:14 hours",
                     "pgt",
                     "etmd",
                     "train"
@@ -129,7 +127,7 @@ public class TrainBusInfo extends BaseActivity {
                     "56604 Shoranur Coimbatore Passenger",
                     "All Days",
                     "09:10 hours",
-                    "09:55 hours",
+                    "09:54 hours",
                     "pgt",
                     "etmd",
                     "train"
@@ -137,8 +135,8 @@ public class TrainBusInfo extends BaseActivity {
             transporters.add(new Transporter(
                     "56650 Kannur Coimbatore Fast Passenger",
                     "All Days",
-                    "11:35 hours",
-                    "12:24 hours",
+                    "11:25 hours",
+                    "12:14 hours",
                     "pgt",
                     "etmd",
                     "train"
@@ -156,7 +154,7 @@ public class TrainBusInfo extends BaseActivity {
                     "66604 Shoranur Coimbatore Passenger",
                     "Except Sundays",
                     "15:55 hours",
-                    "16:40 hours",
+                    "16:39 hours",
                     "pgt",
                     "etmd",
                     "train"
@@ -164,8 +162,8 @@ public class TrainBusInfo extends BaseActivity {
             transporters.add(new Transporter(
                     "56324 Mangalore - Coimbatore Fast Passenger",
                     "All Days",
-                    "18:00 hours",
-                    "18:51 hours",
+                    "17:50 hours",
+                    "18:39 hours",
                     "pgt",
                     "etmd",
                     "train"
@@ -174,11 +172,11 @@ public class TrainBusInfo extends BaseActivity {
         //
         // TODO TRAINS FROM ETMD TO CBE
         //
-        if (type.equals("Trains to Coimbatore")) {
+        if (type != null && type.equals("Trains to Coimbatore")) {
             transporters.add(new Transporter(
-                    "56848 Palghat Town Tiruchchirapalli Fast Passenger",
+                    "56712 Palghat Town Tiruchchirapalli Fast Passenger",
                     "All Days",
-                    "07:30 hours",
+                    "07:25 hours",
                     "08:05 hours",
                     "etmd",
                     "cbe",
@@ -187,7 +185,7 @@ public class TrainBusInfo extends BaseActivity {
             transporters.add(new Transporter(
                     "66606 Palghat Town Coimbatore Passenger",
                     "Except Sundays",
-                    "08:19 hours",
+                    "08:15 hours",
                     "09:00 hours",
                     "etmd",
                     "cbe",
@@ -196,8 +194,8 @@ public class TrainBusInfo extends BaseActivity {
             transporters.add(new Transporter(
                     "56604 Shoranur Coimbatore Passenger",
                     "All Days",
-                    "09:56 hours",
-                    "10:45 hours",
+                    "09:55 hours",
+                    "10:50 hours",
                     "etmd",
                     "cbe",
                     "train"
@@ -205,8 +203,8 @@ public class TrainBusInfo extends BaseActivity {
             transporters.add(new Transporter(
                     "56650 Kannur Coimbatore Fast Passenger",
                     "All Days",
-                    "12:25 hours",
-                    "13:25 hours",
+                    "12:15 hours",
+                    "13:30 hours",
                     "etmd",
                     "cbe",
                     "train"
@@ -223,8 +221,8 @@ public class TrainBusInfo extends BaseActivity {
             transporters.add(new Transporter(
                     "66604 Shoranur Coimbatore Passenger",
                     "Except Sundays",
-                    "16:41 hours",
-                    "17:30 hours",
+                    "16:40 hours",
+                    "17:40 hours",
                     "etmd",
                     "cbe",
                     "train"
@@ -232,7 +230,7 @@ public class TrainBusInfo extends BaseActivity {
             transporters.add(new Transporter(
                     "56324 Mangalore - Coimbatore Fast Passenger",
                     "All Days",
-                    "18:52 hours",
+                    "18:40 hours",
                     "19:35 hours",
                     "etmd",
                     "cbe",
@@ -242,12 +240,12 @@ public class TrainBusInfo extends BaseActivity {
         //
         // TODO TRAINS FROM ETMD TO PGT
         //
-        if (type.equals("Trains to Palghat")) {
+        if (type != null && type.equals("Trains to Palghat")) {
             transporters.add(new Transporter(
                     "56323 Coimbatore Mangalore Fast Passenger",
                     "All Days",
-                    "08:10 hours",
-                    "09:00  hours",
+                    "07:58 hours",
+                    "08:55  hours",
                     "etmd",
                     "pgt",
                     "train"
@@ -264,8 +262,8 @@ public class TrainBusInfo extends BaseActivity {
             transporters.add(new Transporter(
                     "66609 Erode Palakkad MEMU",
                     "Except Thursdays",
-                    "11:15 hours",
-                    "12:05  hours",
+                    "11:05 hours",
+                    "11:50  hours",
                     "etmd",
                     "pgt",
                     "train"
@@ -274,7 +272,7 @@ public class TrainBusInfo extends BaseActivity {
                     "56651 Coimbatore Kannur Fast Passenger",
                     "All Days",
                     "14:37 hours",
-                    "15:20 hours",
+                    "15:15 hours",
                     "etmd",
                     "pgt",
                     "train"
@@ -282,8 +280,8 @@ public class TrainBusInfo extends BaseActivity {
             transporters.add(new Transporter(
                     "56605 Coimbatore Thrissur Passenger",
                     "All Days",
-                    "17:09 hours",
-                    "17:55 hours",
+                    "17:08 hours",
+                    "17:50 hours",
                     "etmd",
                     "pgt",
                     "train"
@@ -291,8 +289,8 @@ public class TrainBusInfo extends BaseActivity {
             transporters.add(new Transporter(
                     "66607 Coimbatore Palakkad Town Passenger",
                     "Except Sundays",
-                    "18:39 hours",
-                    "19:22 hours",
+                    "18:38 hours",
+                    "19:23 hours",
                     "etmd",
                     "pgt",
                     "train"
@@ -300,8 +298,8 @@ public class TrainBusInfo extends BaseActivity {
             transporters.add(new Transporter(
                     "56847 Trichy - Palakkad Town Fast Passenger",
                     "All Days",
-                    "19:27 hours",
-                    "20:22 hours",
+                    "19:04 hours",
+                    "19:55 hours",
                     "etmd",
                     "pgt",
                     "train"
@@ -310,7 +308,7 @@ public class TrainBusInfo extends BaseActivity {
         //
         // TODO BUS FROM CBE TO ETMD
         //
-        if (type.equals("Buses from Coimbatore")) {
+        if (type != null && type.equals("Buses from Coimbatore")) {
             transporters.add(new Transporter(
                     "Local Govt. Transport Bus 'A3'",
                     "All Days",
@@ -378,7 +376,7 @@ public class TrainBusInfo extends BaseActivity {
         //
         // TODO BUS FROM ETMD TO CBE
         //
-        if (type.equals("Buses to Coimbatore")) {
+        if (type != null && type.equals("Buses to Coimbatore")) {
             transporters.add(new Transporter(
                     "Local Govt. Transport Bus 'A3'",
                     "All Days",

@@ -3,7 +3,6 @@ package com.njlabs.amrita.aid.landing;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -37,16 +36,13 @@ import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.about.Amrita;
 import com.njlabs.amrita.aid.about.App;
 import com.njlabs.amrita.aid.aums.Aums;
-import com.njlabs.amrita.aid.bunker.AttendanceManager;
-import com.njlabs.amrita.aid.explorer.Explorer;
-import com.njlabs.amrita.aid.explorer.ExplorerSignup;
+import com.njlabs.amrita.aid.gpms.GpmsActivity;
 import com.njlabs.amrita.aid.info.Calender;
 import com.njlabs.amrita.aid.info.Curriculum;
 import com.njlabs.amrita.aid.info.TrainBusInfo;
 import com.njlabs.amrita.aid.news.NewsActivity;
 import com.njlabs.amrita.aid.news.NewsUpdateService;
 import com.njlabs.amrita.aid.settings.SettingsActivity;
-import com.njlabs.amrita.aid.util.ark.ConnectionDetector;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,8 +53,7 @@ import cz.msebera.android.httpclient.Header;
 public class Landing extends BaseActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void init(Bundle savedInstanceState) {
         setupLayout(R.layout.activity_landing, "Amrita Info Desk");
         toolbar.setBackgroundColor(getResources().getColor(R.color.white));
         setRecentHeaderColor(getResources().getColor(R.color.white));
@@ -91,15 +86,12 @@ public class Landing extends BaseActivity {
                         switch (position) {
                             case 1:
                                 startActivity(new Intent(baseContext, NewsActivity.class));
-                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                                 break;
                             case 3:
                                 startActivity(new Intent(baseContext, App.class));
-                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                                 break;
                             case 4:
                                 startActivity(new Intent(baseContext, SettingsActivity.class));
-                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                                 break;
                         }
                         return false;
@@ -141,7 +133,8 @@ public class Landing extends BaseActivity {
                         startActivity(new Intent(baseContext, Amrita.class));
                         break;
                     case "Amrita Explorer":
-                        // AMRITA EXPLORER
+                        Snackbar.make(parentView, "Amrita Explorer is under maintenance", Snackbar.LENGTH_SHORT).show();
+                        /*// AMRITA EXPLORER
                         SharedPreferences preferences = getSharedPreferences("pref", MODE_PRIVATE);
                         String explorer_is_registered = preferences.getString("explorer_is_registered", "");
                         if (explorer_is_registered.equals("yes")) {
@@ -156,7 +149,7 @@ public class Landing extends BaseActivity {
                         } else {
                             Intent intent = new Intent(baseContext, ExplorerSignup.class);
                             startActivity(intent);
-                        }
+                        }*/
                         break;
                     case "Academic Calender":
                         // ACADEMIC CALENDER
@@ -177,16 +170,15 @@ public class Landing extends BaseActivity {
                                 Intent trainBusOpen = new Intent(baseContext, TrainBusInfo.class);
                                 trainBusOpen.putExtra("type", transportationOptions[item]);
                                 startActivity(trainBusOpen);
-                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                             }
                         });
                         AlertDialog transportationDialog = transportationDialogBuilder.create();
                         transportationDialog.show();
                         break;
 
-                    case "Attendance Manager":
-                        // ATTENDANCE MANAGER
-                        startActivity(new Intent(baseContext, AttendanceManager.class));
+                    case "GPMS Login":
+                        // GPMS LOGIN
+                        startActivity(new Intent(baseContext, GpmsActivity.class));
                         break;
                     case "Curriculum Info":
                         // CURRICULUM INFO
@@ -199,7 +191,6 @@ public class Landing extends BaseActivity {
                                 Intent curriculum_open = new Intent(baseContext, Curriculum.class);
                                 curriculum_open.putExtra("department", items_c[item]);
                                 startActivity(curriculum_open);
-                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                             }
                         });
                         AlertDialog departmentDialog = departmentDialogBuilder.create();
@@ -213,14 +204,13 @@ public class Landing extends BaseActivity {
                     default:
                         Toast.makeText(baseContext, String.valueOf(i), Toast.LENGTH_SHORT).show();
                 }
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
     }
 
     public void checkForUpdates() {
         AsyncHttpClient client = new AsyncHttpClient();
-        client.get("http://api.onemarker.com/update_status.php?app=com.njlabs.amrita.aid", new JsonHttpResponseHandler() {
+        client.get("https://api.codezero.xyz/aid/latest", new JsonHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
 
@@ -237,7 +227,7 @@ public class Landing extends BaseActivity {
                     Double Latest = 0.0;
                     String Description = null;
                     try {
-                        Latest = response.getDouble("latest");
+                        Latest = response.getDouble("version");
                         Description = response.getString("description");
                     } catch (JSONException e) {
                         Crashlytics.logException(e);
@@ -263,12 +253,12 @@ public class Landing extends BaseActivity {
                         changelogWebView.setLongClickable(false);
                         updateDialogBuilder.setView(changelogView).setCancelable(true)
                                 .setCancelable(false)
-                                .setNegativeButton("DISMISS", new DialogInterface.OnClickListener() {
+                                .setNegativeButton("Dismiss", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         dialog.cancel();
                                     }
                                 })
-                                .setPositiveButton("UPDATE NOW", new DialogInterface.OnClickListener() {
+                                .setPositiveButton("Update Now", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         Uri uri = Uri.parse("market://details?id=com.njlabs.amrita.aid");
                                         Intent it = new Intent(Intent.ACTION_VIEW, uri);

@@ -11,6 +11,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
@@ -52,7 +53,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import cz.msebera.android.httpclient.Header;
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.OnNeverAskAgain;
+import permissions.dispatcher.OnPermissionDenied;
+import permissions.dispatcher.RuntimePermissions;
 
+@RuntimePermissions
 public class Explorer extends BaseActivity implements LocationListener {
 
     private LocationManager locationManager;
@@ -74,16 +80,18 @@ public class Explorer extends BaseActivity implements LocationListener {
     Boolean WaitingLocation = false;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-
-        // ONE TIME LOCATION UPDATE
-        OneTimeLocationUpdate();
-
+    public void init(Bundle savedInstanceState) {
         // REQUEST TO SHOW INDETERMINATE PROGRESS ON ACTION BAR
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
         setupLayout(R.layout.activity_explorer, Color.parseColor("#3f51b5"));
+        ExplorerPermissionsDispatcher.initialiseWithCheck(this);
+    }
 
+    @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+    public void initialise() {
+        // ONE TIME LOCATION UPDATE
+        OneTimeLocationUpdate();
         // DECLARE LOCATION MANAGER AND DO RELATED STUFF
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         Criteria crit = new Criteria();
@@ -108,6 +116,18 @@ public class Explorer extends BaseActivity implements LocationListener {
         // FINAL MAP SETUPS AND AUTO UPDATE START
         setUpMapIfNeeded();
         StartAutoUpdate();
+    }
+
+    @OnPermissionDenied(Manifest.permission.ACCESS_FINE_LOCATION)
+    void showDeniedForPhoneState() {
+        Toast.makeText(this, "Location permission is required to use Amrita Explorer", Toast.LENGTH_SHORT).show();
+        finish();
+    }
+
+    @OnNeverAskAgain(Manifest.permission.ACCESS_FINE_LOCATION)
+    void showNeverAskForPhoneState() {
+        Toast.makeText(this, "Location permission is required to use Amrita Explorer", Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     public void OneTimeLocationUpdate() {
@@ -408,11 +428,15 @@ public class Explorer extends BaseActivity implements LocationListener {
         setUpMapIfNeeded();
         if (mMap != null) {
             // Keep the UI Settings state in sync with the checkboxes.
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
             mUiSettings.setMyLocationButtonEnabled(true);
             mMap.setMyLocationEnabled(true);
             locationManager.requestLocationUpdates(provider, 0, 0, this);
+            StartAutoUpdate();
         }
-        StartAutoUpdate();
+
     }
 
     @Override
@@ -440,6 +464,9 @@ public class Explorer extends BaseActivity implements LocationListener {
     }
 
     private void setUpMap() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
         mMap.setMyLocationEnabled(true);
         mUiSettings = mMap.getUiSettings();
         mMap.addMarker(new MarkerOptions().position(new LatLng(10.900539, 76.902806)).title("Amrita School Of Engineering"));
@@ -451,7 +478,6 @@ public class Explorer extends BaseActivity implements LocationListener {
             Intent exit = new Intent(Explorer.this, Landing.class);
             exit.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(exit);
-            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         }
         return true;
     }
@@ -460,6 +486,13 @@ public class Explorer extends BaseActivity implements LocationListener {
         Intent exit = new Intent(Explorer.this, Landing.class);
         exit.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(exit);
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // NOTE: delegate the permission handling to generated method
+        ExplorerPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
+
 }

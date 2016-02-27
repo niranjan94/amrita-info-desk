@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent">
+
+    <include layout="@layout/toolbar" android:id="@+id/toolbar"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:background="@color/white"
+        android:scrollbarStyle="outsideInset"
+        android:layout_below="@+id/toolbar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Pass required from:"
+                android:textStyle="bold"
+                fontPath="fonts/bariol_bold-webfont.ttf"
+                android:layout_marginBottom="4dp"/>
+
+            <Button
+                android:id="@+id/from_date_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left|center_vertical"
+                android:textAllCaps="false"
+                android:drawablePadding="5dp"
+                android:padding="10dp"
+                android:onClick="pickFromDate"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/material_button_bg"
+                android:text="Pick date &amp; time" />
+
+            <TextView
+                android:id="@+id/required_till_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Pass required till:"
+                android:textStyle="bold"
+                fontPath="fonts/bariol_bold-webfont.ttf"
+                android:layout_marginBottom="4dp"/>
+
+            <Button
+                android:id="@+id/to_date_btn"
+                android:enabled="false"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left|center_vertical"
+                android:textAllCaps="false"
+                android:drawablePadding="5dp"
+                android:padding="10dp"
+                android:onClick="pickToDate"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/material_button_bg"
+                android:text="Pick date &amp; time" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Pass applied during:"
+                android:textStyle="bold"
+                fontPath="fonts/bariol_bold-webfont.ttf"
+                android:layout_marginBottom="4dp"/>
+
+            <org.angmarch.views.NiceSpinner
+                android:id="@+id/nice_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="12dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Reason for pass:"
+                android:textStyle="bold"
+                fontPath="fonts/bariol_bold-webfont.ttf"
+                android:layout_marginBottom="4dp"/>
+
+            <!-- Dummy item to prevent AutoCompleteTextView from receiving focus -->
+            <LinearLayout
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:layout_width="0px"
+                android:layout_height="0px"
+                tools:ignore="UselessLeaf"/>
+
+            <!-- :nextFocusUp and :nextFocusLeft have been set to the id of this component
+to prevent the dummy from receiving focus again -->
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:ems="10"
+                android:id="@+id/reason"
+                android:nextFocusUp="@id/reason"
+                android:nextFocusLeft="@id/reason"
+                android:layout_marginBottom="16dp"/>
+
+            <Button
+                android:id="@+id/apply_pass"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textAllCaps="true"
+                android:drawablePadding="5dp"
+                android:padding="10dp"
+                android:onClick="applyPass"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="12dp"
+                android:textSize="16sp"
+                android:background="@drawable/material_button_bg"
+                android:text="Apply for Day Pass" />
+
+
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

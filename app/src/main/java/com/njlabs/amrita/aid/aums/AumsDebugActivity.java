@@ -10,13 +10,10 @@ import android.webkit.WebView;
 
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.R;
-import com.njlabs.amrita.aid.util.ark.logging.Ln;
 
 public class AumsDebugActivity extends BaseActivity {
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    public void init(Bundle savedInstanceState) {
         Bundle extras = getIntent().getExtras();
         String response = null;
         if (extras != null) {
@@ -28,5 +25,6 @@ public class AumsDebugActivity extends BaseActivity {
         WebView webView = (WebView) findViewById(R.id.webView);
         webView.loadData(response,"text/html","UTF-8");
         webView.getSettings().setJavaScriptEnabled(true);
+
     }
 }

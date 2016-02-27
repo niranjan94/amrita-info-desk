@@ -33,8 +33,7 @@ public class Amrita extends BaseActivity {
     ViewPager viewPager;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void init(Bundle savedInstanceState) {
         setupLayout(R.layout.activity_about_campus, Color.parseColor("#03a9f4"));
 
         viewPager = (ViewPager) findViewById(R.id.pager);
@@ -134,7 +133,6 @@ public class Amrita extends BaseActivity {
                 Intent trainBusOpen = new Intent(Amrita.this, TrainBusInfo.class);
                 trainBusOpen.putExtra("type", items_t[item]);
                 startActivity(trainBusOpen);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
         AlertDialog alert_t = builder_t.create();
@@ -192,14 +190,12 @@ public class Amrita extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item){
         if(item.getItemId() == android.R.id.home) {
             finish();
-            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         }
         return true;
     }
     @Override
     public void onBackPressed() {
         finish(); //go back to the previous Activity
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 
 }

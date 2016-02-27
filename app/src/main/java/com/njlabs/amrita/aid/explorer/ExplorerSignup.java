@@ -1,5 +1,6 @@
 package com.njlabs.amrita.aid.explorer;
 
+import android.Manifest;
 import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
@@ -28,33 +30,22 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import cz.msebera.android.httpclient.Header;
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.OnNeverAskAgain;
+import permissions.dispatcher.OnPermissionDenied;
+import permissions.dispatcher.RuntimePermissions;
 
+@RuntimePermissions
 public class ExplorerSignup extends BaseActivity {
 
     public String mobile_num = null;
     public ProgressDialog dialog;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void init(Bundle savedInstanceState) {
         setupLayout(R.layout.activity_explorer_signup, Color.parseColor("#3f51b5"));
 
-            TelephonyManager mTelephonyMgr;
-            mTelephonyMgr = (TelephonyManager)
-                    getSystemService(Context.TELEPHONY_SERVICE);
-            String mobile_no = mTelephonyMgr.getLine1Number();
-            EditText mobile = (EditText) findViewById(R.id.mobile);
-            if (mobile_no == null || mobile_no.length() < 10) {
-                mobile.setHint("Mobile number (with +91)");
-                mobile.setEnabled(true);
-                mobile.setInputType(InputType.TYPE_CLASS_TEXT);
-                mobile.setFocusable(true);
-            } else {
-                mobile.setText(mobile_no);
-                mobile.setEnabled(false);
-                mobile.setInputType(InputType.TYPE_NULL);
-                mobile.setFocusable(false);
-            }
+        ExplorerSignupPermissionsDispatcher.initialiseWithCheck(this);
 
         dialog = new ProgressDialog(this);
         dialog.setIndeterminate(true);
@@ -62,7 +53,46 @@ public class ExplorerSignup extends BaseActivity {
         dialog.setInverseBackgroundForced(false);
         dialog.setCanceledOnTouchOutside(false);
         dialog.setMessage("Authenticating your credentials ... ");
+    }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // NOTE: delegate the permission handling to generated method
+        ExplorerSignupPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
+
+
+    @NeedsPermission(Manifest.permission.READ_PHONE_STATE)
+    public void initialise() {
+        TelephonyManager mTelephonyMgr;
+        mTelephonyMgr = (TelephonyManager)
+                getSystemService(Context.TELEPHONY_SERVICE);
+        String mobile_no = mTelephonyMgr.getLine1Number();
+        EditText mobile = (EditText) findViewById(R.id.mobile);
+        if (mobile_no == null || mobile_no.length() < 10) {
+            mobile.setHint("Mobile number (with +91)");
+            mobile.setEnabled(true);
+            mobile.setInputType(InputType.TYPE_CLASS_TEXT);
+            mobile.setFocusable(true);
+        } else {
+            mobile.setText(mobile_no);
+            mobile.setEnabled(false);
+            mobile.setInputType(InputType.TYPE_NULL);
+            mobile.setFocusable(false);
+        }
+    }
+
+    @OnPermissionDenied(Manifest.permission.READ_PHONE_STATE)
+    void showDeniedForPhoneState() {
+        Toast.makeText(this, "Permission to read phone state is required for device verification", Toast.LENGTH_SHORT).show();
+        finish();
+    }
+
+    @OnNeverAskAgain(Manifest.permission.READ_PHONE_STATE)
+    void showNeverAskForPhoneState() {
+        Toast.makeText(this, "Permission to read phone state is required for device verification", Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     public void signup(String name, String mobile, String email, String type)
@@ -78,12 +108,10 @@ public class ExplorerSignup extends BaseActivity {
         String deviceid = telephonyManager.getDeviceId();
 
         params.put("deviceid", deviceid);
-        if(type.equals("new"))
-        {
+        if(type.equals("new")) {
             dialog.setMessage("Signing up ...");
         }
-        else
-        {
+        else {
             dialog.setMessage("Verifying your existing registration data ...");
         }
 
@@ -153,7 +181,6 @@ public class ExplorerSignup extends BaseActivity {
 
     public void goBack(View view) {
         finish();
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 
     @SuppressWarnings("unchecked")
@@ -205,14 +232,12 @@ public class ExplorerSignup extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item){
         if(item.getItemId() == android.R.id.home) {
             finish();
-            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         }
         return true;
     }
     @Override
     public void onBackPressed() {
         finish(); //go back to the previous Activity
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 
 }

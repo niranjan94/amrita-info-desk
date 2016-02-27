@@ -14,10 +14,9 @@ import com.njlabs.amrita.aid.R;
 
 
 public class SettingsActivity extends BaseActivity {
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
+    @Override
+    public void init(Bundle savedInstanceState) {
         setupLayout(R.layout.activity_settings, Color.parseColor("#5B96E7"));
 
         FragmentManager mFragmentManager = getFragmentManager();

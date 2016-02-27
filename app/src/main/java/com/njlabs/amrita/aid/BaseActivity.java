@@ -24,7 +24,7 @@ import com.crashlytics.android.Crashlytics;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity {
 
     public Context baseContext;
     public Toolbar toolbar;
@@ -39,7 +39,10 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         baseContext = this;
+        init(savedInstanceState);
     }
+
+    public abstract void init(Bundle savedInstanceState);
 
     public void setupLayout(int layoutRef, int primaryColor){
         setContentView(layoutRef);
@@ -61,6 +64,16 @@ public class BaseActivity extends AppCompatActivity {
         setupToolbar(title);
         parentView = (View) toolbar.getParent();
     }
+
+    public void setupLayout(int layoutRef, String title, int primaryColor){
+        setContentView(layoutRef);
+        setupToolbar(title);
+        toolbar.setBackgroundColor(primaryColor);
+        setStatusbarColor(primaryColor);
+        setRecentHeaderColor(primaryColor);
+        parentView = (View) toolbar.getParent();
+    }
+
 
     public void setupLayoutNoActionBar(int layoutRef){
         setContentView(layoutRef);
@@ -115,7 +128,6 @@ public class BaseActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item){
         if(item.getItemId() == android.R.id.home) {
             finish();
-            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         }
         return true;
     }
@@ -123,6 +135,5 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         finish(); //go back to the previous Activity
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 }

@@ -20,8 +20,7 @@ import com.parse.ParseInstallation;
 public class App extends BaseActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void init(Bundle savedInstanceState) {
         setupLayout(R.layout.activity_about_app, Color.parseColor("#5B96E7"));
         ((TextView) findViewById(R.id.version)).setText("Version "+BuildConfig.VERSION_NAME);
         ((TextView) findViewById(R.id.install_id_view)).setText("Installation ID: "+ ParseInstallation.getCurrentInstallation().getInstallationId());
@@ -40,7 +39,6 @@ public class App extends BaseActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 return true;
             case R.id.action_bug_report:
                 SharedPreferences preferences = getSharedPreferences("aums_prefs", Context.MODE_PRIVATE);
@@ -50,7 +48,6 @@ public class App extends BaseActivity {
                 intent.putExtra("studentName",("Anonymous"));
                 intent.putExtra("studentRollNo",RollNo);
                 startActivity(intent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

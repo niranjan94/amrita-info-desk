@@ -1,18 +1,20 @@
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
+apply plugin: 'android-apt'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
+    maven { url "https://jitpack.io" }
 }
 
 def versionMajor = 2
 def versionMinor = 1
-def versionPatch = 5
-def versionBuild = 2
+def versionPatch = 6
+def versionBuild = 4
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion '23.0.2'
 
     defaultConfig {
         applicationId "com.njlabs.amrita.aid"
@@ -23,7 +25,6 @@ android {
         resConfigs "en"
 
         proguardFiles 'proguard-rules.pro'
-        shrinkResources true
     }
 
     dexOptions {
@@ -32,10 +33,12 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
         }
         debug {
-            minifyEnabled true
+            minifyEnabled false
+            shrinkResources false
         }
     }
     packagingOptions {
@@ -54,8 +57,8 @@ dependencies {
     compile 'com.android.support:cardview-v7:23.1.1'
     compile 'com.android.support:recyclerview-v7:23.1.1'
 
-    compile 'com.google.android.gms:play-services-maps:8.3.0'
-    compile 'com.google.android.gms:play-services-gcm:8.3.0'
+    compile 'com.google.android.gms:play-services-maps:8.4.0'
+    compile 'com.google.android.gms:play-services-gcm:8.4.0'
 
     compile 'org.apache.commons:commons-lang3:3.3.2'
     compile 'org.jsoup:jsoup:1.8.3'
@@ -70,8 +73,13 @@ dependencies {
         transitive = true
     }
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.mobsandgeeks:android-saripaar:2.0.3'
 
     compile 'com.loopj.android:android-async-http:1.4.9'
     compile 'uk.co.chrisjenx:calligraphy:2.1.0'
+
+    compile 'com.github.hotchemi:permissionsdispatcher:2.0.1'
+    apt 'com.github.hotchemi:permissionsdispatcher-processor:2.0.1'
+    compile 'com.code-troopers.betterpickers:library:2.5.1'
+    compile 'com.squareup.okhttp:okhttp:2.7.4'
+    compile 'com.github.arcadefire:nice-spinner:d65f4fe052'
 }

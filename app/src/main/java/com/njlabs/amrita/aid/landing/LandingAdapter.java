@@ -36,9 +36,9 @@ public class LandingAdapter extends BaseAdapter {
         items.add(new Item("#ffc107", "News", FontAwesomeIcons.fa_newspaper_o));
         items.add(new Item("#e91e63", "Amrita UMS Login", FontAwesomeIcons.fa_lock));
         items.add(new Item("#fe5352", "Academic Calender", FontAwesomeIcons.fa_calendar));
-        items.add(new Item("#3f51b5", "Amrita Explorer", FontAwesomeIcons.fa_globe));
+        items.add(new Item("#009688", "GPMS Login", FontAwesomeIcons.fa_smile_o));
         items.add(new Item("#9c27b0", "Train & Bus Timings", FontAwesomeIcons.fa_clock_o));
-        items.add(new Item("#009688", "Attendance Manager", FontAwesomeIcons.fa_smile_o));
+        items.add(new Item("#3f51b5", "Amrita Explorer", FontAwesomeIcons.fa_globe));
         items.add(new Item("#259b24", "Curriculum Info", FontAwesomeIcons.fa_book));
         items.add(new Item("#03a9f4", "About Amrita", FontAwesomeIcons.fa_info_circle));
     }

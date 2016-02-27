@@ -392,9 +392,7 @@ public class Calender extends BaseActivity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    public void init(Bundle savedInstanceState) {
         setupLayout(R.layout.activity_calender, Color.parseColor("#fe5352"));
         final SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
         final Calender this_context = this;

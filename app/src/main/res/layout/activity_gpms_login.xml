@@ -1,0 +1,87 @@
+<!--
+  ~ Copyright (c) 2016. Niranjan Rajendran <niranjan94@yahoo.com>
+  -->
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <include layout="@layout/toolbar" android:id="@+id/toolbar"/>
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:background="@color/white"
+        android:scrollbarStyle="outsideInset"
+        android:layout_below="@+id/toolbar">
+
+        <LinearLayout
+            android:id="@+id/aumsLinearView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:text="Username:"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_marginTop="10dp" />
+
+            <EditText
+                android:id="@+id/roll_no"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAllCaps="true"
+                android:ems="10"
+                android:hint="Your full roll number"
+                android:inputType="textCapCharacters|text|textNoSuggestions|textFilter"  />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:text="Password:"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_marginTop="5dp" />
+
+            <EditText
+                android:id="@+id/pwd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Your GPMS password"
+                android:inputType="textPassword"  />
+
+            <LinearLayout
+                android:id="@+id/buttonArea"
+                style="?android:attr/buttonBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="bottom|right"
+                android:layout_marginTop="15dp"
+                android:orientation="horizontal"
+                android:background="@color/button_bar_grey" >
+
+                <Button
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="reset"
+                    android:text="Reset" />
+
+                <Button
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:onClick="loginStart"
+                    android:focusable="true"
+                    android:text="Login" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

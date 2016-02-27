@@ -23,10 +23,9 @@ public class BugReport extends BaseActivity {
 
     private String studentName;
     private String studentRollNo;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
+    @Override
+    public void init(Bundle savedInstanceState) {
         setupLayout(R.layout.activity_bug_report, Color.parseColor("#5B96E7"));
 
         studentName = getIntent().getStringExtra("studentName");

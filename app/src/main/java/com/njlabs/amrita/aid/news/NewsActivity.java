@@ -44,15 +44,15 @@ public class NewsActivity extends BaseActivity {
 
     private ExtendedSwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void init(Bundle savedInstanceState) {
         setupLayout(R.layout.activity_news, Color.parseColor("#ffc107"));
 
         swipeRefreshLayout = (ExtendedSwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         recyclerView = (RecyclerView) findViewById(R.id.list);
 
-        swipeRefreshLayout.setColorSchemeColors(Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW);
+        swipeRefreshLayout.setColorSchemeColors(Color.parseColor("#ffc107"));
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -95,8 +95,8 @@ public class NewsActivity extends BaseActivity {
         })).start();
     }
 
-    private void getNews(final Boolean refresh){
-        AsyncHttpClient client = new AsyncHttpClient();
+    private void getNews(final Boolean refresh) {
+        AsyncHttpClient client = new AsyncHttpClient(true, 80, 443);
         client.get("https://www.amrita.edu/campus/Coimbatore/news", new TextHttpResponseHandler() {
 
             @Override
