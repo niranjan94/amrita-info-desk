@@ -4,6 +4,7 @@
 
 package com.njlabs.amrita.aid.news;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -19,8 +20,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.TextHttpResponseHandler;
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.classes.NewsModel;
@@ -32,10 +31,15 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import cz.msebera.android.httpclient.Header;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Created by Niranjan on 07-07-2015.
@@ -44,6 +48,7 @@ public class NewsActivity extends BaseActivity {
 
     private ExtendedSwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
+    private OkHttpClient client;
 
     @Override
     public void init(Bundle savedInstanceState) {
@@ -93,75 +98,81 @@ public class NewsActivity extends BaseActivity {
                 });
             }
         })).start();
+
+        client = new OkHttpClient.Builder()
+                .followRedirects(true)
+                .followSslRedirects(true)
+                .build();
+
     }
 
     private void getNews(final Boolean refresh) {
-        AsyncHttpClient client = new AsyncHttpClient(true, 80, 443);
-        client.get("https://www.amrita.edu/campus/Coimbatore/news", new TextHttpResponseHandler() {
+        swipeRefreshLayout.setRefreshing(true);
 
+        Request request = new Request.Builder().url("https://www.amrita.edu/campus/Coimbatore/news").build();
+
+        client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onStart() {
-                swipeRefreshLayout.setRefreshing(true);
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
-
-
-                if(refresh){
-                    (new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            NewsModel.deleteAll(NewsModel.class);
-                        }
-                    })).start();
-                }
-
-                final List<NewsModel> newsArticles = new ArrayList<>();
-
-                Document doc = Jsoup.parse(responseString);
-                Elements articles = doc.select("article");
-                for(Element article : articles){
-                    Element header = article.select(".flexslider").first();
-                    Element content = article.select(".group-blog-content").first();
-                    Element footer = article.select(".group-blog-footer").first();
-                    String imageUrl = header.select("ul > li > img").first().attr("src");
-                    String title = content.select(".field-name-title > div > div > h2").first().text();
-                    String url = "https://www.amrita.edu"+footer.select(".field-name-node-link > div > div > a").first().attr("href");
-                    newsArticles.add(new NewsModel(imageUrl, title, url));
-                }
-
-                (new Thread(new Runnable() {
+            public void onFailure(Call call, IOException e) {
+                ((Activity) baseContext).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        NewsModel.saveInTx(newsArticles);
+                        swipeRefreshLayout.setRefreshing(false);
+                        Snackbar.make(parentView,"Can't establish a reliable connection to the server.", Snackbar.LENGTH_SHORT)
+                                .setAction("Retry", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        getNews(refresh);
+                                    }
+                                }).show();
                     }
-                })).start();
-
-                recyclerView.setAdapter(new NewsAdapter(newsArticles));
-                swipeRefreshLayout.setRefreshing(false);
+                });
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable e) {
-                swipeRefreshLayout.setRefreshing(false);
-                Snackbar.make(parentView,"Can't establish a reliable connection to the server.", Snackbar.LENGTH_SHORT)
-                        .setAction("Retry", new View.OnClickListener() {
+            public void onResponse(Call call, final Response response) throws IOException {
+                final String responseString = response.body().string();
+                ((Activity) baseContext).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        if(refresh){
+                            (new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    NewsModel.deleteAll(NewsModel.class);
+                                }
+                            })).start();
+                        }
+
+                        final List<NewsModel> newsArticles = new ArrayList<>();
+
+                        Document doc = Jsoup.parse(responseString);
+                        Elements articles = doc.select("article");
+                        for(Element article : articles){
+                            Element header = article.select(".flexslider").first();
+                            Element content = article.select(".group-blog-content").first();
+                            Element footer = article.select(".group-blog-footer").first();
+                            String imageUrl = header.select("ul > li > img").first().attr("src");
+                            String title = content.select(".field-name-title > div > div > h2").first().text();
+                            String url = "https://www.amrita.edu"+footer.select(".field-name-node-link > div > div > a").first().attr("href");
+                            newsArticles.add(new NewsModel(imageUrl, title, url));
+                        }
+
+                        (new Thread(new Runnable() {
                             @Override
-                            public void onClick(View v) {
-                                getNews(refresh);
+                            public void run() {
+                                NewsModel.saveInTx(newsArticles);
                             }
-                        }).show();
-            }
+                        })).start();
 
-            @Override
-            public void onRetry(int retryNo) {
-
+                        recyclerView.setAdapter(new NewsAdapter(newsArticles));
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                });
             }
         });
     }
-
-
 
     public void articleClick(View v){
         Uri uri = Uri.parse(((TextView)v.findViewById(R.id.url)).getText().toString());

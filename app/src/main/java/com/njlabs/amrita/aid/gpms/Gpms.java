@@ -8,14 +8,16 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.loopj.android.http.RequestParams;
-import com.loopj.android.http.TextHttpResponseHandler;
 import com.njlabs.amrita.aid.gpms.models.HistoryEntry;
 import com.njlabs.amrita.aid.gpms.models.PendingEntry;
 import com.njlabs.amrita.aid.gpms.responses.HistoryResponse;
 import com.njlabs.amrita.aid.gpms.responses.InfoResponse;
+import com.njlabs.amrita.aid.gpms.responses.LoginResponse;
 import com.njlabs.amrita.aid.gpms.responses.PendingResponse;
 import com.njlabs.amrita.aid.gpms.responses.SuccessResponse;
+import com.njlabs.amrita.aid.gpms.responses.TextResponse;
+import com.njlabs.amrita.aid.util.PersistentCookieStore;
+import com.njlabs.amrita.aid.util.RequestParams;
 import com.njlabs.amrita.aid.util.ark.logging.Ln;
 
 import org.joda.time.DateTime;
@@ -26,11 +28,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import cz.msebera.android.httpclient.Header;
 
 public class Gpms {
 
@@ -44,7 +43,7 @@ public class Gpms {
     public Gpms(Context context) {
         this.context = context;
         client = new GpmsClient(context);
-        cookiePrefFile = context.getSharedPreferences("CookiePrefsFile", Context.MODE_PRIVATE);
+        cookiePrefFile = context.getSharedPreferences(PersistentCookieStore.GPMS_COOKIE_PREFS, Context.MODE_PRIVATE);
 
         studentRollNo = cookiePrefFile.getString("gpms_roll_no", null);
         studentName = cookiePrefFile.getString("gpms_name", null);
@@ -72,47 +71,54 @@ public class Gpms {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void logout() {
         client.closeClient();
-        cookiePrefFile.edit().clear().commit();
-        String filePath = context.getFilesDir().getParent()+"/shared_prefs/CookiePrefsFile.xml";
-        File deletePrefFile = new File(filePath );
-        deletePrefFile.delete();
-
     }
 
-    public void basicLogin(String rollNo, String password, final SuccessResponse successResponse) {
+    public void basicLogin(String rollNo, String password, final LoginResponse loginResponse) {
         RequestParams params = new RequestParams();
         params.put("userid", rollNo);
         params.put("passwd", password);
         params.put("submit", "");
 
-        client.post("/index.php", params, new TextHttpResponseHandler() {
+        client.post("/index.php", params, new TextResponse() {
+
             @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                successResponse.onFailure(responseString, throwable);
+            public void onFailure(Throwable throwable) {
+                loginResponse.onFailure(throwable);
             }
 
             @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                successResponse.onSuccess();
+            public void onSuccess(String responseString) {
+                loginResponse.onSuccess();
             }
         });
     }
 
     public void login(String rollNo, String password, final InfoResponse infoResponse) {
 
-        basicLogin(rollNo, password, new SuccessResponse() {
+        basicLogin(rollNo, password, new LoginResponse() {
+            @Override
+            public void onFailedAuthentication() {
+                infoResponse.onFailedAuthentication();
+            }
+
             @Override
             public void onSuccess() {
-                client.get("/applyleave.php", null, new TextHttpResponseHandler() {
+                client.get("/applyleave.php", null, new TextResponse() {
                     @Override
-                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                        infoResponse.onFailure(responseString, throwable);
+                    public void onFailure(Throwable throwable) {
+                        infoResponse.onFailure(throwable);
                     }
 
                     @Override
-                    public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                    public void onSuccess(String responseString) {
                         try {
                             Document doc = Jsoup.parse(responseString);
+
+                            Elements forgotPassword = doc.select("p.forgot");
+                            if(forgotPassword.size() != 0) {
+                                infoResponse.onFailedAuthentication();
+                                return;
+                            }
                             Element mainContent = doc.select("div.maincontent").first();
 
                             Element infoTableBody = mainContent.select("form > center > table > tbody > tr > td:nth-child(1) > table > tbody").first();
@@ -132,15 +138,15 @@ public class Gpms {
 
                             infoResponse.onSuccess(regNo, name, hostel, roomNo, mobile, email, photoUrl, numPasses);
                         } catch (Exception e) {
-                            infoResponse.onFailure(responseString, e);
+                            infoResponse.onFailure(e);
                         }
                     }
                 });
             }
 
             @Override
-            public void onFailure(String response, Throwable throwable) {
-                infoResponse.onFailure(response, throwable);
+            public void onFailure(Throwable throwable) {
+                infoResponse.onFailure(throwable);
             }
         });
     }
@@ -159,17 +165,17 @@ public class Gpms {
         params.put("groundsforleave", reason);
         params.put("fromdate", dateTime);
         params.put("todate", toDate.toString(dateFormat));
-        params.put("noofdays", 1);
+        params.put("noofdays", String.valueOf(1));
         params.put("confirm", "confirm");
 
-        client.post("/applyleave.php", params, new TextHttpResponseHandler() {
+        client.post("/applyleave.php", params, new TextResponse() {
             @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                successResponse.onFailure(responseString, throwable);
+            public void onFailure(Throwable throwable) {
+                successResponse.onFailure(throwable);
             }
 
             @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+            public void onSuccess(String responseString) {
                 successResponse.onSuccess();
             }
         });
@@ -185,31 +191,31 @@ public class Gpms {
         params.put("groundsforleave", reason);
         params.put("fromdate", fromDateTime);
         params.put("todate", toDateTime);
-        params.put("noofdays", days);
+        params.put("noofdays", String.valueOf(days));
         params.put("confirm", "confirm");
 
-        client.post("/applyleave.php", params, new TextHttpResponseHandler() {
+        client.post("/applyleave.php", params, new TextResponse() {
             @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                successResponse.onFailure(responseString, throwable);
+            public void onFailure(Throwable throwable) {
+                successResponse.onFailure(throwable);
             }
 
             @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+            public void onSuccess(String responseString) {
                 successResponse.onSuccess();
             }
         });
     }
 
     public void getPendingPasses(final PendingResponse pendingResponse) {
-        client.get("/leavestatus.php", null, new TextHttpResponseHandler() {
+        client.get("/leavestatus.php", null, new TextResponse() {
             @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                pendingResponse.onFailure(responseString, throwable);
+            public void onFailure(Throwable throwable) {
+                pendingResponse.onFailure(throwable);
             }
 
             @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+            public void onSuccess(String responseString) {
                 Document doc = Jsoup.parse(responseString);
                 Element tBody = doc.select("body > div:nth-child(9) > table > tbody").first();
                 Elements rows = tBody.select("tr");
@@ -246,28 +252,28 @@ public class Gpms {
         params.put("reqid", requestId);
         params.put("cancel", "Cancel");
 
-        client.post("/leavestatus.php", params, new TextHttpResponseHandler() {
+        client.post("/leavestatus.php", params, new TextResponse() {
             @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                successResponse.onFailure(responseString, throwable);
+            public void onFailure(Throwable throwable) {
+                successResponse.onFailure(throwable);
             }
 
             @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+            public void onSuccess(String responseString) {
                 successResponse.onSuccess();
             }
         });
     }
 
     public void getPassesHistory(final HistoryResponse historyResponse) {
-        client.get("/leavehistory.php", null, new TextHttpResponseHandler() {
+        client.get("/leavehistory.php", null, new TextResponse() {
             @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                historyResponse.onFailure(responseString, throwable);
+            public void onFailure(Throwable throwable) {
+                historyResponse.onFailure(throwable);
             }
 
             @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+            public void onSuccess(String responseString) {
 
                 Document doc = Jsoup.parse(responseString);
                 Element tBody = doc.select("#FilterForm > label > table > tbody").first();

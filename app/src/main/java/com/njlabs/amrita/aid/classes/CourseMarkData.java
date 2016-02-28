@@ -6,9 +6,9 @@ package com.njlabs.amrita.aid.classes;
 
 public class CourseMarkData {
 
-    public String courseCode;
-    public String mark;
-    public String exam;
+    public String courseCode = null;
+    public String mark = null;
+    public String exam = null;
 
     public CourseMarkData() {
 

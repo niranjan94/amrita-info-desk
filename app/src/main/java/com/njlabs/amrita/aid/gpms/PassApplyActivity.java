@@ -108,7 +108,7 @@ public class PassApplyActivity extends BaseActivity {
                     }
 
                     @Override
-                    public void onFailure(String response, Throwable throwable) {
+                    public void onFailure(Throwable throwable) {
                         Ln.e(throwable);
                         dialog.dismiss();
                         Snackbar.make(parentView, "An error occurred. Try again.", Snackbar.LENGTH_LONG).show();
@@ -140,7 +140,7 @@ public class PassApplyActivity extends BaseActivity {
                     }
 
                     @Override
-                    public void onFailure(String response, Throwable throwable) {
+                    public void onFailure(Throwable throwable) {
                         Ln.e(throwable);
                         dialog.dismiss();
                         Snackbar.make(parentView, "An error occurred. Try again.", Snackbar.LENGTH_LONG).show();
@@ -182,7 +182,7 @@ public class PassApplyActivity extends BaseActivity {
 
                                     }
                                 })
-                                .setStartTime(startDate.getHourOfDay(), startDate.getMinuteOfHour() - 1)
+                                .setStartTime(startDate.getHourOfDay(), (startDate.getMinuteOfHour() - 1 == -1 ? 0 : startDate.getMinuteOfHour() - 1))
                                 .setThemeDark(false);
                         rtpd.show(getSupportFragmentManager(), "FRAG_TAG_TIME_PICKER");
 

@@ -8,7 +8,6 @@ import com.njlabs.amrita.aid.gpms.models.HistoryEntry;
 
 import java.util.List;
 
-public abstract class HistoryResponse {
+public abstract class HistoryResponse extends BaseResponse {
     public abstract void onSuccess(List<HistoryEntry> historyEntries);
-    public abstract void onFailure(String response, Throwable throwable);
 }

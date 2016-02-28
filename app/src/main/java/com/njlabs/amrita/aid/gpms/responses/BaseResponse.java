@@ -4,7 +4,6 @@
 
 package com.njlabs.amrita.aid.gpms.responses;
 
-public abstract class SuccessResponse extends BaseResponse {
-    public abstract void onSuccess();
-
+public abstract class BaseResponse  {
+    public abstract void onFailure(Throwable throwable);
 }

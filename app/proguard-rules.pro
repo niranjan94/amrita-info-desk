@@ -46,8 +46,9 @@
 -keep class com.crashlytics.** { *; }
 -keep class com.crashlytics.android.**
 
--keep class cz.msebera.android.httpclient.** { *; }
--keep class com.loopj.android.http.** { *; }
+-keep class javax.net.ssl.** { *; }
+-keep class okhttp3.** { *; }
+-keep class com.njlabs.** { *; }
 
 -keepattributes SourceFile,LineNumberTable
 
@@ -68,3 +69,6 @@
 -dontwarn uk.**
 -dontwarn io.**
 -dontwarn java.**
+-dontwarn okhttp3.**
+-dontwarn javax.net.ssl.**
+

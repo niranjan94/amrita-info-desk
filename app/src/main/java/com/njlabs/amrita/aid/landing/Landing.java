@@ -1,5 +1,6 @@
 package com.njlabs.amrita.aid.landing;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,8 +21,6 @@ import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.JsonHttpResponseHandler;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.accountswitcher.AccountHeader;
@@ -35,7 +34,7 @@ import com.njlabs.amrita.aid.BuildConfig;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.about.Amrita;
 import com.njlabs.amrita.aid.about.App;
-import com.njlabs.amrita.aid.aums.Aums;
+import com.njlabs.amrita.aid.aums.AumsActivity;
 import com.njlabs.amrita.aid.gpms.GpmsActivity;
 import com.njlabs.amrita.aid.info.Calender;
 import com.njlabs.amrita.aid.info.Curriculum;
@@ -43,11 +42,20 @@ import com.njlabs.amrita.aid.info.TrainBusInfo;
 import com.njlabs.amrita.aid.news.NewsActivity;
 import com.njlabs.amrita.aid.news.NewsUpdateService;
 import com.njlabs.amrita.aid.settings.SettingsActivity;
+import com.njlabs.amrita.aid.util.PersistentCookieStore;
+import com.njlabs.amrita.aid.util.ark.logging.Ln;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import cz.msebera.android.httpclient.Header;
+import java.io.File;
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 
 public class Landing extends BaseActivity {
@@ -117,6 +125,17 @@ public class Landing extends BaseActivity {
 
         GcmNetworkManager.getInstance(this).schedule(periodic);
 
+
+        File aumsCookieFile = new File(getApplicationContext().getFilesDir().getParent()+"/shared_prefs/" + PersistentCookieStore.AUMS_COOKIE_PREFS+ ".xml" );
+        if(aumsCookieFile.exists()) {
+            aumsCookieFile.delete();
+        }
+
+        File gpmsCookieFile = new File(getApplicationContext().getFilesDir().getParent()+"/shared_prefs/" + PersistentCookieStore.GPMS_COOKIE_PREFS+ ".xml" );
+        if(gpmsCookieFile.exists()) {
+            gpmsCookieFile.delete();
+        }
+
     }
 
     private void setupGrid() {
@@ -134,22 +153,6 @@ public class Landing extends BaseActivity {
                         break;
                     case "Amrita Explorer":
                         Snackbar.make(parentView, "Amrita Explorer is under maintenance", Snackbar.LENGTH_SHORT).show();
-                        /*// AMRITA EXPLORER
-                        SharedPreferences preferences = getSharedPreferences("pref", MODE_PRIVATE);
-                        String explorer_is_registered = preferences.getString("explorer_is_registered", "");
-                        if (explorer_is_registered.equals("yes")) {
-                            ConnectionDetector cd = new ConnectionDetector(baseContext);
-                            boolean isInternetPresent = cd.isConnectingToInternet();
-                            if (isInternetPresent) {
-                                Intent intent = new Intent(baseContext, Explorer.class);
-                                startActivity(intent);
-                            } else {
-                                Snackbar.make(parentView,"Internet connection is required for Amrita Explorer", Snackbar.LENGTH_SHORT).show();
-                            }
-                        } else {
-                            Intent intent = new Intent(baseContext, ExplorerSignup.class);
-                            startActivity(intent);
-                        }*/
                         break;
                     case "Academic Calender":
                         // ACADEMIC CALENDER
@@ -157,7 +160,7 @@ public class Landing extends BaseActivity {
                         break;
                     case "Amrita UMS Login":
                         // AUMS
-                        startActivity(new Intent(baseContext, Aums.class));
+                        startActivity(new Intent(baseContext, AumsActivity.class));
                         break;
                     case "Train & Bus Timings":
                         // TRAIN & BUS INFO
@@ -209,68 +212,90 @@ public class Landing extends BaseActivity {
     }
 
     public void checkForUpdates() {
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get("https://api.codezero.xyz/aid/latest", new JsonHttpResponseHandler() {
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
 
+        OkHttpClient client = new OkHttpClient.Builder()
+                .followRedirects(true)
+                .followSslRedirects(true)
+                .build();
+
+        Request.Builder request = new Request.Builder()
+                .url("https://api.codezero.xyz/aid/latest");
+
+        client.newCall(request.build()).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Ln.e(e);
             }
+
             @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                String Status = "";
-                try {
-                    Status = response.getString("status");
-                } catch (JSONException e) {
-                    Crashlytics.logException(e);
-                }
-                if (Status.equals("ok")) {
-                    Double Latest = 0.0;
-                    String Description = null;
-                    try {
-                        Latest = response.getDouble("version");
-                        Description = response.getString("description");
-                    } catch (JSONException e) {
-                        Crashlytics.logException(e);
-                    }
-                    if (Latest > BuildConfig.VERSION_CODE) {
+            public void onResponse(Call call, final Response rawResponse) throws IOException {
+                final String responseString = rawResponse.body().string();
+                ((Activity) baseContext).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
 
-                        AlertDialog.Builder updateDialogBuilder = new AlertDialog.Builder(Landing.this);
+                        JSONObject response;
 
-                        LayoutInflater factory = LayoutInflater.from(Landing.this);
-                        final View changelogView = factory.inflate(R.layout.webview_dialog, null);
-                        LinearLayout WebViewDialogLayout = (LinearLayout) changelogView.findViewById(R.id.WebViewDialogLayout);
-                        WebViewDialogLayout.setPadding(5, 5, 5, 5);
-                        WebView changelogWebView = (WebView) changelogView.findViewById(R.id.LicensesView);
-                        changelogWebView.loadData(String.format("%s", Description), "text/html", "utf-8");
-                        changelogWebView.setPadding(5,5,5,5);
-                        changelogWebView.setBackgroundColor(0);
-                        changelogWebView.setOnLongClickListener(new View.OnLongClickListener() {
-                            @Override
-                            public boolean onLongClick(View v) {
-                                return true;
+                        try {
+                            response = new JSONObject(responseString);
+
+                            String status = "";
+                            status = response.getString("status");
+
+                            if (status.equals("ok")) {
+                                Double Latest = 0.0;
+                                String Description = null;
+                                try {
+                                    Latest = response.getDouble("version");
+                                    Description = response.getString("description");
+                                } catch (JSONException e) {
+                                    Crashlytics.logException(e);
+                                }
+                                if (Latest > BuildConfig.VERSION_CODE) {
+
+                                    AlertDialog.Builder updateDialogBuilder = new AlertDialog.Builder(Landing.this);
+
+                                    LayoutInflater factory = LayoutInflater.from(Landing.this);
+                                    final View changelogView = factory.inflate(R.layout.webview_dialog, null);
+                                    LinearLayout WebViewDialogLayout = (LinearLayout) changelogView.findViewById(R.id.WebViewDialogLayout);
+                                    WebViewDialogLayout.setPadding(5, 5, 5, 5);
+                                    WebView changelogWebView = (WebView) changelogView.findViewById(R.id.LicensesView);
+                                    changelogWebView.loadData(String.format("%s", Description), "text/html", "utf-8");
+                                    changelogWebView.setPadding(5,5,5,5);
+                                    changelogWebView.setBackgroundColor(0);
+                                    changelogWebView.setOnLongClickListener(new View.OnLongClickListener() {
+                                        @Override
+                                        public boolean onLongClick(View v) {
+                                            return true;
+                                        }
+                                    });
+                                    changelogWebView.setLongClickable(false);
+                                    updateDialogBuilder.setView(changelogView).setCancelable(true)
+                                            .setCancelable(false)
+                                            .setNegativeButton("Dismiss", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    dialog.cancel();
+                                                }
+                                            })
+                                            .setPositiveButton("Update Now", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    Uri uri = Uri.parse("market://details?id=com.njlabs.amrita.aid");
+                                                    Intent it = new Intent(Intent.ACTION_VIEW, uri);
+                                                    startActivity(it);
+                                                }
+                                            });
+                                    AlertDialog alert = updateDialogBuilder.create();
+                                    alert.setTitle("Update Available");
+                                    alert.setIcon(R.mipmap.ic_launcher);
+                                    alert.show();
+                                }
                             }
-                        });
-                        changelogWebView.setLongClickable(false);
-                        updateDialogBuilder.setView(changelogView).setCancelable(true)
-                                .setCancelable(false)
-                                .setNegativeButton("Dismiss", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        dialog.cancel();
-                                    }
-                                })
-                                .setPositiveButton("Update Now", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        Uri uri = Uri.parse("market://details?id=com.njlabs.amrita.aid");
-                                        Intent it = new Intent(Intent.ACTION_VIEW, uri);
-                                        startActivity(it);
-                                    }
-                                });
-                        AlertDialog alert = updateDialogBuilder.create();
-                        alert.setTitle("Update Available");
-                        alert.setIcon(R.mipmap.ic_launcher);
-                        alert.show();
+
+                        } catch (Exception e) {
+                            Ln.e(e);
+                        }
                     }
-                }
+                });
             }
         });
     }

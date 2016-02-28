@@ -13,6 +13,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -138,6 +139,18 @@ public abstract class BaseActivity extends AppCompatActivity {
         Color.colorToHSV(color, hsv);
         hsv[2] *= 0.8f; // value component
         return Color.HSVToColor(hsv);
+    }
+
+    public void createSnackbar(String text) {
+        createSnackbar(text, Snackbar.LENGTH_SHORT);
+    }
+
+    public void createSnackbar(String text, int duration) {
+        Snackbar.make(parentView, text, duration).show();
+    }
+
+    public void createLongSnackbar(String text) {
+        createSnackbar(text, Snackbar.LENGTH_LONG);
     }
 
     public boolean isLollipop(){

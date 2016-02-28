@@ -76,7 +76,7 @@ public class PassHistoryActivity extends BaseActivity {
             }
 
             @Override
-            public void onFailure(String response, Throwable throwable) {
+            public void onFailure(Throwable throwable) {
                 Snackbar.make(parentView, "Cannot establish reliable connection to the server. Try again.", Snackbar.LENGTH_LONG).show();
             }
         });

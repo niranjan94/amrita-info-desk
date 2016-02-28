@@ -19,8 +19,6 @@ import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
 import com.google.android.gms.gcm.TaskParams;
-import com.loopj.android.http.SyncHttpClient;
-import com.loopj.android.http.TextHttpResponseHandler;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.classes.NewsModel;
 
@@ -29,10 +27,13 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import cz.msebera.android.httpclient.Header;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class NewsUpdateService extends GcmTaskService {
     Context mContext;
@@ -67,13 +68,23 @@ public class NewsUpdateService extends GcmTaskService {
 
 
     private void getNews(final Boolean refresh, final List<NewsModel> oldArticles){
-        SyncHttpClient client = new SyncHttpClient();
-        client.get("https://www.amrita.edu/campus/Coimbatore/news", new TextHttpResponseHandler() {
 
-            private List<NewsModel> currentArticles;
+        List<NewsModel> currentArticles;
 
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+        OkHttpClient client = new OkHttpClient.Builder()
+                .followRedirects(true)
+                .followSslRedirects(true)
+                .build();
+
+        Request request = new Request.Builder()
+                .url("https://www.amrita.edu/campus/Coimbatore/news")
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+
+            if(response.isSuccessful()) {
+                String responseString = response.body().string();
                 status = GcmNetworkManager.RESULT_SUCCESS;
                 currentArticles = new ArrayList<>();
                 if(refresh){
@@ -114,7 +125,7 @@ public class NewsUpdateService extends GcmTaskService {
                                     .setDefaults(Notification.DEFAULT_SOUND)
                                     .setContentIntent(resultPendingIntent)
                                     .setAutoCancel(true)
-                    .setContentText(currentArticles.get(0).getTitle());
+                                    .setContentText(currentArticles.get(0).getTitle());
 
                     if(allowNotification){
                         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -141,13 +152,13 @@ public class NewsUpdateService extends GcmTaskService {
                     }
 
                 }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable e) {
+            } else {
                 status = GcmNetworkManager.RESULT_RESCHEDULE;
             }
-        });
+        } catch (IOException e) {
+            status = GcmNetworkManager.RESULT_RESCHEDULE;
+        }
+
     }
 
     @Override

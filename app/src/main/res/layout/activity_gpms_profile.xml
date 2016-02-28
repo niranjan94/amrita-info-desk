@@ -30,7 +30,7 @@
                     android:layout_height="wrap_content" >
 
                     <ProgressBar
-                        android:id="@+id/StudentProfilePicProgress"
+                        android:id="@+id/student_profile_pic_progress"
                         android:layout_width="wrap_content"
                         style="?android:attr/progressBarStyleLarge"
                         android:layout_height="wrap_content"

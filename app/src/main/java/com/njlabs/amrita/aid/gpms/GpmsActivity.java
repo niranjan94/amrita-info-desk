@@ -27,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.analytics.HitBuilders;
+import com.jakewharton.picasso.OkHttp3Downloader;
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.MainApplication;
 import com.njlabs.amrita.aid.R;
@@ -35,9 +36,7 @@ import com.njlabs.amrita.aid.gpms.responses.InfoResponse;
 import com.njlabs.amrita.aid.landing.Landing;
 import com.njlabs.amrita.aid.util.ark.Security;
 import com.njlabs.amrita.aid.util.ark.logging.Ln;
-import com.squareup.okhttp.OkHttpClient;
 import com.squareup.picasso.Downloader;
-import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 
 import org.apache.commons.lang3.StringUtils;
@@ -50,6 +49,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
+import okhttp3.OkHttpClient;
 
 public class GpmsActivity extends BaseActivity {
 
@@ -146,6 +147,16 @@ public class GpmsActivity extends BaseActivity {
             gpms.logout();
             gpms.login(rollNo, password, new InfoResponse() {
 
+                @Override
+                public void onSuccess() {
+                    showError();
+                }
+
+                @Override
+                public void onFailedAuthentication() {
+                    showIncorrectError();
+                }
+
                 @SuppressWarnings("ConstantConditions")
                 @Override
                 public void onSuccess(String regNo, String name, String hostel, String roomNo, String mobile, String email, String photoUrl, String numPasses) {
@@ -171,7 +182,7 @@ public class GpmsActivity extends BaseActivity {
                 }
 
                 @Override
-                public void onFailure(String response, Throwable throwable) {
+                public void onFailure(Throwable throwable) {
                     Ln.e(throwable);
                     showError();
                 }
@@ -205,6 +216,13 @@ public class GpmsActivity extends BaseActivity {
 
     private void showError() {
         Snackbar.make(parentView, "Cannot connect to Server. Try again later.", Snackbar.LENGTH_LONG).show();
+        if (dialog != null) {
+            dialog.dismiss();
+        }
+    }
+
+    private void showIncorrectError() {
+        Snackbar.make(parentView, "Credentials Incorrect.", Snackbar.LENGTH_LONG).show();
         if (dialog != null) {
             dialog.dismiss();
         }
@@ -255,16 +273,16 @@ public class GpmsActivity extends BaseActivity {
                 }
             });
 
-            OkHttpClient client = new OkHttpClient();
-            client.setSslSocketFactory(sc.getSocketFactory());
-            client.setHostnameVerifier(new HostnameVerifier() {
-                @Override
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
-                }
-            });
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .sslSocketFactory(sc.getSocketFactory())
+                    .hostnameVerifier(new HostnameVerifier() {
+                        @Override
+                        public boolean verify(String hostname, SSLSession session) {
+                            return true;
+                        }
+                    }).build();
 
-            Downloader downloader = new OkHttpDownloader(client);
+            Downloader downloader = new OkHttp3Downloader(client);
             return builder.downloader(downloader).build();
         } catch (Exception ignored) {
             Picasso.Builder builder = new Picasso.Builder(baseContext).listener(new Picasso.Listener() {
@@ -339,5 +357,17 @@ public class GpmsActivity extends BaseActivity {
         }
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(gpms != null) {
+            try {
+                gpms.logout();
+            } catch (Exception ignored) {
+
+            }
+        }
+    }
 
 }

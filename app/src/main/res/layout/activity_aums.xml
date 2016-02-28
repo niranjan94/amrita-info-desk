@@ -4,6 +4,7 @@
     android:layout_height="fill_parent">
 
     <include layout="@layout/toolbar" android:id="@+id/toolbar"/>
+
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -22,10 +23,26 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="10dp"
-                android:text="Username:"
+                android:paddingTop="5dp"
+                android:text="Campus:"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:layout_marginTop="10dp" />
+
+            <org.angmarch.views.NiceSpinner
+                android:id="@+id/nice_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:selectableItemBackground"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:layout_marginTop="4dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="5dp"
+                android:text="Username:"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_marginTop="8dp" />
 
             <EditText
                 android:id="@+id/roll_no"

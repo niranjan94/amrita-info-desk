@@ -81,7 +81,7 @@ public class PendingPassActivity extends BaseActivity {
             }
 
             @Override
-            public void onFailure(String response, Throwable throwable) {
+            public void onFailure(Throwable throwable) {
                 Snackbar.make(parentView, "Cannot establish reliable connection to the server. Try again.", Snackbar.LENGTH_LONG).show();
             }
         });
@@ -122,7 +122,7 @@ public class PendingPassActivity extends BaseActivity {
             }
 
             @Override
-            public void onFailure(String response, Throwable throwable) {
+            public void onFailure(Throwable throwable) {
                 Ln.e(throwable);
                 if(finalProgressBar != null) {
                     finalProgressBar.setVisibility(View.GONE);

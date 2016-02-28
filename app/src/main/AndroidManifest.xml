@@ -74,23 +74,6 @@
                 android:value=".landing.Landing" />
         </activity>
         <activity
-            android:name=".explorer.Explorer"
-            android:label="@string/title_activity_explorer"
-            android:parentActivityName=".landing.Landing"
-            android:theme="@style/Theme.Explorer" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".landing.Landing" />
-        </activity>
-        <activity
-            android:name=".explorer.ExplorerSignup"
-            android:label="@string/title_activity_explorer"
-            android:parentActivityName=".landing.Landing" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".landing.Landing" />
-        </activity>
-        <activity
             android:name=".info.Calender"
             android:label="@string/title_activity_academic_calender"
             android:parentActivityName=".landing.Landing" >
@@ -99,7 +82,7 @@
                 android:value=".landing.Landing" />
         </activity>
         <activity
-            android:name=".aums.Aums"
+            android:name=".aums.AumsActivity"
             android:label="@string/title_activity_aums"
             android:parentActivityName=".landing.Landing" >
             <meta-data
@@ -107,19 +90,19 @@
                 android:value=".landing.Landing" />
         </activity>
         <activity
-            android:name=".aums.AumsGrades"
+            android:name=".aums.GradesActivity"
             android:label="@string/title_activity_aums_grades" >
         </activity>
         <activity
-            android:name=".aums.AumsAttendance"
+            android:name=".aums.AttendanceActivity"
             android:label="@string/title_activity_aums_attendance" >
         </activity>
         <activity
-            android:name=".aums.AumsMarks"
+            android:name=".aums.MarksActivity"
             android:label="@string/title_activity_aums_marks" >
         </activity>
         <activity
-            android:name=".aums.AumsDebugActivity"
+            android:name=".aums.old.AumsDebugActivity"
             android:label="@string/title_activity_aums_debug" >
         </activity>
         <activity
@@ -139,9 +122,6 @@
                 android:value=".landing.Landing" />
         </activity>
 
-        <receiver android:name=".explorer.ExplorerBackgroundLocation" />
-        <service android:name=".explorer.ExplorerBackgroundLocationService" />
-
         <activity
             android:name=".settings.SettingsActivity"
             android:label="@string/title_activity_settings"
@@ -159,7 +139,7 @@
                 android:value=".landing.Landing" />
         </activity>
         <activity
-            android:name=".aums.AttendanceFlow"
+            android:name=".aums.old.AttendanceFlow"
             android:label="@string/title_activity_attendance_flow"
             android:parentActivityName=".landing.Landing" >
             <meta-data
