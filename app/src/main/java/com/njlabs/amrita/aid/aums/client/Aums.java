@@ -5,22 +5,27 @@
 package com.njlabs.amrita.aid.aums.client;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
-import android.graphics.BitmapFactory;
 
+import com.njlabs.amrita.aid.aums.models.CourseAttendanceData;
+import com.njlabs.amrita.aid.aums.models.CourseData;
+import com.njlabs.amrita.aid.aums.models.CourseGradeData;
+import com.njlabs.amrita.aid.aums.models.CourseMarkData;
+import com.njlabs.amrita.aid.aums.models.CourseResource;
 import com.njlabs.amrita.aid.aums.responses.AttendanceResponse;
-import com.njlabs.amrita.aid.aums.responses.BitmapResponse;
-import com.njlabs.amrita.aid.aums.responses.FileResponse;
+import com.njlabs.amrita.aid.aums.responses.CourseResourcesResponse;
+import com.njlabs.amrita.aid.aums.responses.CoursesResponse;
 import com.njlabs.amrita.aid.aums.responses.GradesResponse;
 import com.njlabs.amrita.aid.aums.responses.LoginResponse;
 import com.njlabs.amrita.aid.aums.responses.MarksResponse;
 import com.njlabs.amrita.aid.aums.responses.SessionResponse;
-import com.njlabs.amrita.aid.aums.responses.TextResponse;
-import com.njlabs.amrita.aid.classes.CourseAttendanceData;
-import com.njlabs.amrita.aid.classes.CourseGradeData;
-import com.njlabs.amrita.aid.classes.CourseMarkData;
-import com.njlabs.amrita.aid.util.RequestParams;
 import com.njlabs.amrita.aid.util.ark.Util;
+import com.njlabs.amrita.aid.util.okhttp.ProgressResponseBody;
+import com.njlabs.amrita.aid.util.okhttp.extras.RequestParams;
+import com.njlabs.amrita.aid.util.okhttp.responses.FileResponse;
+import com.njlabs.amrita.aid.util.okhttp.responses.RawResponse;
+import com.njlabs.amrita.aid.util.okhttp.responses.TextResponse;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -34,10 +39,13 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import okhttp3.Response;
 
 @SuppressWarnings("unused")
 public class Aums {
@@ -53,8 +61,14 @@ public class Aums {
     private Map<String, String> semesterMapping;
 
     public Aums(Context context) {
+        this(context, null);
+    }
+
+    public Aums(Context context, ProgressResponseBody.ProgressListener progressListener) {
         this.context = context;
         client = new AumsClient(context);
+        client.setProgressListener(progressListener);
+        client.powerUp();
         semesterMapping = new HashMap<>();
         loadSemesterMapping();
     }
@@ -105,10 +119,6 @@ public class Aums {
                 response.onFailure(throwable);
             }
 
-            @Override
-            public void onSiteStructureChange() {
-                response.onSiteStructureChange();
-            }
         });
     }
 
@@ -198,11 +208,6 @@ public class Aums {
             public void onFailure(Throwable throwable) {
                 response.onFailure(throwable);
             }
-
-            @Override
-            public void onSiteStructureChange() {
-                response.onSiteStructureChange();
-            }
         });
     }
 
@@ -215,11 +220,6 @@ public class Aums {
             @Override
             public void onFailure(Throwable throwable) {
                 response.onFailure(throwable);
-            }
-
-            @Override
-            public void onSiteStructureChange() {
-                response.onSiteStructureChange();
             }
 
             @Override
@@ -236,7 +236,7 @@ public class Aums {
 
     }
 
-    public void getPhotoFile(final BitmapResponse response) {
+    public void getPhotoFile(final FileResponse response) {
         RequestParams params = new RequestParams();
         params.put("action", "UMS-SRMHR_SHOW_PERSON_PHOTO");
         params.put("personId", studentHashId);
@@ -248,14 +248,9 @@ public class Aums {
             }
 
             @Override
-            public void onSiteStructureChange() {
-                response.onSiteStructureChange();
-            }
-
-            @Override
             public void onSuccess(File file) {
                 if (file.exists()) {
-                    response.onSuccess(BitmapFactory.decodeFile(file.getAbsolutePath()));
+                    response.onSuccess(file);
                 } else {
                     response.onFailure(new IOException(file + "does not exist"));
                 }
@@ -275,16 +270,11 @@ public class Aums {
             }
 
             @Override
-            public void onSiteStructureChange() {
-                response.onSiteStructureChange();
-            }
-
-            @Override
             public void onSuccess(String responseString) {
 
                 RequestParams params = new RequestParams();
                 params.put("htmlPageTopContainer_selectSem", semesterMapping.get(semester));
-                params.put("Page_refIndex_hidden", String.valueOf(attendanceRefIndex++));
+                params.put("Page_refIndex_hidden", attendanceRefIndex++);
                 params.put("htmlPageTopContainer_selectCourse", "0");
                 params.put("htmlPageTopContainer_selectType", "1");
                 params.put("htmlPageTopContainer_hiddentSummary", "");
@@ -297,11 +287,6 @@ public class Aums {
                     @Override
                     public void onFailure(Throwable throwable) {
                         response.onFailure(throwable);
-                    }
-
-                    @Override
-                    public void onSiteStructureChange() {
-                        response.onSiteStructureChange();
                     }
 
                     @Override
@@ -347,7 +332,7 @@ public class Aums {
     public void getGrades(String semester, final GradesResponse response) {
         RequestParams params = new RequestParams();
         params.put("htmlPageTopContainer_selectStep", semesterMapping.get(semester));
-        params.put("Page_refIndex_hidden", String.valueOf(gradeRefIndex++));
+        params.put("Page_refIndex_hidden", gradeRefIndex++);
         params.put("htmlPageTopContainer_hiddentblGrades", "");
         params.put("htmlPageTopContainer_status", "");
         params.put("htmlPageTopContainer_action", "UMS-EVAL_STUDPERFORMSURVEY_CHANGESEM_SCREEN");
@@ -358,11 +343,6 @@ public class Aums {
             @Override
             public void onFailure(Throwable throwable) {
                 response.onFailure(throwable);
-            }
-
-            @Override
-            public void onSiteStructureChange() {
-                response.onSiteStructureChange();
             }
 
             @Override
@@ -425,15 +405,10 @@ public class Aums {
             }
 
             @Override
-            public void onSiteStructureChange() {
-                marksResponse.onSiteStructureChange();
-            }
-
-            @Override
             public void onSuccess(String responseString) {
                 RequestParams params = new RequestParams();
                 params.put("htmlPageTopContainer_selectStep", semesterMapping.get(semester));
-                params.put("Page_refIndex_hidden", String.valueOf(markRefIndex++));
+                params.put("Page_refIndex_hidden", markRefIndex++);
                 params.put("htmlPageTopContainer_status", "");
                 params.put("htmlPageTopContainer_action", "UMS-EVAL_STUDMARKVIEW_SELSEM_SCREEN");
                 params.put("htmlPageTopContainer_notify", "I");
@@ -445,11 +420,6 @@ public class Aums {
                     }
 
                     @Override
-                    public void onSiteStructureChange() {
-                        marksResponse.onSiteStructureChange();
-                    }
-
-                    @Override
                     public void onSuccess(String responseString) {
                         ArrayList<String> subjects = new ArrayList<>();
                         List<CourseMarkData> markDataList = new ArrayList<>();
@@ -457,6 +427,12 @@ public class Aums {
 
                         try {
                             Element table = doc.select("table[width=75%]").first();
+
+                            if(table == null) {
+                                marksResponse.onDataUnavailable();
+                                return;
+                            }
+
                             Elements rows = table.select("tr");
                             Elements headerRowCells = rows.get(0).select("td");
 
@@ -498,12 +474,197 @@ public class Aums {
                                     }
                                 }
                             }
-                            marksResponse.onSuccess(markDataList);
+
+                            if(markDataList.size() > 0) {
+                                marksResponse.onSuccess(markDataList);
+                            } else {
+                                marksResponse.onDataUnavailable();
+                            }
+
                         } catch (Exception e) {
                             marksResponse.onFailure(e);
                         }
                     }
                 });
+            }
+        });
+    }
+
+    public void getCourses(final CoursesResponse response){
+        RequestParams params = new RequestParams();
+        params.put("action", "UMS-EVAL_CLASSHEADER_SCREEN_INIT");
+        client.get("/aums/Jsp/DefineComponent/ClassHeader.jsp", params, new TextResponse() {
+            @Override
+            public void onSuccess(String responseString) {
+
+                Document doc = Jsoup.parse(responseString);
+                Element tr = doc.select("body > form > table > tbody > tr").first();
+
+                Elements mainCells = tr.select("td[width=\"21%\"]");
+                mainCells.remove(0);
+                Elements options = tr.select("td > select > option");
+                final List<CourseData> courseDataList = new ArrayList<>();
+                for (Element mainCell: mainCells) {
+
+                    String fullName = mainCell.select("a").first().text().trim();
+                    String fullUrl = mainCell.select("a").first().attr("href").trim();
+
+                    String[] fullNameArray = fullName.split("\\.");
+                    String[] fullUrlArray = fullUrl.split("/");
+
+                    CourseData courseData = new CourseData();
+                    courseData.setCourseCode(fullNameArray[fullNameArray.length - 1]);
+                    courseData.setId(fullUrlArray[fullUrlArray.length - 1]);
+                    courseData.setType("regular");
+
+                    for (String fullNameArrayPart: fullNameArray) {
+                        if(fullNameArrayPart.trim().equals("Re")) {
+                            courseData.setType("re_reg");
+                            break;
+                        }
+                    }
+
+                    courseDataList.add(courseData);
+                }
+
+                for (Element option: options) {
+                    if(!option.attr("value").equals("0")) {
+                        String fullName = option.text().trim();
+                        String[] fullNameArray = fullName.split("\\.");
+                        CourseData courseData = new CourseData();
+                        courseData.setCourseCode(fullNameArray[fullNameArray.length - 1]);
+                        courseData.setId(option.attr("value").trim());
+                        courseData.setType("regular");
+
+                        for (String fullNameArrayPart: fullNameArray) {
+                            if(fullNameArrayPart.trim().equals("Re")) {
+                                courseData.setType("re_reg");
+                                break;
+                            }
+                        }
+                        courseDataList.add(courseData);
+                    }
+                }
+
+                final int[] responded = {0};
+                for (final CourseData courseData: courseDataList) {
+                    getCourseNameFromId(courseData.getId(), new TextResponse() {
+                        @Override
+                        public void onSuccess(String responseString) {
+                            responded[0]++;
+                            courseData.setCourseName(responseString);
+                            if(responded[0] == courseDataList.size()) {
+                                response.onSuccess(courseDataList);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Throwable throwable) {
+                            responded[0]++;
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                response.onFailure(throwable);
+            }
+        });
+    }
+
+    public void getCourseNameFromId(String id, final TextResponse textResponse) {
+        client.get("/access/site/" + id + "/", new TextResponse() {
+            @Override
+            public void onSuccess(String responseString) {
+                Document doc = Jsoup.parse(responseString);
+                Element div = doc.select("body > div").first();
+                String crappyCourseName = div.text().trim();
+                String awesomeCourseName = crappyCourseName.replaceFirst(".+?(?=:)", "").split("_")[0].split(":")[1];
+                textResponse.onSuccess(awesomeCourseName);
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                textResponse.onFailure(throwable);
+            }
+        });
+    }
+
+
+    public void getCourseResources(final String courseId, final CourseResourcesResponse response) {
+
+        client.get("/access/content/group/" + courseId + "/", new TextResponse() {
+
+            @Override
+            public void onSuccess(String responseString) {
+
+                Document doc = Jsoup.parse(responseString);
+                Elements tRows = doc.select("body > div > table > tbody > tr");
+
+                final List<CourseResource> courseResourceList = new ArrayList<>();
+
+                for(Element row: tRows) {
+                    courseResourceList.add(new CourseResource(courseId, row.select("td:nth-child(1) > a").first().text().trim()));
+                }
+                response.onSuccess(courseResourceList);
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                response.onFailure(throwable);
+            }
+        });
+    }
+
+
+    public void getResourceFileSize(String courseId, String fileName, final TextResponse textResponse) {
+        try {
+            fileName = URLEncoder.encode(fileName, "UTF-8").replace("+", "%20");
+        } catch (UnsupportedEncodingException e) {
+            fileName = URLEncoder.encode(fileName).replace("+", "%20");
+        }
+        client.get("/access/content/group/" + courseId + "/" + fileName, new RawResponse() {
+            @Override
+            public void onSuccess(Response rawResponse) {
+
+                final String contentLength = rawResponse.header("Content-Length", null);
+
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        textResponse.onSuccess(contentLength);
+                    }
+                });
+
+                try {
+                    rawResponse.body().close();
+                } catch (Exception ignored) { }
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                textResponse.onFailure(throwable);
+            }
+        });
+
+    }
+
+    public void downloadResource(String courseId, String fileName, final FileResponse fileResponse) {
+        try {
+            fileName = URLEncoder.encode(fileName, "UTF-8").replace("+", "%20");
+        } catch (UnsupportedEncodingException e) {
+            fileName = URLEncoder.encode(fileName).replace("+", "%20");
+        }
+        client.get("/access/content/group/" + courseId + "/" + fileName, null, new FileResponse() {
+            @Override
+            public void onSuccess(File file) {
+                fileResponse.onSuccess(file);
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                fileResponse.onFailure(throwable);
             }
         });
     }

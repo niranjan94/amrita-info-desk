@@ -42,7 +42,7 @@ import com.njlabs.amrita.aid.info.TrainBusInfo;
 import com.njlabs.amrita.aid.news.NewsActivity;
 import com.njlabs.amrita.aid.news.NewsUpdateService;
 import com.njlabs.amrita.aid.settings.SettingsActivity;
-import com.njlabs.amrita.aid.util.PersistentCookieStore;
+import com.njlabs.amrita.aid.util.okhttp.extras.PersistentCookieStore;
 import com.njlabs.amrita.aid.util.ark.logging.Ln;
 
 import org.json.JSONException;

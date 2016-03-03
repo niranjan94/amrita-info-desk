@@ -1,13 +1,24 @@
 package com.njlabs.amrita.aid;
 
+import android.content.Context;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.joanzapata.iconify.Iconify;
 import com.joanzapata.iconify.fonts.FontAwesomeModule;
+import com.njlabs.amrita.aid.util.ark.logging.Ln;
 import com.orm.SugarApp;
 import com.parse.Parse;
 import com.parse.ParseInstallation;
+
+import org.onepf.opfpush.OPFPush;
+import org.onepf.opfpush.configuration.Configuration;
+import org.onepf.opfpush.gcm.GCMProvider;
+import org.onepf.opfpush.listener.SimpleEventListener;
+import org.onepf.opfutils.OPFLog;
 
 import io.fabric.sdk.android.Fabric;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -31,6 +42,26 @@ public class MainApplication extends SugarApp {
                 .setDefaultFontPath("fonts/bariol_regular-webfont.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build());
+
+        OPFLog.setEnabled(BuildConfig.DEBUG, true);
+        final Configuration configuration = new Configuration.Builder()
+                .addProviders(new GCMProvider(this, getString(R.string.gcm_defaultSenderId)))
+                .setSelectSystemPreferred(true)
+                .setEventListener(new SimpleEventListener() {
+                    @Override
+                    public void onMessage(@NonNull Context context, @NonNull String providerName, Bundle extras) {
+                        Ln.d("GCM Message received");
+                    }
+
+                    @Override
+                    public void onRegistered(@NonNull Context context, @NonNull String providerName, @NonNull String registrationId) {
+                        Ln.d("GCM Message registered");
+                    }
+                })
+                .build();
+
+        OPFPush.init(this, configuration);
+        OPFPush.getHelper().register();
     }
 
     synchronized public Tracker getDefaultTracker() {

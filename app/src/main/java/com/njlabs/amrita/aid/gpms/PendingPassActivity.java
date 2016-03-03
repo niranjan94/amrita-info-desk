@@ -22,9 +22,9 @@ import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.gpms.models.PendingEntry;
 import com.njlabs.amrita.aid.gpms.responses.PendingResponse;
-import com.njlabs.amrita.aid.gpms.responses.SuccessResponse;
 import com.njlabs.amrita.aid.util.ExtendedSwipeRefreshLayout;
 import com.njlabs.amrita.aid.util.ark.logging.Ln;
+import com.njlabs.amrita.aid.util.okhttp.responses.SuccessResponse;
 
 import java.util.List;
 

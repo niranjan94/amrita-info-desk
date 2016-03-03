@@ -22,7 +22,6 @@ import android.widget.TextView;
 
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.R;
-import com.njlabs.amrita.aid.classes.NewsModel;
 import com.njlabs.amrita.aid.util.ExtendedSwipeRefreshLayout;
 import com.squareup.picasso.Picasso;
 
@@ -35,6 +34,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
+import jp.wasabeef.recyclerview.adapters.SlideInLeftAnimationAdapter;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -166,7 +167,7 @@ public class NewsActivity extends BaseActivity {
                             }
                         })).start();
 
-                        recyclerView.setAdapter(new NewsAdapter(newsArticles));
+                        recyclerView.setAdapter(new SlideInLeftAnimationAdapter(new AlphaInAnimationAdapter(new NewsAdapter(newsArticles))));
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 });

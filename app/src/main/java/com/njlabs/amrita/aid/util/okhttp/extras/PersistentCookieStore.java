@@ -1,4 +1,8 @@
-package com.njlabs.amrita.aid.util;
+/*
+ * Copyright (c) 2016. Niranjan Rajendran <niranjan94@yahoo.com>
+ */
+
+package com.njlabs.amrita.aid.util.okhttp.extras;
 
 import android.content.Context;
 import android.content.SharedPreferences;

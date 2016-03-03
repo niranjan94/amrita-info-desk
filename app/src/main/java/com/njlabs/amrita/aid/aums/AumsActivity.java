@@ -10,7 +10,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -31,20 +30,22 @@ import com.njlabs.amrita.aid.MainApplication;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.aums.client.Aums;
 import com.njlabs.amrita.aid.aums.client.AumsServer;
-import com.njlabs.amrita.aid.aums.responses.BitmapResponse;
 import com.njlabs.amrita.aid.aums.responses.LoginResponse;
 import com.njlabs.amrita.aid.aums.responses.SessionResponse;
-import com.njlabs.amrita.aid.aums.responses.TextResponse;
 import com.njlabs.amrita.aid.bugs.BugReport;
 import com.njlabs.amrita.aid.landing.Landing;
 import com.njlabs.amrita.aid.util.StringCallback;
 import com.njlabs.amrita.aid.util.ark.Security;
 import com.njlabs.amrita.aid.util.ark.logging.Ln;
+import com.njlabs.amrita.aid.util.okhttp.responses.FileResponse;
+import com.njlabs.amrita.aid.util.okhttp.responses.TextResponse;
+import com.squareup.picasso.Picasso;
 
 import org.angmarch.views.NiceSpinner;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -260,37 +261,22 @@ public class AumsActivity extends BaseActivity {
                 Ln.e(throwable);
             }
 
-            @Override
-            public void onSiteStructureChange() {
-                createSnackbar("Site's structure has changed. Reported to the developer.");
-                cgpaView.setText("error");
-                cgpaView.setTextColor(getResources().getColor(R.color.md_red_400));
-            }
         });
     }
 
     private void loadPhoto() {
-        aums.getPhotoFile(new BitmapResponse() {
+        aums.getPhotoFile(new FileResponse() {
             @Override
-            public void onSuccess(Bitmap image) {
+            public void onSuccess(File file) {
                 findViewById(R.id.student_profile_pic_progress).setVisibility(View.GONE);
                 ImageView myImage = (ImageView) findViewById(R.id.student_profile_pic);
                 myImage.setVisibility(View.VISIBLE);
-                myImage.setImageBitmap(image);
+                Picasso.with(baseContext).load(file).error(R.drawable.user).into(myImage);
             }
 
             @Override
             public void onFailure(Throwable throwable) {
                 Ln.e(throwable);
-                findViewById(R.id.student_profile_pic_progress).setVisibility(View.GONE);
-                ImageView myImage = (ImageView) findViewById(R.id.student_profile_pic);
-                myImage.setVisibility(View.VISIBLE);
-                myImage.setImageResource(R.drawable.user);
-            }
-
-            @Override
-            public void onSiteStructureChange() {
-                onFailure(new Throwable());
                 findViewById(R.id.student_profile_pic_progress).setVisibility(View.GONE);
                 ImageView myImage = (ImageView) findViewById(R.id.student_profile_pic);
                 myImage.setVisibility(View.VISIBLE);
@@ -336,6 +322,12 @@ public class AumsActivity extends BaseActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    public void openResources(View v) {
+        final Intent intent = new Intent(baseContext, AumsResourcesActivity.class);
+        intent.putExtra("server", aums.getServer());
+        startActivity(intent);
     }
 
     private void semesterPicker(final StringCallback stringCallback) {

@@ -20,7 +20,6 @@ import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
 import com.google.android.gms.gcm.TaskParams;
 import com.njlabs.amrita.aid.R;
-import com.njlabs.amrita.aid.classes.NewsModel;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

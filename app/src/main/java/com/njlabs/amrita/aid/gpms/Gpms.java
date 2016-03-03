@@ -14,15 +14,13 @@ import com.njlabs.amrita.aid.gpms.responses.HistoryResponse;
 import com.njlabs.amrita.aid.gpms.responses.InfoResponse;
 import com.njlabs.amrita.aid.gpms.responses.LoginResponse;
 import com.njlabs.amrita.aid.gpms.responses.PendingResponse;
-import com.njlabs.amrita.aid.gpms.responses.SuccessResponse;
-import com.njlabs.amrita.aid.gpms.responses.TextResponse;
-import com.njlabs.amrita.aid.util.PersistentCookieStore;
-import com.njlabs.amrita.aid.util.RequestParams;
 import com.njlabs.amrita.aid.util.ark.logging.Ln;
+import com.njlabs.amrita.aid.util.okhttp.extras.PersistentCookieStore;
+import com.njlabs.amrita.aid.util.okhttp.extras.RequestParams;
+import com.njlabs.amrita.aid.util.okhttp.responses.SuccessResponse;
+import com.njlabs.amrita.aid.util.okhttp.responses.TextResponse;
 
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -36,17 +34,22 @@ public class Gpms {
     public GpmsClient client;
     private String studentRollNo = null;
     private String studentName = null;
+    private String studentHostelCode = null;
     private Context context;
     private SharedPreferences cookiePrefFile;
     public static String dateFormat = "dd MMM yyyy HH:mm:ss";
+    public static String shortDateFormat = "dd MMM yyyy";
 
     public Gpms(Context context) {
         this.context = context;
         client = new GpmsClient(context);
+        client.powerUp();
+
         cookiePrefFile = context.getSharedPreferences(PersistentCookieStore.GPMS_COOKIE_PREFS, Context.MODE_PRIVATE);
 
         studentRollNo = cookiePrefFile.getString("gpms_roll_no", null);
         studentName = cookiePrefFile.getString("gpms_name", null);
+        studentHostelCode = cookiePrefFile.getString("gpms_hostel_code", null);
     }
 
     public String getStudentName() {
@@ -65,6 +68,15 @@ public class Gpms {
     public void setStudentName(String studentName) {
         cookiePrefFile.edit().putString("gpms_name", studentName).apply();
         this.studentName = studentName;
+    }
+
+    public String getStudentHostelCode() {
+        return studentHostelCode;
+    }
+
+    public void setStudentHostelCode(String studentHostelCode) {
+        cookiePrefFile.edit().putString("gpms_hostel_code", studentHostelCode).apply();
+        this.studentHostelCode = studentHostelCode;
     }
 
     @SuppressLint("CommitPrefEdits")
@@ -125,16 +137,18 @@ public class Gpms {
 
                             String regNo = infoTableBody.select("tr:nth-child(2) > td.textFont-2").first().text().trim();
                             String name = infoTableBody.select("tr:nth-child(3) > td.textFont-2").first().text().trim();
+                            String hostelCode = mainContent.select("input[name=sthostel]").first().val();
                             String hostel = infoTableBody.select("tr:nth-child(4) > td.textFont-2").first().text().trim();
                             String roomNo = infoTableBody.select("tr:nth-child(5) > td.textFont-2").first().text().trim();
                             String mobile = infoTableBody.select("tr:nth-child(6) > td.textFont-2").first().text().trim();
                             String email = infoTableBody.select("tr:nth-child(7) > td.textFont-2").first().text().trim();
                             String numPasses = infoTableBody.select("tr:nth-child(13) > td.textFont-2").first().text().trim();
                             String photoUrl = infoTableBody.select("tr:nth-child(2) > td:nth-child(3) > img").first().attr("src").trim();
-                            photoUrl = "https://anokha.amrita.edu" + photoUrl;
+                            photoUrl = client.getAbsoluteUrl("/" + photoUrl);
                             Ln.d(photoUrl);
                             setStudentRollNo(regNo);
                             setStudentName(name);
+                            setStudentHostelCode(hostelCode);
 
                             infoResponse.onSuccess(regNo, name, hostel, roomNo, mobile, email, photoUrl, numPasses);
                         } catch (Exception e) {
@@ -151,71 +165,138 @@ public class Gpms {
         });
     }
 
-    public void applyDayPass(String dateTime, String occasion, String reason, final SuccessResponse successResponse) {
+    public void applyDayPass(final DateTime fromDate, final String occasion, final String reason, final SuccessResponse successResponse) {
 
-        DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormat);
-        DateTime toDate = formatter.parseDateTime(dateTime).withHourOfDay(18).withMinuteOfHour(59);
+        final DateTime toDate = roundOffDate(fromDate).withHourOfDay(19).withMinuteOfHour(0);
 
         RequestParams params = new RequestParams();
-        params.put("regno", studentRollNo);
+        params.put("stregno", studentRollNo);
         params.put("stname", studentName);
-        params.put("applyingto", "Warden");
+        params.put("sthostel", studentHostelCode);
+        params.put("passtaken", "");
         params.put("passtype", "Day Pass");
+        params.put("fromdate", roundOffDate(fromDate).toString(shortDateFormat));
+        params.put("fhour", roundOffDate(fromDate).getHourOfDay());
+        params.put("fmin", roundOffDate(fromDate).getMinuteOfHour());
+        params.put("applyingto", "Warden");
         params.put("occassion", occasion);
         params.put("groundsforleave", reason);
-        params.put("fromdate", dateTime);
-        params.put("todate", toDate.toString(dateFormat));
-        params.put("noofdays", String.valueOf(1));
-        params.put("confirm", "confirm");
+        params.put("leavesubmit", "Submit Leave");
 
+        client.setReferer(client.getUnproxiedUrl("/applyleave.php"));
         client.post("/applyleave.php", params, new TextResponse() {
-            @Override
-            public void onFailure(Throwable throwable) {
-                successResponse.onFailure(throwable);
-            }
 
             @Override
             public void onSuccess(String responseString) {
-                successResponse.onSuccess();
+
+                RequestParams params = new RequestParams();
+                params.put("regno", studentRollNo);
+                params.put("stname", studentName);
+                params.put("applyingto", "Warden");
+                params.put("passtype", "Day Pass");
+                params.put("occassion", occasion);
+                params.put("groundsforleave", reason);
+                params.put("fromdate", roundOffDate(fromDate).toString(dateFormat));
+                params.put("todate", toDate.toString(dateFormat));
+                params.put("noofdays", 1);
+                params.put("confirm", "confirm");
+
+                client.post("/applyleave.php", params, new TextResponse() {
+                    @Override
+                    public void onFailure(Throwable throwable) {
+                        client.removeReferer();
+                        successResponse.onFailure(throwable);
+                    }
+
+                    @Override
+                    public void onSuccess(String responseString) {
+                        client.removeReferer();
+                        successResponse.onSuccess();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                client.removeReferer();
+                successResponse.onFailure(throwable);
             }
         });
+
+
     }
 
-    public void applyHomePass(String fromDateTime, String toDateTime, long days, String occasion, String reason, final SuccessResponse successResponse) {
+    public void applyHomePass(final DateTime fromDate, final DateTime toDate, final long days, final String occasion, final String reason, final SuccessResponse successResponse) {
+
         RequestParams params = new RequestParams();
-        params.put("regno", studentRollNo);
+        params.put("stregno", studentRollNo);
         params.put("stname", studentName);
-        params.put("applyingto", "Warden");
+        params.put("sthostel", studentHostelCode);
+        params.put("passtaken", "");
         params.put("passtype", "Home Pass");
+        params.put("fromdate", roundOffDate(fromDate).toString(shortDateFormat));
+        params.put("fhour", roundOffDate(fromDate).getHourOfDay());
+        params.put("fmin", roundOffDate(fromDate).getMinuteOfHour());
+        params.put("todate", roundOffDate(toDate).toString(shortDateFormat));
+        params.put("thour", roundOffDate(toDate).getHourOfDay());
+        params.put("tmin", roundOffDate(toDate).getMinuteOfHour());
+        params.put("applyingto", "Warden");
         params.put("occassion", occasion);
         params.put("groundsforleave", reason);
-        params.put("fromdate", fromDateTime);
-        params.put("todate", toDateTime);
-        params.put("noofdays", String.valueOf(days));
-        params.put("confirm", "confirm");
+        params.put("leavesubmit", "Submit Leave");
 
+        client.setReferer(client.getUnproxiedUrl("/applyleave.php"));
         client.post("/applyleave.php", params, new TextResponse() {
             @Override
-            public void onFailure(Throwable throwable) {
-                successResponse.onFailure(throwable);
+            public void onSuccess(String responseString) {
+
+                RequestParams params = new RequestParams();
+                params.put("regno", studentRollNo);
+                params.put("stname", studentName);
+                params.put("applyingto", "Warden");
+                params.put("passtype", "Home Pass");
+                params.put("occassion", occasion);
+                params.put("groundsforleave", reason);
+                params.put("fromdate", roundOffDate(fromDate).toString(dateFormat));
+                params.put("todate", roundOffDate(toDate).toString(dateFormat));
+                params.put("noofdays", days);
+                params.put("confirm", "confirm");
+
+                client.post("/applyleave.php", params, new TextResponse() {
+                    @Override
+                    public void onFailure(Throwable throwable) {
+                        client.removeReferer();
+                        successResponse.onFailure(throwable);
+                    }
+
+                    @Override
+                    public void onSuccess(String responseString) {
+                        client.removeReferer();
+                        successResponse.onSuccess();
+                    }
+                });
             }
 
             @Override
-            public void onSuccess(String responseString) {
-                successResponse.onSuccess();
+            public void onFailure(Throwable throwable) {
+                client.removeReferer();
+                successResponse.onFailure(throwable);
             }
         });
     }
 
     public void getPendingPasses(final PendingResponse pendingResponse) {
+        client.setReferer(client.getUnproxiedUrl("/home.php"));
         client.get("/leavestatus.php", null, new TextResponse() {
             @Override
             public void onFailure(Throwable throwable) {
+                client.removeReferer();
                 pendingResponse.onFailure(throwable);
             }
 
             @Override
             public void onSuccess(String responseString) {
+                client.removeReferer();
                 Document doc = Jsoup.parse(responseString);
                 Element tBody = doc.select("body > div:nth-child(9) > table > tbody").first();
                 Elements rows = tBody.select("tr");
@@ -266,15 +347,17 @@ public class Gpms {
     }
 
     public void getPassesHistory(final HistoryResponse historyResponse) {
+        client.setReferer(client.getUnproxiedUrl("/home.php"));
         client.get("/leavehistory.php", null, new TextResponse() {
             @Override
             public void onFailure(Throwable throwable) {
+                client.removeReferer();
                 historyResponse.onFailure(throwable);
             }
 
             @Override
             public void onSuccess(String responseString) {
-
+                client.removeReferer();
                 Document doc = Jsoup.parse(responseString);
                 Element tBody = doc.select("#FilterForm > label > table > tbody").first();
                 Elements rows = tBody.select("tr");
@@ -305,5 +388,24 @@ public class Gpms {
                 }
             }
         });
+    }
+
+    private DateTime roundOffDate(DateTime target) {
+        int minutes = target.getMinuteOfHour();
+        if(minutes > 0 && minutes < 15) {
+            return target.withMinuteOfHour(15);
+        } else if(minutes > 15 && minutes < 30) {
+            return target.withMinuteOfHour(30);
+        } else if(minutes > 30 && minutes < 45) {
+            return target.withMinuteOfHour(45);
+        } else if(minutes > 45 && minutes <= 59) {
+            if(target.getHourOfDay() == 23) {
+                return target.plusDays(1).withHourOfDay(0).withMinuteOfHour(0);
+            } else {
+                return target.plusHours(1).withMinuteOfHour(0);
+            }
+        } else {
+            return target;
+        }
     }
 }

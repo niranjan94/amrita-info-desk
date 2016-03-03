@@ -4,7 +4,8 @@
 
 package com.njlabs.amrita.aid.aums.responses;
 
-public abstract class BaseResponse {
-    public abstract void onFailure(Throwable throwable);
+import com.njlabs.amrita.aid.util.okhttp.responses.BaseResponse;
+
+public abstract class AumsBaseResponse extends BaseResponse {
     public abstract void onSiteStructureChange();
 }

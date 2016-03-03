@@ -1,19 +1,29 @@
 /*
- * Copyright (c) 2014. Niranjan Rajendran <niranjan94@yahoo.com>
+ * Copyright (c) 2016. Niranjan Rajendran <niranjan94@yahoo.com>
  */
 
-package com.njlabs.amrita.aid.classes;
+package com.njlabs.amrita.aid.aums.models;
 
 /**
  * Created by Niranjan on 22-10-2014.
  */
 public class CourseData {
+
+    String id;
     String courseCode;
     String courseName;
     String type;
-    float credits;
+    double credits;
 
     public CourseData() {
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getCourseCode() {
@@ -40,11 +50,11 @@ public class CourseData {
         this.type = type;
     }
 
-    public float getCredits() {
+    public double getCredits() {
         return credits;
     }
 
-    public void setCredits(float credits) {
+    public void setCredits(double credits) {
         this.credits = credits;
     }
 }

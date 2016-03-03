@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2015. Niranjan Rajendran <niranjan94@yahoo.com>
+ * Copyright (c) 2016. Niranjan Rajendran <niranjan94@yahoo.com>
  */
 
-package com.njlabs.amrita.aid.classes;
+package com.njlabs.amrita.aid.aums.models;
 
 public class CourseMarkData {
 

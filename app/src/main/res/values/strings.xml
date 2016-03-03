@@ -33,5 +33,6 @@
     <string name="title_activity_gpms">Gate Pass Management System</string>
     <string name="title_activity_gpms_pending_pass">Pass Status</string>
     <string name="title_activity_gpms_pass_history">Passes History</string>
+    <string name="title_activity_aums_resources">Course Resources</string>
 
 </resources>

@@ -200,7 +200,6 @@
                 android:onClick="openMarks"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
-                android:layout_marginBottom="16dp"
                 android:layout_width="fill_parent"
                 android:layout_height="100dp"
                 card_view:cardCornerRadius="4dp">
@@ -234,6 +233,56 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Check your periodicals and continuous assessment marks"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:layout_gravity="center"
+                android:layout_marginTop="12dp"
+                android:background="?android:selectableItemBackground"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:onClick="openResources"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="16dp"
+                android:layout_width="fill_parent"
+                android:layout_height="100dp"
+                card_view:cardCornerRadius="4dp">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:padding="5dp"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/cloud"
+                        android:layout_gravity="center_vertical"/>
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="5dp"
+                        android:layout_gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Course Resources"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="View and download resource material uploaded by your faculty"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
 
                     </LinearLayout>

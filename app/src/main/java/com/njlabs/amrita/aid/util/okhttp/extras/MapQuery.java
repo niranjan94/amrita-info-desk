@@ -2,7 +2,7 @@
  * Copyright (c) 2016. Niranjan Rajendran <niranjan94@yahoo.com>
  */
 
-package com.njlabs.amrita.aid.util;
+package com.njlabs.amrita.aid.util.okhttp.extras;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

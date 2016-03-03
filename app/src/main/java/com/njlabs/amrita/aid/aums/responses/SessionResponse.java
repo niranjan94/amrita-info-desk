@@ -4,6 +4,6 @@
 
 package com.njlabs.amrita.aid.aums.responses;
 
-public abstract class SessionResponse extends BaseResponse {
+public abstract class SessionResponse extends AumsBaseResponse {
     public abstract void onSuccess(String formAction, String lt);
 }

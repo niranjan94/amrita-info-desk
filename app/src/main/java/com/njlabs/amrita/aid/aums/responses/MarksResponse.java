@@ -4,11 +4,11 @@
 
 package com.njlabs.amrita.aid.aums.responses;
 
-import com.njlabs.amrita.aid.classes.CourseMarkData;
+import com.njlabs.amrita.aid.aums.models.CourseMarkData;
 
 import java.util.List;
 
-public abstract class MarksResponse extends BaseResponse {
+public abstract class MarksResponse extends AumsBaseResponse {
     public abstract void onSuccess(List<CourseMarkData> markDataList);
     public abstract void onDataUnavailable();
 }

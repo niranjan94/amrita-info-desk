@@ -4,6 +4,8 @@
 
 package com.njlabs.amrita.aid.gpms.responses;
 
+import com.njlabs.amrita.aid.util.okhttp.responses.SuccessResponse;
+
 public abstract class LoginResponse extends SuccessResponse {
     public abstract void onFailedAuthentication();
 }

@@ -4,71 +4,98 @@
 
 package com.njlabs.amrita.aid.aums;
 
-import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.TypedValue;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.aums.client.Aums;
+import com.njlabs.amrita.aid.aums.models.CourseGradeData;
 import com.njlabs.amrita.aid.aums.responses.GradesResponse;
-import com.njlabs.amrita.aid.classes.CourseGradeData;
+import com.njlabs.amrita.aid.util.ExtendedSwipeRefreshLayout;
 
 import java.util.List;
 
+import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
+import jp.wasabeef.recyclerview.adapters.SlideInBottomAnimationAdapter;
+
 public class GradesActivity extends BaseActivity {
 
-    ListView list;
-    ProgressDialog dialog;
+    private ExtendedSwipeRefreshLayout swipeRefreshLayout;
+    private RecyclerView recyclerView;
+    private Aums aums;
+    private String semester;
+
     @Override
     public void init(Bundle savedInstanceState) {
-        setupLayout(R.layout.activity_aums_data, Color.parseColor("#e91e63"));
+        setupLayout(R.layout.activity_aums_list, Color.parseColor("#e91e63"));
         String server = getIntent().getStringExtra("server");
-        String semester = getIntent().getStringExtra("semester");
+        semester = getIntent().getStringExtra("semester");
 
-        list = (ListView) findViewById(R.id.list);
+        swipeRefreshLayout = (ExtendedSwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        recyclerView = (RecyclerView) findViewById(R.id.list);
 
-        Aums aums = new Aums(baseContext);
+        swipeRefreshLayout.setColorSchemeColors(Color.parseColor("#e91e63"));
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getGrades();
+            }
+        });
 
-        dialog = new ProgressDialog(this);
-        dialog.setIndeterminate(true);
-        dialog.setCancelable(false);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.setMessage("Loading your grades");
-        dialog.show();
+        final LinearLayoutManager layoutParams = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutParams);
+        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
 
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+            }
+        });
+
+        swipeRefreshLayout.setRefreshing(true);
+        aums = new Aums(baseContext);
         aums.setServer(server);
+        getGrades();
+    }
+
+    private void getGrades() {
         aums.getGrades(semester, new GradesResponse() {
             @Override
             public void onSuccess(String sgpa, List<CourseGradeData> gradeDataList) {
+                swipeRefreshLayout.setRefreshing(false);
                 setupList(sgpa, gradeDataList);
             }
 
             @Override
             public void onDataUnavailable() {
-                dialog.dismiss();
+                swipeRefreshLayout.setRefreshing(false);
                 Toast.makeText(baseContext, "Grades data unavailable for the selected semester", Toast.LENGTH_LONG).show();
                 finish();
             }
 
             @Override
             public void onFailure(Throwable throwable) {
-                dialog.dismiss();
+                swipeRefreshLayout.setRefreshing(false);
                 Toast.makeText(baseContext, "An error occurred while connecting to the server", Toast.LENGTH_LONG).show();
                 finish();
             }
 
             @Override
             public void onSiteStructureChange() {
-                dialog.dismiss();
+                swipeRefreshLayout.setRefreshing(false);
                 Toast.makeText(baseContext, "Site's structure has changed. Reported to the developer", Toast.LENGTH_LONG).show();
                 finish();
             }
@@ -77,68 +104,115 @@ public class GradesActivity extends BaseActivity {
 
     public void setupList(String sgpa, List<CourseGradeData> gradesData) {
 
-        list = (ListView) findViewById(R.id.list);
-        list.setBackgroundColor(getResources().getColor(R.color.white));
+        if(sgpa == null || sgpa.trim().equals("null")){
+            Toast.makeText(baseContext,"Results for the semester have not been published yet.", Toast.LENGTH_LONG).show();
+            finish();
+        }
 
-        ArrayAdapter<CourseGradeData> dataAdapter = new ArrayAdapter<CourseGradeData>(getBaseContext(), R.layout.item_aums_attendance, gradesData) {
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                if (convertView == null) {
-                    convertView = getLayoutInflater().inflate(R.layout.item_aums_attendance, null);
-                }
-                CourseGradeData data = getItem(position);
-                ((TextView)convertView.findViewById(R.id.course_title)).setText(data.courseTitle);
+        CourseGradeData cgpaData =  new CourseGradeData();
+        cgpaData.setGrade(sgpa);
+        cgpaData.setCourseCode("sgpa");
+        cgpaData.setCourseTitle(null);
 
-                String grade = data.grade.trim();
+        gradesData.add(0, cgpaData);
 
+        GradesAdapter adapter = new GradesAdapter(gradesData);
+        recyclerView.setAdapter(new SlideInBottomAnimationAdapter(new AlphaInAnimationAdapter(adapter)));
+    }
+
+    public class GradesAdapter extends RecyclerView.Adapter<GradesAdapter.ViewHolder> {
+
+        private List<CourseGradeData> courseGradeDataList;
+        private int HEADER = 1;
+        private int ITEM = 2;
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+
+            public TextView courseTitle;
+            public TextView attendanceStatus;
+            public TextView percentage;
+            public View indicator;
+            public View root;
+
+            public ViewHolder(View v) {
+                super(v);
+                courseTitle = ((TextView) v.findViewById(R.id.course_title));
+                attendanceStatus = ((TextView) v.findViewById(R.id.attendance_status));
+                percentage = ((TextView) v.findViewById(R.id.percentage));
+                indicator = v.findViewById(R.id.indicator);
+                root = v;
+            }
+
+        }
+
+        public GradesAdapter(List<CourseGradeData> courseGradeDataList) {
+            this.courseGradeDataList = courseGradeDataList;
+        }
+
+        @Override
+        public GradesAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View v;
+            if(viewType == HEADER) {
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_aums_grades_sgpa, parent, false);
+            } else {
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_aums_attendance, parent, false);
+            }
+            return new ViewHolder(v);
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            if(position == 0) {
+                return HEADER;
+            }
+            return ITEM;
+        }
+
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+
+            CourseGradeData courseGradeData = courseGradeDataList.get(position);
+
+            if(courseGradeData.courseCode.equals("sgpa") || courseGradeData.courseTitle == null) {
+
+                ((TextView) holder.root).setText("This semester's GPA : " + courseGradeData.grade);
+
+            } else {
+
+                holder.courseTitle.setText(courseGradeData.courseTitle);
+                String grade = courseGradeData.grade.trim();
                 if(grade.toLowerCase().contains("supply")) {
                     grade = grade.replace("(Supply)","");
-                    ((TextView)convertView.findViewById(R.id.attendance_status)).setText(data.courseCode+" - " + data.type + " - Supply");
+                    holder.attendanceStatus.setText(courseGradeData.courseCode+" - " + courseGradeData.type + " - Supply");
                 } else {
-                    ((TextView)convertView.findViewById(R.id.attendance_status)).setText(data.courseCode+" - " + data.type);
+                    holder.attendanceStatus.setText(courseGradeData.courseCode+" - " + courseGradeData.type);
                 }
-
                 switch (grade) {
                     case "A+":
                     case "A":
                     case "B+":
                     case "B":
                     case "C+":
-                        convertView.findViewById(R.id.indicator).setBackgroundResource(R.drawable.circle_green);
+                        holder.indicator.setBackgroundResource(R.drawable.circle_green);
                         break;
                     case "C":
                     case "D+":
                     case "D":
-                        convertView.findViewById(R.id.indicator).setBackgroundResource(R.drawable.circle_yellow);
+                        holder.indicator.setBackgroundResource(R.drawable.circle_yellow);
                         break;
                     default:
-                        convertView.findViewById(R.id.indicator).setBackgroundResource(R.drawable.circle_red);
+                        holder.indicator.setBackgroundResource(R.drawable.circle_red);
                         break;
                 }
-                ((TextView)convertView.findViewById(R.id.percentage)).setText(grade);
-                return convertView;
-            }
-        };
+                holder.percentage.setText(grade);
 
-        TextView header = new TextView(this);
-        header.setPadding(10,10,10,10);
-        header.setTextSize(TypedValue.COMPLEX_UNIT_SP, 26);
-        header.setText("This semester's GPA : " + sgpa);
-        if(sgpa == null || sgpa.trim().equals("null") || header.getText().toString().trim().equals("This semester's GPA : null")){
-            Toast.makeText(baseContext,"Results for the semester have not been published yet.", Toast.LENGTH_LONG).show();
-            finish();
+            }
         }
 
-        list.setHeaderDividersEnabled(true);
-        list.addHeaderView(header);
-        list.setAdapter(dataAdapter);
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-            }
-        });
-
-        list.setVisibility(View.VISIBLE);
-        dialog.dismiss();
+        @Override
+        public int getItemCount() {
+            return courseGradeDataList.size();
+        }
     }
 }

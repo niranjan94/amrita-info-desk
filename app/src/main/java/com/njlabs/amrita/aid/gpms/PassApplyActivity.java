@@ -19,8 +19,8 @@ import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFra
 import com.google.android.gms.analytics.HitBuilders;
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.R;
-import com.njlabs.amrita.aid.gpms.responses.SuccessResponse;
 import com.njlabs.amrita.aid.util.ark.logging.Ln;
+import com.njlabs.amrita.aid.util.okhttp.responses.SuccessResponse;
 
 import org.angmarch.views.NiceSpinner;
 import org.joda.time.DateTime;
@@ -80,7 +80,7 @@ public class PassApplyActivity extends BaseActivity {
     }
 
     public void pickToDate(View v) {
-        loadDateTimePicker(fromDate, v, "toDate");
+        loadDateTimePicker(fromDate.plusHours(1), v, "toDate");
     }
 
     public void applyPass(View v) {
@@ -91,9 +91,11 @@ public class PassApplyActivity extends BaseActivity {
                 reasonEditText.setError("A minimum of two words is required for the reason");
             } else if(fromDate.getHourOfDay()>=19) {
                 Snackbar.make(parentView, "You cannot apply for a day pass after 7pm. Change the time.", Snackbar.LENGTH_LONG).show();
+            } else if(fromDate.getMillis() < DateTime.now().getMillis() + 30000) {
+                Snackbar.make(parentView, "Please change to a later time.", Snackbar.LENGTH_LONG).show();
             } else {
                 dialog.show();
-                gpms.applyDayPass(fromDate.toString(Gpms.dateFormat), spinner.getText().toString(), reasonEditText.getText().toString(), new SuccessResponse() {
+                gpms.applyDayPass(fromDate, spinner.getText().toString(), reasonEditText.getText().toString(), new SuccessResponse() {
                     @Override
                     public void onSuccess() {
                         dialog.dismiss();
@@ -120,11 +122,13 @@ public class PassApplyActivity extends BaseActivity {
                 Snackbar.make(parentView, "Select the dates", Snackbar.LENGTH_LONG).show();
             } else if(reasonEditText.getText().toString().split("\\s+").length < 2) {
                 reasonEditText.setError("A minimum of two words is required for the reason");
+            } else if(fromDate.getMillis() < DateTime.now().getMillis() + 30000) {
+                Snackbar.make(parentView, "Please change the from date-time to a later time.", Snackbar.LENGTH_LONG).show();
             } else {
                 double days = (toDate.getMillis() - fromDate.getMillis())/(1000*60*60*24);
                 long roundedDays = Math.round(Math.ceil(days));
                 dialog.show();
-                gpms.applyHomePass(fromDate.toString(Gpms.dateFormat), toDate.toString(Gpms.dateFormat), roundedDays, spinner.getText().toString(), reasonEditText.getText().toString(), new SuccessResponse() {
+                gpms.applyHomePass(fromDate, toDate, roundedDays, spinner.getText().toString(), reasonEditText.getText().toString(), new SuccessResponse() {
                     @Override
                     public void onSuccess() {
                         dialog.dismiss();
@@ -195,4 +199,10 @@ public class PassApplyActivity extends BaseActivity {
         cdp.show(getSupportFragmentManager(), "FRAG_TAG_DATE_PICKER");
 
     }
+
+    /*private DateTime roundOffDate(DateTime target) {
+        if(target.getMinuteOfHour() > 0 && target.getMinuteOfHour() < 15) {
+
+        }
+    }*/
 }

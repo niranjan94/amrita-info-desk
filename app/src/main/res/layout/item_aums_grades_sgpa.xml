@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2016. Niranjan Rajendran <niranjan94@yahoo.com>
+  -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:padding="14dp"
+          android:textSize="20sp"
+          fontPath="fonts/bariol_bold-webfont.ttf"
+          android:text="This semester's GPA :" />
