@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -140,7 +141,7 @@
         </activity>
 
         <activity
-            android:name=".gpms.GpmsActivity"
+            android:name=".gpms.ui.GpmsActivity"
             android:label="@string/title_activity_gpms"
             android:parentActivityName=".landing.Landing" >
             <meta-data
@@ -149,31 +150,31 @@
         </activity>
 
         <activity
-            android:name=".gpms.PassApplyActivity"
+            android:name=".gpms.ui.PassApplyActivity"
             android:label="@string/title_activity_gpms"
-            android:parentActivityName=".gpms.GpmsActivity" >
+            android:parentActivityName=".gpms.ui.GpmsActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".gpms.GpmsActivity" />
+                android:value=".gpms.ui.GpmsActivity" />
         </activity>
 
 
         <activity
-            android:name=".gpms.PendingPassActivity"
+            android:name=".gpms.ui.PendingPassActivity"
             android:label="@string/title_activity_gpms_pending_pass"
-            android:parentActivityName=".gpms.GpmsActivity" >
+            android:parentActivityName=".gpms.ui.GpmsActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".gpms.GpmsActivity" />
+                android:value=".gpms.ui.GpmsActivity" />
         </activity>
 
         <activity
-            android:name=".gpms.PassHistoryActivity"
+            android:name=".gpms.ui.PassHistoryActivity"
             android:label="@string/title_activity_gpms_pass_history"
-            android:parentActivityName=".gpms.GpmsActivity" >
+            android:parentActivityName=".gpms.ui.GpmsActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".gpms.GpmsActivity" />
+                android:value=".gpms.ui.GpmsActivity" />
         </activity>
 
 
@@ -204,46 +205,30 @@
             </intent-filter>
         </service>
 
+        <service
+            android:name=".gpms.proxy.ProxyServiceStarterService"
+            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
+            </intent-filter>
+        </service>
+
+
         <meta-data
             android:name="com.crashlytics.ApiKey"
             android:value="37243dbea20e385bdebdc999bef0715ef594e382" />
 
-        <service android:name="com.parse.PushService" />
+        <service android:name=".gpms.proxy.ProxyRequestReceivedService" />
 
-        <receiver android:name="com.parse.ParseBroadcastReceiver" >
+        <receiver android:name=".gpms.proxy.ProxyServiceBroadcastReceiver" >
             <intent-filter>
+                <action android:name="com.njlabs.amrita.aid.boot" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.USER_PRESENT" />
-            </intent-filter>
-        </receiver>
-        <receiver
-            android:name="com.parse.ParsePushBroadcastReceiver"
-            android:exported="false" >
-            <intent-filter>
-                <action android:name="com.parse.push.intent.RECEIVE" />
-                <action android:name="com.parse.push.intent.DELETE" />
-                <action android:name="com.parse.push.intent.OPEN" />
-            </intent-filter>
-        </receiver>
-        <receiver
-            android:name="com.parse.GcmBroadcastReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND" >
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-
-                <category android:name="com.njlabs.amrita.aid" />
-            </intent-filter>
-        </receiver>
-
-        <receiver
-            android:name="com.google.android.gms.gcm.GcmReceiver"
-            android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND">
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
-                <category android:name="com.njlabs.amrita.aid"/>
+                <action android:name="android.intent.action.SCREEN_ON" />
+                <action android:name="android.intent.action.SCREEN_OFF" />
+                <action android:name="android.net.wifi.STATE_CHANGE" />
             </intent-filter>
         </receiver>
 

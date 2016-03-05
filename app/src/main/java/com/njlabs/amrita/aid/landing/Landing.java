@@ -1,12 +1,17 @@
 package com.njlabs.amrita.aid.landing;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,15 +40,18 @@ import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.about.Amrita;
 import com.njlabs.amrita.aid.about.App;
 import com.njlabs.amrita.aid.aums.AumsActivity;
-import com.njlabs.amrita.aid.gpms.GpmsActivity;
+import com.njlabs.amrita.aid.gpms.proxy.ProxyRequestReceivedService;
+import com.njlabs.amrita.aid.gpms.proxy.ProxyServiceBroadcastReceiver;
+import com.njlabs.amrita.aid.gpms.proxy.ProxyServiceStarterService;
+import com.njlabs.amrita.aid.gpms.ui.GpmsActivity;
 import com.njlabs.amrita.aid.info.Calender;
 import com.njlabs.amrita.aid.info.Curriculum;
 import com.njlabs.amrita.aid.info.TrainBusInfo;
 import com.njlabs.amrita.aid.news.NewsActivity;
 import com.njlabs.amrita.aid.news.NewsUpdateService;
 import com.njlabs.amrita.aid.settings.SettingsActivity;
-import com.njlabs.amrita.aid.util.okhttp.extras.PersistentCookieStore;
 import com.njlabs.amrita.aid.util.ark.logging.Ln;
+import com.njlabs.amrita.aid.util.okhttp.extras.PersistentCookieStore;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -56,10 +64,15 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.OnNeverAskAgain;
+import permissions.dispatcher.OnPermissionDenied;
+import permissions.dispatcher.RuntimePermissions;
 
-
+@RuntimePermissions
 public class Landing extends BaseActivity {
 
+    @SuppressLint("ShortAlarm")
     @Override
     public void init(Bundle savedInstanceState) {
         setupLayout(R.layout.activity_landing, "Amrita Info Desk");
@@ -125,7 +138,6 @@ public class Landing extends BaseActivity {
 
         GcmNetworkManager.getInstance(this).schedule(periodic);
 
-
         File aumsCookieFile = new File(getApplicationContext().getFilesDir().getParent()+"/shared_prefs/" + PersistentCookieStore.AUMS_COOKIE_PREFS+ ".xml" );
         if(aumsCookieFile.exists()) {
             aumsCookieFile.delete();
@@ -136,6 +148,48 @@ public class Landing extends BaseActivity {
             gpmsCookieFile.delete();
         }
 
+        LandingPermissionsDispatcher.checkPhoneStateWithCheck(this);
+    }
+
+
+    @SuppressLint("ShortAlarm")
+    @NeedsPermission(Manifest.permission.READ_PHONE_STATE)
+    void checkPhoneState() {
+        long periodSecs = 5L;
+        long flexSecs = 1L;
+        String tag = "periodic  | ProxyServiceStarterService: " + periodSecs + "s, f:" + flexSecs;
+        PeriodicTask periodic = new PeriodicTask.Builder()
+                .setService(ProxyServiceStarterService.class)
+                .setPeriod(periodSecs)
+                .setFlex(flexSecs)
+                .setTag(tag)
+                .setPersisted(true)
+                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
+                .setRequiresCharging(false)
+                .build();
+
+        GcmNetworkManager.getInstance(this).schedule(periodic);
+
+        Intent i = new Intent(baseContext, ProxyServiceBroadcastReceiver.class);
+        PendingIntent sender = PendingIntent.getBroadcast(baseContext, 1, i, 0);
+        long firstTime = SystemClock.elapsedRealtime();
+        firstTime += 3 * 1000;
+        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 5000, sender);
+
+        startService(new Intent(this, ProxyRequestReceivedService.class));
+    }
+
+    @OnPermissionDenied(Manifest.permission.READ_PHONE_STATE)
+    void showDeniedForCamera() {
+        Toast.makeText(this, "Phone permission is required for Amrita Info Desk to function", Toast.LENGTH_LONG).show();
+        finish();
+    }
+
+    @OnNeverAskAgain(Manifest.permission.READ_PHONE_STATE)
+    void showNeverAskAgainForCamera() {
+        Toast.makeText(this, "Phone permission is required for Amrita Info Desk to function", Toast.LENGTH_LONG).show();
+        finish();
     }
 
     private void setupGrid() {
@@ -300,4 +354,9 @@ public class Landing extends BaseActivity {
         });
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        LandingPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
 }

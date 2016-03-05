@@ -86,12 +86,7 @@ dependencies {
     compile "com.squareup.okhttp3:okhttp-urlconnection:3.2.0"
     compile 'com.github.arcadefire:nice-spinner:d65f4fe052'
     compile 'jp.wasabeef:recyclerview-animators:2.2.1'
-
-    compile 'org.onepf:opfpush:0.3.1@aar'
-    compile 'org.onepf:opfutils:0.1.25'
-    compile 'org.onepf:opfpush-gcm:0.3.1@aar'
-
-
+    compile 'com.neovisionaries:nv-websocket-client:1.22'
 }
 
 apply plugin: 'com.google.gms.google-services'
