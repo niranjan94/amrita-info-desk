@@ -2,7 +2,7 @@
  * Copyright (c) 2016. Niranjan Rajendran <niranjan94@yahoo.com>
  */
 
-package com.njlabs.amrita.aid.gpms;
+package com.njlabs.amrita.aid.gpms.ui;
 
 import android.app.ProgressDialog;
 import android.graphics.Color;
@@ -19,6 +19,7 @@ import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFra
 import com.google.android.gms.analytics.HitBuilders;
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.R;
+import com.njlabs.amrita.aid.gpms.client.Gpms;
 import com.njlabs.amrita.aid.util.ark.logging.Ln;
 import com.njlabs.amrita.aid.util.okhttp.responses.SuccessResponse;
 

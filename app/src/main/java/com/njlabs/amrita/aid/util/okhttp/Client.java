@@ -57,8 +57,6 @@ abstract public class Client {
     private ProgressResponseBody.ProgressListener progressListener = null;
 
     public Client(Context context) {
-
-
         this.context = context;
     }
 
@@ -130,7 +128,7 @@ abstract public class Client {
         client.newCall(request.build()).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, final IOException e) {
-                ((Activity) context).runOnUiThread(new Runnable() {
+                runOnCorrectThread(new Runnable() {
                     @Override
                     public void run() {
                         responseHandler.onFailure(e);
@@ -142,7 +140,7 @@ abstract public class Client {
             @Override
             public void onResponse(Call call, final Response response) throws IOException {
                 final String responseString = response.body().string();
-                ((Activity) context).runOnUiThread(new Runnable() {
+                runOnCorrectThread(new Runnable() {
                     @Override
                     public void run() {
                         if(response.isSuccessful()) {
@@ -176,7 +174,7 @@ abstract public class Client {
         client.newCall(request.build()).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, final IOException e) {
-                ((Activity) context).runOnUiThread(new Runnable() {
+                runOnCorrectThread(new Runnable() {
                     @Override
                     public void run() {
                         responseHandler.onFailure(e);
@@ -191,7 +189,7 @@ abstract public class Client {
                 if(response.isSuccessful()) {
                     responseHandler.onSuccess(response);
                 } else {
-                    ((Activity) context).runOnUiThread(new Runnable() {
+                    runOnCorrectThread(new Runnable() {
                         @Override
                         public void run() {
                             responseHandler.onFailure(new IOException(call.request().toString()));
@@ -225,7 +223,7 @@ abstract public class Client {
 
             @Override
             public void onFailure(Call call, final IOException e) {
-                ((Activity) context).runOnUiThread(new Runnable() {
+                runOnCorrectThread(new Runnable() {
                     @Override
                     public void run() {
                         responseHandler.onFailure(e);
@@ -262,7 +260,7 @@ abstract public class Client {
                 final File finalCacheFile = cacheFile;
                 final Response finalResponse = response;
 
-                ((Activity) context).runOnUiThread(new Runnable() {
+                runOnCorrectThread(new Runnable() {
                     @Override
                     public void run() {
                         if(finalResponse.isSuccessful()) {
@@ -310,7 +308,7 @@ abstract public class Client {
         client.newCall(request.build()).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, final IOException e) {
-                ((Activity) context).runOnUiThread(new Runnable() {
+                runOnCorrectThread(new Runnable() {
                     @Override
                     public void run() {
                         responseHandler.onFailure(e);
@@ -322,7 +320,7 @@ abstract public class Client {
             @Override
             public void onResponse(Call call, final Response response) throws IOException {
                 final String responseString = response.body().string();
-                ((Activity) context).runOnUiThread(new Runnable() {
+                runOnCorrectThread(new Runnable() {
                     @Override
                     public void run() {
                         if(response.isSuccessful()) {
@@ -352,6 +350,14 @@ abstract public class Client {
 
     public void closeClient() {
         resetClient();
+    }
+
+    public void runOnCorrectThread(Runnable runnable) {
+        if(context instanceof Activity) {
+            ((Activity) context).runOnUiThread(runnable);
+        } else {
+            runnable.run();
+        }
     }
 
     Interceptor interceptor = new Interceptor() {

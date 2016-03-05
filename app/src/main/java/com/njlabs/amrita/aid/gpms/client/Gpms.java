@@ -2,7 +2,7 @@
  * Copyright (c) 2016. Niranjan Rajendran <niranjan94@yahoo.com>
  */
 
-package com.njlabs.amrita.aid.gpms;
+package com.njlabs.amrita.aid.gpms.client;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -26,6 +26,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +47,18 @@ public class Gpms {
         client.powerUp();
 
         cookiePrefFile = context.getSharedPreferences(PersistentCookieStore.GPMS_COOKIE_PREFS, Context.MODE_PRIVATE);
+
+        studentRollNo = cookiePrefFile.getString("gpms_roll_no", null);
+        studentName = cookiePrefFile.getString("gpms_name", null);
+        studentHostelCode = cookiePrefFile.getString("gpms_hostel_code", null);
+    }
+
+    public Gpms(Context context, String cookiePrefFilename) {
+        this.context = context;
+        client = new GpmsClient(context, cookiePrefFilename);
+        client.powerUp();
+
+        cookiePrefFile = context.getSharedPreferences(cookiePrefFilename, Context.MODE_PRIVATE);
 
         studentRollNo = cookiePrefFile.getString("gpms_roll_no", null);
         studentName = cookiePrefFile.getString("gpms_name", null);
@@ -83,6 +96,15 @@ public class Gpms {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void logout() {
         client.closeClient();
+    }
+
+    public void deletePrefs() {
+        try {
+            File deletePrefFile = new File("/data/data/com.njlabs.amrita.aid/shared_prefs/" + client.COOKIE_FILE + ".xml");
+            deletePrefFile.delete();
+        } catch (Exception ignored) {
+
+        }
     }
 
     public void basicLogin(String rollNo, String password, final LoginResponse loginResponse) {
@@ -298,7 +320,13 @@ public class Gpms {
             public void onSuccess(String responseString) {
                 client.removeReferer();
                 Document doc = Jsoup.parse(responseString);
-                Element tBody = doc.select("body > div:nth-child(9) > table > tbody").first();
+/*
+                WebView webView = new WebView(context);
+                webView.loadData(responseString, "text/html", "UTF-8");
+                ((Activity) context).setContentView(webView);
+*/
+
+                Element tBody = doc.select("body > div:nth-child(7) > table > tbody").first();
                 Elements rows = tBody.select("tr");
                 Ln.d(rows.size());
                 if(rows.size() == 1) {

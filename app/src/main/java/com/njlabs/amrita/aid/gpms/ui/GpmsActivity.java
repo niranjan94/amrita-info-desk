@@ -2,7 +2,7 @@
  * Copyright (c) 2016. Niranjan Rajendran <niranjan94@yahoo.com>
  */
 
-package com.njlabs.amrita.aid.gpms;
+package com.njlabs.amrita.aid.gpms.ui;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -32,6 +32,7 @@ import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.MainApplication;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.bugs.BugReport;
+import com.njlabs.amrita.aid.gpms.client.Gpms;
 import com.njlabs.amrita.aid.gpms.responses.InfoResponse;
 import com.njlabs.amrita.aid.landing.Landing;
 import com.njlabs.amrita.aid.util.ark.Security;

@@ -2,7 +2,7 @@
  * Copyright (c) 2016. Niranjan Rajendran <niranjan94@yahoo.com>
  */
 
-package com.njlabs.amrita.aid.gpms;
+package com.njlabs.amrita.aid.gpms.ui;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.R;
+import com.njlabs.amrita.aid.gpms.client.Gpms;
 import com.njlabs.amrita.aid.gpms.models.HistoryEntry;
 import com.njlabs.amrita.aid.gpms.responses.HistoryResponse;
 import com.njlabs.amrita.aid.util.ExtendedSwipeRefreshLayout;
