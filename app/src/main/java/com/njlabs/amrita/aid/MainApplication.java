@@ -10,7 +10,7 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.joanzapata.iconify.Iconify;
 import com.joanzapata.iconify.fonts.FontAwesomeModule;
-import com.njlabs.amrita.aid.gpms.proxy.ProxyRequestReceivedService;
+import com.njlabs.amrita.aid.gpms.proxy.BackgroundSocketService;
 import com.njlabs.amrita.aid.util.ark.logging.Ln;
 import com.orm.SugarApp;
 import com.parse.Parse;
@@ -43,10 +43,10 @@ public class MainApplication extends SugarApp {
 
         Ln.d("onCreate");
 
-        startService(new Intent(this, ProxyRequestReceivedService.class));
+        startService(new Intent(this, BackgroundSocketService.class));
 
         if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-            startService(new Intent(this, ProxyRequestReceivedService.class));
+            startService(new Intent(this, BackgroundSocketService.class));
         }
     }
 
@@ -65,7 +65,7 @@ public class MainApplication extends SugarApp {
 
         try {
             if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-                startService(new Intent(this, ProxyRequestReceivedService.class));
+                startService(new Intent(this, BackgroundSocketService.class));
             }
         } catch (Exception e) {
             Ln.e(e);

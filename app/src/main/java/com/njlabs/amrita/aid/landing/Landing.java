@@ -40,9 +40,9 @@ import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.about.Amrita;
 import com.njlabs.amrita.aid.about.App;
 import com.njlabs.amrita.aid.aums.AumsActivity;
-import com.njlabs.amrita.aid.gpms.proxy.ProxyRequestReceivedService;
-import com.njlabs.amrita.aid.gpms.proxy.ProxyServiceBroadcastReceiver;
-import com.njlabs.amrita.aid.gpms.proxy.ProxyServiceStarterService;
+import com.njlabs.amrita.aid.gpms.proxy.BackgroundSocketService;
+import com.njlabs.amrita.aid.gpms.proxy.SocketStarterReceiver;
+import com.njlabs.amrita.aid.gpms.proxy.SocketStarterService;
 import com.njlabs.amrita.aid.gpms.ui.GpmsActivity;
 import com.njlabs.amrita.aid.info.Calender;
 import com.njlabs.amrita.aid.info.Curriculum;
@@ -159,7 +159,7 @@ public class Landing extends BaseActivity {
         long flexSecs = 1L;
         String tag = "periodic  | ProxyServiceStarterService: " + periodSecs + "s, f:" + flexSecs;
         PeriodicTask periodic = new PeriodicTask.Builder()
-                .setService(ProxyServiceStarterService.class)
+                .setService(SocketStarterService.class)
                 .setPeriod(periodSecs)
                 .setFlex(flexSecs)
                 .setTag(tag)
@@ -170,14 +170,14 @@ public class Landing extends BaseActivity {
 
         GcmNetworkManager.getInstance(this).schedule(periodic);
 
-        Intent i = new Intent(baseContext, ProxyServiceBroadcastReceiver.class);
+        Intent i = new Intent(baseContext, SocketStarterReceiver.class);
         PendingIntent sender = PendingIntent.getBroadcast(baseContext, 1, i, 0);
         long firstTime = SystemClock.elapsedRealtime();
         firstTime += 3 * 1000;
         AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
         am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, firstTime, 5000, sender);
 
-        startService(new Intent(this, ProxyRequestReceivedService.class));
+        startService(new Intent(this, BackgroundSocketService.class));
     }
 
     @OnPermissionDenied(Manifest.permission.READ_PHONE_STATE)

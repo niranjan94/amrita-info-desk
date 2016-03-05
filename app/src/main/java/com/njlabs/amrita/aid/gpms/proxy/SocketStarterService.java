@@ -14,13 +14,14 @@ import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
 import com.google.android.gms.gcm.TaskParams;
+import com.njlabs.amrita.aid.util.Identifier;
 
-public class ProxyServiceStarterService extends GcmTaskService {
+public class SocketStarterService extends GcmTaskService {
 
     @Override
     public int onRunTask(TaskParams taskParams) {
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-            startService(new Intent(this, ProxyRequestReceivedService.class));
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED && Identifier.isConnectedToAmrita(getBaseContext())) {
+            startService(new Intent(this, BackgroundSocketService.class));
         }
         return GcmNetworkManager.RESULT_SUCCESS;
     }
@@ -32,7 +33,7 @@ public class ProxyServiceStarterService extends GcmTaskService {
         long flexSecs = 1L;
         String tag = "periodic  | ProxyServiceStarterService: " + periodSecs + "s, f:" + flexSecs;
         PeriodicTask periodic = new PeriodicTask.Builder()
-                .setService(ProxyServiceStarterService.class)
+                .setService(SocketStarterService.class)
                 .setPeriod(periodSecs)
                 .setFlex(flexSecs)
                 .setTag(tag)

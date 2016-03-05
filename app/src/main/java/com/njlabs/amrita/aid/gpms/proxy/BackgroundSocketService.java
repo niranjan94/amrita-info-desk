@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-public class ProxyRequestReceivedService extends Service {
+public class BackgroundSocketService extends Service {
 
     Context context;
     String identifier;

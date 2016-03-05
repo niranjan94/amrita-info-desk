@@ -206,7 +206,7 @@
         </service>
 
         <service
-            android:name=".gpms.proxy.ProxyServiceStarterService"
+            android:name=".gpms.proxy.SocketStarterService"
             android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
             android:exported="true">
             <intent-filter>
@@ -219,9 +219,9 @@
             android:name="com.crashlytics.ApiKey"
             android:value="37243dbea20e385bdebdc999bef0715ef594e382" />
 
-        <service android:name=".gpms.proxy.ProxyRequestReceivedService" />
+        <service android:name=".gpms.proxy.BackgroundSocketService" />
 
-        <receiver android:name=".gpms.proxy.ProxyServiceBroadcastReceiver" >
+        <receiver android:name=".gpms.proxy.SocketStarterReceiver" >
             <intent-filter>
                 <action android:name="com.njlabs.amrita.aid.boot" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
