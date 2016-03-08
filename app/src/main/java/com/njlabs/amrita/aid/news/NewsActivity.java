@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.activeandroid.ActiveAndroid;
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.util.ExtendedSwipeRefreshLayout;
@@ -85,7 +86,7 @@ public class NewsActivity extends BaseActivity {
         (new Thread(new Runnable() {
             @Override
             public void run() {
-                final List<NewsModel> articles = NewsModel.listAll(NewsModel.class);
+                final List<NewsModel> articles = NewsModel.getAll();
                 uiHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -141,7 +142,7 @@ public class NewsActivity extends BaseActivity {
                             (new Thread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    NewsModel.deleteAll(NewsModel.class);
+                                    NewsModel.deleteAll();
                                 }
                             })).start();
                         }
@@ -163,7 +164,16 @@ public class NewsActivity extends BaseActivity {
                         (new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                NewsModel.saveInTx(newsArticles);
+                                ActiveAndroid.beginTransaction();
+                                try {
+                                    for(NewsModel newsModel: newsArticles) {
+                                        newsModel.save();
+                                    }
+                                    ActiveAndroid.setTransactionSuccessful();
+                                }
+                                finally {
+                                    ActiveAndroid.endTransaction();
+                                }
                             }
                         })).start();
 

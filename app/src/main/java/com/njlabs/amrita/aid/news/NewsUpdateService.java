@@ -14,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
+import com.activeandroid.ActiveAndroid;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.PeriodicTask;
@@ -55,7 +56,7 @@ public class NewsUpdateService extends GcmTaskService {
         }
 
         public int execute() {
-            oldArticles = NewsModel.listAll(NewsModel.class);
+            oldArticles = NewsModel.getAll();
             if (oldArticles != null && oldArticles.size() > 0) {
                 getNews(true, oldArticles);
             } else {
@@ -87,7 +88,7 @@ public class NewsUpdateService extends GcmTaskService {
                 status = GcmNetworkManager.RESULT_SUCCESS;
                 currentArticles = new ArrayList<>();
                 if(refresh){
-                    NewsModel.deleteAll(NewsModel.class);
+                    NewsModel.deleteAll();
                 }
 
                 NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
@@ -102,9 +103,20 @@ public class NewsUpdateService extends GcmTaskService {
                     String imageUrl = header.select("ul > li > img").first().attr("src");
                     String title = content.select(".field-name-title > div > div > h2").first().text();
                     String url = "https://www.amrita.edu"+footer.select(".field-name-node-link > div > div > a").first().attr("href");
-                    (new NewsModel(imageUrl,title,url)).save();
+
                     inboxStyle.addLine(title);
                     currentArticles.add(new NewsModel(imageUrl,title,url));
+                }
+
+                ActiveAndroid.beginTransaction();
+                try {
+                    for(NewsModel newsModel: currentArticles) {
+                        newsModel.save();
+                    }
+                    ActiveAndroid.setTransactionSuccessful();
+                }
+                finally {
+                    ActiveAndroid.endTransaction();
                 }
 
                 Intent resultIntent = new Intent(mContext, NewsActivity.class);

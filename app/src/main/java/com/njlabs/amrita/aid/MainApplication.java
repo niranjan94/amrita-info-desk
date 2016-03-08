@@ -1,25 +1,28 @@
 package com.njlabs.amrita.aid;
 
 
+import android.app.Application;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.content.ContextCompat;
 
+import com.activeandroid.ActiveAndroid;
+import com.activeandroid.Configuration;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.joanzapata.iconify.Iconify;
 import com.joanzapata.iconify.fonts.FontAwesomeModule;
 import com.njlabs.amrita.aid.gpms.proxy.BackgroundSocketService;
+import com.njlabs.amrita.aid.news.NewsModel;
 import com.njlabs.amrita.aid.util.ark.logging.Ln;
-import com.orm.SugarApp;
 import com.parse.Parse;
 import com.parse.ParseInstallation;
 
 import io.fabric.sdk.android.Fabric;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
-public class MainApplication extends SugarApp {
+public class MainApplication extends Application {
 
     private Tracker mTracker;
 
@@ -42,6 +45,13 @@ public class MainApplication extends SugarApp {
                 .build());
 
         Ln.d("onCreate");
+
+        Configuration dbConfiguration = new Configuration.Builder(this)
+                .setDatabaseName("storage.db")
+                .addModelClass(NewsModel.class)
+                .create();
+
+        ActiveAndroid.initialize(dbConfiguration);
 
         startService(new Intent(this, BackgroundSocketService.class));
 

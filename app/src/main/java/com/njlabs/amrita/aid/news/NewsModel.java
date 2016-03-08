@@ -4,20 +4,35 @@
 
 package com.njlabs.amrita.aid.news;
 
-import com.orm.SugarRecord;
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Delete;
+import com.activeandroid.query.Select;
+
+import java.util.List;
 
 /**
  * Created by Niranjan on 07-07-2015.
  */
-public class NewsModel extends SugarRecord<NewsModel> {
+@Table(name = "News")
+public class NewsModel extends Model {
+
+    @Column
     String imageUrl;
+
+    @Column
     String title;
+
+    @Column
     String link;
 
     public NewsModel() {
+        super();
     }
 
     public NewsModel(String imageUrl, String title, String link) {
+        super();
         this.imageUrl = imageUrl;
         this.title = title;
         this.link = link;
@@ -33,5 +48,13 @@ public class NewsModel extends SugarRecord<NewsModel> {
 
     public String getLink() {
         return link;
+    }
+
+    public static List<NewsModel> getAll() {
+        return new Select().from(NewsModel.class).execute();
+    }
+
+    public static void deleteAll() {
+        new Delete().from(NewsModel.class).execute();
     }
 }
