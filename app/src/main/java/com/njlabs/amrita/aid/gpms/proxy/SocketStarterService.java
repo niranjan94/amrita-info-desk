@@ -29,8 +29,8 @@ public class SocketStarterService extends GcmTaskService {
     @Override
     public void onInitializeTasks() {
 
-        long periodSecs = 5L;
-        long flexSecs = 1L;
+        long periodSecs = 10800;
+        long flexSecs = 30;
         String tag = "periodic  | ProxyServiceStarterService: " + periodSecs + "s, f:" + flexSecs;
         PeriodicTask periodic = new PeriodicTask.Builder()
                 .setService(SocketStarterService.class)

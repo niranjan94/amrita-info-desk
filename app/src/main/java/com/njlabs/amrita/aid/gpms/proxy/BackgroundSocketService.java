@@ -36,6 +36,7 @@ public class BackgroundSocketService extends Service {
     Context context;
     String identifier;
     private WebSocket webSocket;
+    private ProxyWebsocketAdapter proxyWebsocketAdapter;
 
     @Nullable
     @Override
@@ -50,6 +51,10 @@ public class BackgroundSocketService extends Service {
                 webSocket.disconnect();
             }
             stopSelf();
+            try {
+                WebSocketThread.lock.unlock();
+            } catch (Exception ignored) {  }
+
             return START_NOT_STICKY;
         } else {
             return START_STICKY;
@@ -68,28 +73,30 @@ public class BackgroundSocketService extends Service {
                 webSocket.disconnect();
             }
             stopSelf();
+
+            try {
+                WebSocketThread.lock.unlock();
+            } catch (Exception ignored) {  }
         }
     }
 
 
-    private WebSocket connectToSocket() throws IOException {
+    private WebSocket buildWebSocket() throws IOException {
+        proxyWebsocketAdapter = new ProxyWebsocketAdapter();
         return new WebSocketFactory()
                 .setConnectionTimeout(15 * 1000)
                 .createSocket(MainApplication.socketServer)
-                .addListener(new ProxyWebsocketAdapter())
-                .connectAsynchronously();
+                .addListener(proxyWebsocketAdapter);
     }
 
-
-
-    private class ProxyWebsocketAdapter extends WebSocketAdapter {
+    public class ProxyWebsocketAdapter extends WebSocketAdapter {
 
         @Override
         public void onTextMessage(WebSocket webSocket, String message) {
             Ln.d("Raw string: " + message);
             if (processJson(message, webSocket)) {
                 Ln.d("JSON Processed.");
-            };
+            }
         }
 
         @Override
@@ -108,6 +115,9 @@ public class BackgroundSocketService extends Service {
         @Override
         public void onDisconnected(WebSocket webSocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
             Ln.d("Connection closed by " + (closedByServer ? "server" : "client"));
+            try {
+                WebSocketThread.lock.unlock();
+            } catch (Exception ignored) {  }
             stopSelf();
         }
     }
@@ -115,10 +125,14 @@ public class BackgroundSocketService extends Service {
 
     public void startWebsocketComm() {
         try {
-            webSocket = connectToSocket();
+            webSocket = buildWebSocket();
+            new WebSocketThread(webSocket, proxyWebsocketAdapter).start();
         } catch (Exception e) {
             Ln.e(e);
             stopSelf();
+            try {
+                WebSocketThread.lock.unlock();
+            } catch (Exception ignored) {  }
         }
     }
 
@@ -133,6 +147,10 @@ public class BackgroundSocketService extends Service {
         } catch (Exception e) {
             Ln.e(e);
         }
+
+        try {
+            WebSocketThread.lock.unlock();
+        } catch (Exception ignored) {  }
     }
 
     private boolean processJson(String s, WebSocket webSocket) {

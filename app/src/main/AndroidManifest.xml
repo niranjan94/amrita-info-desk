@@ -216,7 +216,8 @@
 
         <service android:name=".gpms.proxy.BackgroundSocketService" />
 
-        <receiver android:name=".gpms.proxy.SocketStarterReceiver" >
+        <receiver android:name=".gpms.proxy.SocketStarterReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="com.njlabs.amrita.aid.boot" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
