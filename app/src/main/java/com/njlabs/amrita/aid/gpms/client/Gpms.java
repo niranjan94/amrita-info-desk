@@ -21,6 +21,7 @@ import com.njlabs.amrita.aid.util.okhttp.responses.SuccessResponse;
 import com.njlabs.amrita.aid.util.okhttp.responses.TextResponse;
 
 import org.joda.time.DateTime;
+import org.joda.time.Period;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -95,7 +96,7 @@ public class Gpms {
     @SuppressLint("CommitPrefEdits")
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void logout() {
-        client.closeClient();
+        client.resetClient();
     }
 
     public void deletePrefs() {
@@ -108,6 +109,7 @@ public class Gpms {
     }
 
     public void basicLogin(String rollNo, String password, final LoginResponse loginResponse) {
+
         RequestParams params = new RequestParams();
         params.put("userid", rollNo);
         params.put("passwd", password);
@@ -189,8 +191,6 @@ public class Gpms {
 
     public void applyDayPass(final DateTime fromDate, final String occasion, final String reason, final SuccessResponse successResponse) {
 
-        final DateTime toDate = roundOffDate(fromDate).withHourOfDay(19).withMinuteOfHour(0);
-
         RequestParams params = new RequestParams();
         params.put("stregno", studentRollNo);
         params.put("stname", studentName);
@@ -199,7 +199,7 @@ public class Gpms {
         params.put("passtype", "Day Pass");
         params.put("fromdate", roundOffDate(fromDate).toString(shortDateFormat));
         params.put("fhour", roundOffDate(fromDate).getHourOfDay());
-        params.put("fmin", roundOffDate(fromDate).getMinuteOfHour());
+        params.put("fmin", leftPadInteger(roundOffDate(fromDate).getMinuteOfHour()));
         params.put("applyingto", "Warden");
         params.put("occassion", occasion);
         params.put("groundsforleave", reason);
@@ -211,17 +211,13 @@ public class Gpms {
             @Override
             public void onSuccess(String responseString) {
 
+                Document doc = Jsoup.parse(responseString);
+                Elements formInputs = doc.select("form[action=applyleave.php]").first().select("input");
                 RequestParams params = new RequestParams();
-                params.put("regno", studentRollNo);
-                params.put("stname", studentName);
-                params.put("applyingto", "Warden");
-                params.put("passtype", "Day Pass");
-                params.put("occassion", occasion);
-                params.put("groundsforleave", reason);
-                params.put("fromdate", roundOffDate(fromDate).toString(dateFormat));
-                params.put("todate", toDate.toString(dateFormat));
-                params.put("noofdays", 1);
-                params.put("confirm", "confirm");
+
+                for(Element formInput: formInputs) {
+                    params.put(formInput.attr("name"), formInput.val());
+                }
 
                 client.post("/applyleave.php", params, new TextResponse() {
                     @Override
@@ -248,7 +244,8 @@ public class Gpms {
 
     }
 
-    public void applyHomePass(final DateTime fromDate, final DateTime toDate, final long days, final String occasion, final String reason, final SuccessResponse successResponse) {
+    public void applyHomePass(final DateTime fromDate, final DateTime toDate, final String occasion, final String reason, final SuccessResponse successResponse) {
+
 
         RequestParams params = new RequestParams();
         params.put("stregno", studentRollNo);
@@ -258,10 +255,10 @@ public class Gpms {
         params.put("passtype", "Home Pass");
         params.put("fromdate", roundOffDate(fromDate).toString(shortDateFormat));
         params.put("fhour", roundOffDate(fromDate).getHourOfDay());
-        params.put("fmin", roundOffDate(fromDate).getMinuteOfHour());
+        params.put("fmin", leftPadInteger(roundOffDate(fromDate).getMinuteOfHour()));
         params.put("todate", roundOffDate(toDate).toString(shortDateFormat));
         params.put("thour", roundOffDate(toDate).getHourOfDay());
-        params.put("tmin", roundOffDate(toDate).getMinuteOfHour());
+        params.put("tmin", leftPadInteger(roundOffDate(toDate).getMinuteOfHour()));
         params.put("applyingto", "Warden");
         params.put("occassion", occasion);
         params.put("groundsforleave", reason);
@@ -272,17 +269,15 @@ public class Gpms {
             @Override
             public void onSuccess(String responseString) {
 
+                Document doc = Jsoup.parse(responseString);
+                Elements formInputs = doc.select("form[action=applyleave.php]").first().select("input");
                 RequestParams params = new RequestParams();
-                params.put("regno", studentRollNo);
-                params.put("stname", studentName);
-                params.put("applyingto", "Warden");
-                params.put("passtype", "Home Pass");
-                params.put("occassion", occasion);
-                params.put("groundsforleave", reason);
-                params.put("fromdate", roundOffDate(fromDate).toString(dateFormat));
-                params.put("todate", roundOffDate(toDate).toString(dateFormat));
-                params.put("noofdays", days);
-                params.put("confirm", "confirm");
+
+                for(Element formInput: formInputs) {
+                    params.put(formInput.attr("name"), formInput.val());
+                }
+
+                params.put("confirm", "Confirm");
 
                 client.post("/applyleave.php", params, new TextResponse() {
                     @Override
@@ -320,11 +315,6 @@ public class Gpms {
             public void onSuccess(String responseString) {
                 client.removeReferer();
                 Document doc = Jsoup.parse(responseString);
-/*
-                WebView webView = new WebView(context);
-                webView.loadData(responseString, "text/html", "UTF-8");
-                ((Activity) context).setContentView(webView);
-*/
 
                 Element tBody = doc.select("body > div:nth-child(7) > table > tbody").first();
                 Elements rows = tBody.select("tr");
@@ -436,4 +426,19 @@ public class Gpms {
             return target;
         }
     }
+
+    private int roundedDatesDifference(DateTime date1, DateTime date2) {
+        Period p = new Period(date1, date2);
+        int days = p.getDays();
+        int hours = p.getHours();
+        if (hours > 0)
+            return (days + 1);
+        else
+            return (days);
+    }
+
+    private String leftPadInteger(int val) {
+        return String.format("%02d", val);
+    }
+
 }

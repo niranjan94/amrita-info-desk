@@ -14,17 +14,17 @@ import java.net.URLEncoder;
 public class GpmsClient extends Client {
 
     public String PROXY_URL = "https://anokha.amrita.edu/glype/browse.php?b=4";
-    public String BASE_URL = "http://gpms.ettimadai.net/gpis/student";
-
     public String COOKIE_FILE = PersistentCookieStore.GPMS_COOKIE_PREFS;
 
     public GpmsClient(Context context) {
         super(context);
+        this.BASE_URL = "http://gpms.ettimadai.net/gpis/student";
     }
 
     public GpmsClient(Context context, String COOKIE_FILE) {
         super(context);
         this.COOKIE_FILE = COOKIE_FILE;
+
     }
 
     @Override

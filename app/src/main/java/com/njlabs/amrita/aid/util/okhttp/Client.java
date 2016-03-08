@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
@@ -50,20 +52,20 @@ import okhttp3.ResponseBody;
 abstract public class Client {
 
     protected OkHttpClient client;
-    protected String userAgent = "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.3) Gecko/20070309 Firefox/2.0.0.3";
+    protected String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/47.0.2526.106 Chrome/47.0.2526.106 Safari/537.36";
     protected Context context;
     protected String referer = null;
     public String BASE_URL;
     private ProgressResponseBody.ProgressListener progressListener = null;
+    private SharedPreferences cookiePrefs;
 
     public Client(Context context) {
         this.context = context;
     }
 
     public void powerUp() {
-
         CookieManager cookieManager = new CookieManager(new PersistentCookieStore(context, getCookieFile()), CookiePolicy.ACCEPT_ALL);
-
+        cookiePrefs = context.getSharedPreferences(getCookieFile(), 0);
         OkHttpClient.Builder builder;
 
         if(shouldVerifySSL()) {
@@ -83,6 +85,7 @@ abstract public class Client {
             });
         }
 
+
         client = builder
                 .cookieJar(new JavaNetCookieJar(cookieManager))
                 .followRedirects(true)
@@ -90,6 +93,37 @@ abstract public class Client {
                 .retryOnConnectionFailure(true)
                 .readTimeout(0, TimeUnit.SECONDS)
                 .addInterceptor(interceptor)
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        Request request = chain.request();
+
+                        URL url = null;
+                        try {
+                            url = new URL(getAbsoluteUrl(""));
+                        } catch (MalformedURLException e) {
+                            Ln.e(e);
+                        }
+
+                        String origin = "https://www.google.com/";
+                        if(url != null) {
+                            origin = url.getProtocol() + "://" + url.getHost();
+                        }
+
+                        Request.Builder newRequest = request.newBuilder();
+
+                        newRequest.addHeader("Origin", origin);
+                        newRequest.addHeader("User-Agent", userAgent);
+
+                        if(referer != null) {
+                            newRequest.addHeader("Referer", referer);
+                        } else {
+                            newRequest.removeHeader("Referer");
+                        }
+
+                        return chain.proceed(newRequest.build());
+                    }
+                })
                 .connectTimeout(0, TimeUnit.SECONDS)
                 .build();
 
@@ -115,17 +149,10 @@ abstract public class Client {
             queryString += MapQuery.urlEncode(params);
         }
 
-        Request.Builder request = new Request.Builder()
-                .url(getAbsoluteUrl(path) + queryString)
-                .header("User-Agent", userAgent);
+        Request request = new Request.Builder()
+                .url(getAbsoluteUrl(path) + queryString).build();
 
-        if(referer != null) {
-            request.addHeader("Referer", getAbsoluteUrl(referer));
-        } else {
-            request.removeHeader("Referer");
-        }
-
-        client.newCall(request.build()).enqueue(new Callback() {
+        client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, final IOException e) {
                 runOnCorrectThread(new Runnable() {
@@ -161,17 +188,10 @@ abstract public class Client {
             queryString += MapQuery.urlEncode(params);
         }
 
-        Request.Builder request = new Request.Builder()
-                .url(getAbsoluteUrl(path) + queryString)
-                .header("User-Agent", userAgent);
+        Request request = new Request.Builder()
+                .url(getAbsoluteUrl(path) + queryString).build();
 
-        if(referer != null) {
-            request.addHeader("Referer", getAbsoluteUrl(referer));
-        } else {
-            request.removeHeader("Referer");
-        }
-
-        client.newCall(request.build()).enqueue(new Callback() {
+        client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, final IOException e) {
                 runOnCorrectThread(new Runnable() {
@@ -196,8 +216,6 @@ abstract public class Client {
                         }
                     });
                 }
-
-
             }
         });
     }
@@ -209,17 +227,11 @@ abstract public class Client {
             queryString += MapQuery.urlEncode(params);
         }
 
-        Request.Builder request = new Request.Builder()
-                .url(getAbsoluteUrl(path) + queryString)
-                .header("User-Agent", userAgent);
+        Request request = new Request.Builder()
+                .url(getAbsoluteUrl(path) + queryString).build();
 
-        if(referer != null) {
-            request.addHeader("Referer", getAbsoluteUrl(referer));
-        } else {
-            request.removeHeader("Referer");
-        }
 
-        client.newCall(request.build()).enqueue(new Callback() {
+        client.newCall(request).enqueue(new Callback() {
 
             @Override
             public void onFailure(Call call, final IOException e) {
@@ -293,19 +305,12 @@ abstract public class Client {
             iterator.remove();
         }
 
-        Request.Builder request = new Request.Builder()
+        Request request = new Request.Builder()
                 .url(getAbsoluteUrl(path))
-                .header("User-Agent", userAgent)
-                .post(formBody.build());
+                .post(formBody.build())
+                .build();
 
-        if(referer != null) {
-            request.addHeader("Referer", getAbsoluteUrl(referer));
-        } else {
-            request.removeHeader("Referer");
-        }
-
-
-        client.newCall(request.build()).enqueue(new Callback() {
+        client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, final IOException e) {
                 runOnCorrectThread(new Runnable() {
@@ -342,14 +347,8 @@ abstract public class Client {
         this.BASE_URL = BASE_URL;
     }
 
-
     public void resetClient() {
-        SharedPreferences cookiePrefs = context.getSharedPreferences(getCookieFile(), 0);
         cookiePrefs.edit().clear().apply();
-    }
-
-    public void closeClient() {
-        resetClient();
     }
 
     public void runOnCorrectThread(Runnable runnable) {
@@ -364,7 +363,6 @@ abstract public class Client {
         @SuppressLint("DefaultLocale")
         @Override
         public Response intercept(Interceptor.Chain chain) throws IOException {
-
             if(setLoggingEnabled()) {
                 Request request = chain.request();
                 long t1 = System.nanoTime();
@@ -375,6 +373,12 @@ abstract public class Client {
                 long t2 = System.nanoTime();
                 Ln.d(String.format("Received response for %s in %.1fms%n%s", response.request().url(), (t2 - t1) / 1e6d, response.headers()));
                 Ln.d(responseBodyString);
+
+                Map<String, ?> cookies = cookiePrefs.getAll();
+                for(String key: cookies.keySet()) {
+                    Ln.d(key + "::" + cookies.get(key));
+                }
+
                 return response.newBuilder()
                         .body(ResponseBody.create(responseBody.contentType(), responseBodyString.getBytes()))
                         .headers(response.headers())

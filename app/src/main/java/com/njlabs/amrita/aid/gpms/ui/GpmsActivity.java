@@ -362,13 +362,6 @@ public class GpmsActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(gpms != null) {
-            try {
-                gpms.logout();
-            } catch (Exception ignored) {
-
-            }
-        }
     }
 
 }

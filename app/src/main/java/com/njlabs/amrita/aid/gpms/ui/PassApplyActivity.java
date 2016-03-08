@@ -126,10 +126,8 @@ public class PassApplyActivity extends BaseActivity {
             } else if(fromDate.getMillis() < DateTime.now().getMillis() + 30000) {
                 Snackbar.make(parentView, "Please change the from date-time to a later time.", Snackbar.LENGTH_LONG).show();
             } else {
-                double days = (toDate.getMillis() - fromDate.getMillis())/(1000*60*60*24);
-                long roundedDays = Math.round(Math.ceil(days));
                 dialog.show();
-                gpms.applyHomePass(fromDate, toDate, roundedDays, spinner.getText().toString(), reasonEditText.getText().toString(), new SuccessResponse() {
+                gpms.applyHomePass(fromDate, toDate, spinner.getText().toString(), reasonEditText.getText().toString(), new SuccessResponse() {
                     @Override
                     public void onSuccess() {
                         dialog.dismiss();

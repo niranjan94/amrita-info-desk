@@ -32,7 +32,7 @@ public class GpmsSlave {
         });
     }
 
-    public static void applyHomePass(final Gpms gpms, String rollNo, String password, final DateTime fromDate, final DateTime toDate, final long days, final String occasion, final String reason, final SuccessResponse successResponse) {
+    public static void applyHomePass(final Gpms gpms, String rollNo, String password, final DateTime fromDate, final DateTime toDate, final String occasion, final String reason, final SuccessResponse successResponse) {
         gpms.basicLogin(rollNo, password, new LoginResponse() {
             @Override
             public void onFailedAuthentication() {
@@ -41,7 +41,7 @@ public class GpmsSlave {
 
             @Override
             public void onSuccess() {
-                gpms.applyHomePass(fromDate, toDate, days, occasion, reason, successResponse);
+                gpms.applyHomePass(fromDate, toDate, occasion, reason, successResponse);
             }
 
             @Override
