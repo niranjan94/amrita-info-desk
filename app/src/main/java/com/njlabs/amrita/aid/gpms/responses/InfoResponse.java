@@ -5,5 +5,5 @@
 package com.njlabs.amrita.aid.gpms.responses;
 
 public abstract class InfoResponse extends LoginResponse {
-    public abstract void onSuccess(String regNo, String name, String hostel, String roomNo, String mobile, String email, String photoUrl, String numPasses);
+    public abstract void onSuccess(String regNo, String name, String hostel, String hostelCode, String roomNo, String mobile, String email, String photoUrl, String numPasses);
 }

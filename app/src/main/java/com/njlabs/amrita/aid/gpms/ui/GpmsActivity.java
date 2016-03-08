@@ -160,7 +160,7 @@ public class GpmsActivity extends BaseActivity {
 
                 @SuppressWarnings("ConstantConditions")
                 @Override
-                public void onSuccess(String regNo, String name, String hostel, String roomNo, String mobile, String email, String photoUrl, String numPasses) {
+                public void onSuccess(String regNo, String name, String hostel, String hostelCode, String roomNo, String mobile, String email, String photoUrl, String numPasses) {
                     setupLayout(R.layout.activity_gpms_profile, Color.parseColor("#009688"));
                     ((TextView) findViewById(R.id.name)).setText(name);
                     ((TextView) findViewById(R.id.roll_no)).setText(regNo);

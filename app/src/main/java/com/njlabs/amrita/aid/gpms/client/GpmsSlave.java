@@ -5,6 +5,7 @@
 package com.njlabs.amrita.aid.gpms.client;
 
 import com.njlabs.amrita.aid.gpms.responses.HistoryResponse;
+import com.njlabs.amrita.aid.gpms.responses.InfoResponse;
 import com.njlabs.amrita.aid.gpms.responses.LoginResponse;
 import com.njlabs.amrita.aid.gpms.responses.PendingResponse;
 import com.njlabs.amrita.aid.util.okhttp.responses.SuccessResponse;
@@ -14,7 +15,12 @@ import org.joda.time.DateTime;
 public class GpmsSlave {
 
     public static void applyDayPass(final Gpms gpms, String rollNo, String password, final DateTime fromDate, final String occasion, final String reason, final SuccessResponse successResponse) {
-        gpms.basicLogin(rollNo, password, new LoginResponse() {
+        gpms.login(rollNo, password, new InfoResponse() {
+            @Override
+            public void onSuccess(String regNo, String name, String hostel, String hostelCode, String roomNo, String mobile, String email, String photoUrl, String numPasses) {
+                gpms.applyDayPass(fromDate, occasion, reason, successResponse);
+            }
+
             @Override
             public void onFailedAuthentication() {
                 successResponse.onFailure(new Exception("failed_authentication"));
@@ -22,7 +28,7 @@ public class GpmsSlave {
 
             @Override
             public void onSuccess() {
-                gpms.applyDayPass(fromDate, occasion, reason, successResponse);
+
             }
 
             @Override
@@ -33,7 +39,12 @@ public class GpmsSlave {
     }
 
     public static void applyHomePass(final Gpms gpms, String rollNo, String password, final DateTime fromDate, final DateTime toDate, final String occasion, final String reason, final SuccessResponse successResponse) {
-        gpms.basicLogin(rollNo, password, new LoginResponse() {
+        gpms.login(rollNo, password, new InfoResponse() {
+            @Override
+            public void onSuccess(String regNo, String name, String hostel, String hostelCode, String roomNo, String mobile, String email, String photoUrl, String numPasses) {
+                gpms.applyDayPass(fromDate, occasion, reason, successResponse);
+            }
+
             @Override
             public void onFailedAuthentication() {
                 successResponse.onFailure(new Exception("failed_authentication"));
@@ -41,7 +52,7 @@ public class GpmsSlave {
 
             @Override
             public void onSuccess() {
-                gpms.applyHomePass(fromDate, toDate, occasion, reason, successResponse);
+
             }
 
             @Override

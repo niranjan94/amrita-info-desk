@@ -4,17 +4,36 @@
 
 package com.njlabs.amrita.aid.gpms.models;
 
+import com.google.gson.annotations.SerializedName;
+
 public class PendingEntry {
-    String id;
-    String appliedFrom;
-    String appliedTill;
-    String passType;
-    String requestedWith;
-    String approvalStatus;
-    String cfwApproval;
-    String status;
+
+    @SerializedName("id")
+    private String id;
+
+    @SerializedName("applied_from")
+    private String appliedFrom;
+
+    @SerializedName("applied_till")
+    private String appliedTill;
+
+    @SerializedName("pass_type")
+    private String passType;
+
+    @SerializedName("requested_with")
+    private String requestedWith;
+
+    @SerializedName("approval_status")
+    private String approvalStatus;
+
+    @SerializedName("cfw_approval")
+    private String cfwApproval;
+
+    @SerializedName("status")
+    private String status;
 
     public PendingEntry() {
+
     }
 
     public PendingEntry(String appliedFrom, String appliedTill, String approvalStatus, String cfwApproval, String id, String passType, String requestedWith, String status) {

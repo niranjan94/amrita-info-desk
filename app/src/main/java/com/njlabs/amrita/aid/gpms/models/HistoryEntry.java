@@ -4,17 +4,39 @@
 
 package com.njlabs.amrita.aid.gpms.models;
 
+import com.google.gson.annotations.SerializedName;
+
 public class HistoryEntry {
-    String departureTime;
-    String arrivalTime;
-    String numDays;
-    String actualNumDays;
-    String passType;
-    String occasion;
-    String approvalStatus;
-    String cfwApproval;
-    String gateApproval;
-    String cancellation;
+
+    @SerializedName("departure_time")
+    private String departureTime;
+
+    @SerializedName("arrival_time")
+    private String arrivalTime;
+
+    @SerializedName("num_days")
+    private String numDays;
+
+    @SerializedName("actual_num_days")
+    private String actualNumDays;
+
+    @SerializedName("pass_type")
+    private String passType;
+
+    @SerializedName("occasion")
+    private String occasion;
+
+    @SerializedName("approval_status")
+    private String approvalStatus;
+
+    @SerializedName("cfw_approval")
+    private String cfwApproval;
+
+    @SerializedName("gate_approval")
+    private String gateApproval;
+
+    @SerializedName("cancellation")
+    private String cancellation;
 
     public HistoryEntry() {
     }

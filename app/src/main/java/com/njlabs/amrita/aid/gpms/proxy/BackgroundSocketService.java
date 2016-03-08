@@ -13,6 +13,9 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
@@ -20,14 +23,22 @@ import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
 import com.njlabs.amrita.aid.MainApplication;
 import com.njlabs.amrita.aid.gpms.client.Gpms;
+import com.njlabs.amrita.aid.gpms.client.GpmsSlave;
+import com.njlabs.amrita.aid.gpms.models.HistoryEntry;
+import com.njlabs.amrita.aid.gpms.models.PendingEntry;
+import com.njlabs.amrita.aid.gpms.responses.HistoryResponse;
 import com.njlabs.amrita.aid.gpms.responses.InfoResponse;
+import com.njlabs.amrita.aid.gpms.responses.PendingResponse;
 import com.njlabs.amrita.aid.util.Identifier;
 import com.njlabs.amrita.aid.util.ark.logging.Ln;
+import com.njlabs.amrita.aid.util.okhttp.responses.SuccessResponse;
 
+import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +48,7 @@ public class BackgroundSocketService extends Service {
     String identifier;
     private WebSocket webSocket;
     private ProxyWebsocketAdapter proxyWebsocketAdapter;
+    private Gson gson;
 
     @Nullable
     @Override
@@ -65,6 +77,12 @@ public class BackgroundSocketService extends Service {
     public void onCreate() {
         super.onCreate();
         context = this;
+        gson = new GsonBuilder()
+                .excludeFieldsWithModifiers(Modifier.FINAL, Modifier.TRANSIENT, Modifier.STATIC)
+                .serializeNulls()
+                .create();
+
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED && Identifier.isConnectedToAmrita(context)) {
             identifier = Identifier.identify(context);
             startWebsocketComm();
@@ -153,18 +171,18 @@ public class BackgroundSocketService extends Service {
         } catch (Exception ignored) {  }
     }
 
-    private boolean processJson(String s, WebSocket webSocket) {
+    private boolean processJson(String s, final WebSocket webSocket) {
         try {
-            JSONObject json = new JSONObject(s);
+            JSONObject request = new JSONObject(s);
 
-            switch (json.getString("action")) {
+            switch (request.getString("action")) {
                 case "respond_if_available":
                     String[] wifiDetails = Identifier.getWifiInfo(context);
                     if (Identifier.isConnectedToAmrita(context)) {
                         JSONObject response = new JSONObject();
                         response.put("action", "respond_back");
                         response.put("from", identifier);
-                        response.put("respond_to", json.getString("caller"));
+                        response.put("respond_to", request.getString("caller"));
                         response.put("signal_strength", wifiDetails[1]);
                         Ln.d(response.toString());
                         webSocket.sendText(response.toString());
@@ -172,35 +190,229 @@ public class BackgroundSocketService extends Service {
                     break;
 
                 case "payload_process":
-                    Gpms gpms = new Gpms(context, json.getString("from"));
-                    JSONObject innerPayload = json.getJSONObject("payload");
-                    String rollNo = innerPayload.getString("roll_no");
-                    String password = innerPayload.getString("password");
+                    Gpms gpms = new Gpms(context, request.getString("from"));
+                    final JSONObject requestPayload = request.getJSONObject("payload");
+                    String rollNo = requestPayload.getString("roll_no");
+                    String password = requestPayload.getString("password");
 
-                    String method = innerPayload.getString("method");
-                    switch (method) {
-                        case "login":
+                    String from = request.getString("from");
+
+                    String activity = requestPayload.getString("activity");
+
+                    final JSONObject response = new JSONObject();
+                    response.put("action", "pass_payload");
+                    response.put("pass_to", from);
+
+                    final JSONObject responsePayload = new JSONObject();
+                    responsePayload.put("activity", activity + "_response");
+
+
+                    switch (activity) {
+                        case "login": {
                             gpms.login(rollNo, password, new InfoResponse() {
                                 @Override
-                                public void onSuccess(String regNo, String name, String hostel, String roomNo, String mobile, String email, String photoUrl, String numPasses) {
+                                public void onSuccess() {
+                                    try {
+                                        responsePayload.put("response", "simple_success");
+                                        response.put("payload", responsePayload);
+                                    } catch (JSONException e) {
+                                        Ln.e(e);
+                                    }
+                                    webSocket.sendText(response.toString());
+                                }
 
+                                @Override
+                                public void onSuccess(String regNo, String name, String hostel, String hostelCode, String roomNo, String mobile, String email, String photoUrl, String numPasses) {
+                                    try {
+                                        responsePayload.put("response", "success");
+                                        responsePayload.put("name", name);
+                                        responsePayload.put("regNo", regNo);
+                                        responsePayload.put("hostel", hostel);
+                                        responsePayload.put("roomNo", roomNo);
+                                        responsePayload.put("mobile", mobile);
+                                        responsePayload.put("email", email);
+                                        response.put("payload", responsePayload);
+                                    } catch (JSONException e) {
+                                        Ln.e(e);
+                                    }
+                                    webSocket.sendText(response.toString());
                                 }
 
                                 @Override
                                 public void onFailedAuthentication() {
-
-                                }
-
-                                @Override
-                                public void onSuccess() {
-
+                                    try {
+                                        responsePayload.put("response", "authentication_failed");
+                                        response.put("payload", responsePayload);
+                                    } catch (JSONException e) {
+                                        Ln.e(e);
+                                    }
+                                    webSocket.sendText(response.toString());
                                 }
 
                                 @Override
                                 public void onFailure(Throwable throwable) {
-
+                                    try {
+                                        responsePayload.put("response", "error");
+                                        responsePayload.put("message", throwable.getMessage());
+                                        response.put("payload", responsePayload);
+                                    } catch (JSONException e) {
+                                        Ln.e(e);
+                                    }
+                                    webSocket.sendText(response.toString());
                                 }
                             });
+                        }
+
+                        case "apply_day_pass": {
+                            DateTime fromDate = DateTime.parse(requestPayload.getString("from_date"));
+                            String occasion = requestPayload.getString("occasion");
+                            String leaveReason = requestPayload.getString("leave_reason");
+                            GpmsSlave.applyDayPass(gpms, rollNo, password, fromDate, occasion, leaveReason, new SuccessResponse() {
+                                @Override
+                                public void onSuccess() {
+                                    try {
+                                        responsePayload.put("response", "success");
+                                        response.put("payload", responsePayload);
+                                    } catch (JSONException e) {
+                                        Ln.e(e);
+                                    }
+                                    webSocket.sendText(response.toString());
+                                }
+
+                                @Override
+                                public void onFailure(Throwable throwable) {
+                                    try {
+                                        responsePayload.put("response", "error");
+                                        responsePayload.put("message", throwable.getMessage());
+                                        response.put("payload", responsePayload);
+                                    } catch (JSONException e) {
+                                        Ln.e(e);
+                                    }
+                                    webSocket.sendText(response.toString());
+                                }
+                            });
+                            break;
+                        }
+
+                        case "apply_home_pass": {
+                            DateTime fromDate = DateTime.parse(requestPayload.getString("from_date"));
+                            DateTime toDate = DateTime.parse(requestPayload.getString("to_date"));
+                            String occasion = requestPayload.getString("occasion");
+                            String leaveReason = requestPayload.getString("leave_reason");
+                            GpmsSlave.applyHomePass(gpms, rollNo, password, fromDate, toDate, occasion, leaveReason, new SuccessResponse() {
+                                @Override
+                                public void onSuccess() {
+                                    try {
+                                        responsePayload.put("response", "success");
+                                        response.put("payload", responsePayload);
+                                    } catch (JSONException e) {
+                                        Ln.e(e);
+                                    }
+                                    webSocket.sendText(response.toString());
+                                }
+
+                                @Override
+                                public void onFailure(Throwable throwable) {
+                                    try {
+                                        responsePayload.put("response", "error");
+                                        responsePayload.put("message", throwable.getMessage());
+                                        response.put("payload", responsePayload);
+                                    } catch (JSONException e) {
+                                        Ln.e(e);
+                                    }
+                                    webSocket.sendText(response.toString());
+                                }
+                            });
+                            break;
+                        }
+
+                        case "get_pending_passes": {
+                            GpmsSlave.getPendingPasses(gpms, rollNo, password, new PendingResponse() {
+                                @Override
+                                public void onSuccess(List<PendingEntry> pendingEntries) {
+                                    try {
+                                        responsePayload.put("response", "success");
+                                        String pendingEntriesJson = gson.toJson(pendingEntries);
+                                        requestPayload.put("data", new JsonParser().parse(pendingEntriesJson).getAsJsonArray());
+                                        response.put("payload", responsePayload);
+                                    } catch (JSONException e) {
+                                        Ln.e(e);
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Throwable throwable) {
+                                    try {
+                                        responsePayload.put("response", "error");
+                                        responsePayload.put("message", throwable.getMessage());
+                                        response.put("payload", responsePayload);
+                                    } catch (JSONException e) {
+                                        Ln.e(e);
+                                    }
+                                }
+                            });
+
+                            break;
+                        }
+
+                        case "get_passes_history": {
+                            GpmsSlave.getPassesHistory(gpms, rollNo, password, new HistoryResponse() {
+                                @Override
+                                public void onSuccess(List<HistoryEntry> historyEntries) {
+                                    try {
+                                        responsePayload.put("response", "success");
+                                        String historyEntriesJson = gson.toJson(historyEntries);
+                                        requestPayload.put("data", new JsonParser().parse(historyEntriesJson).getAsJsonArray());
+                                        response.put("payload", responsePayload);
+                                    } catch (JSONException e) {
+                                        Ln.e(e);
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Throwable throwable) {
+                                    try {
+                                        responsePayload.put("response", "error");
+                                        responsePayload.put("message", throwable.getMessage());
+                                        response.put("payload", responsePayload);
+                                    } catch (JSONException e) {
+                                        Ln.e(e);
+                                    }
+                                }
+                            });
+
+                            break;
+                        }
+
+                        case "cancel_pass": {
+                            String passId = requestPayload.getString("pass_id");
+
+                            GpmsSlave.cancelPass(gpms, rollNo, password, passId, new SuccessResponse() {
+
+                                @Override
+                                public void onSuccess() {
+                                    try {
+                                        responsePayload.put("response", "success");
+                                        response.put("payload", responsePayload);
+                                    } catch (JSONException e) {
+                                        Ln.e(e);
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Throwable throwable) {
+                                    try {
+                                        responsePayload.put("response", "error");
+                                        responsePayload.put("message", throwable.getMessage());
+                                        response.put("payload", responsePayload);
+                                    } catch (JSONException e) {
+                                        Ln.e(e);
+                                    }
+                                }
+                            });
+
+                            break;
+                        }
                     }
 
                     gpms.logout();

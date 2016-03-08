@@ -101,11 +101,10 @@ public class Gpms {
 
     public void deletePrefs() {
         try {
+            @SuppressLint("SdCardPath")
             File deletePrefFile = new File("/data/data/com.njlabs.amrita.aid/shared_prefs/" + client.COOKIE_FILE + ".xml");
             deletePrefFile.delete();
-        } catch (Exception ignored) {
-
-        }
+        } catch (Exception ignored) { }
     }
 
     public void basicLogin(String rollNo, String password, final LoginResponse loginResponse) {
@@ -174,7 +173,7 @@ public class Gpms {
                             setStudentName(name);
                             setStudentHostelCode(hostelCode);
 
-                            infoResponse.onSuccess(regNo, name, hostel, roomNo, mobile, email, photoUrl, numPasses);
+                            infoResponse.onSuccess(regNo, name, hostel, hostelCode, roomNo, mobile, email, photoUrl, numPasses);
                         } catch (Exception e) {
                             infoResponse.onFailure(e);
                         }
