@@ -32,9 +32,13 @@ import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.MainApplication;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.bugs.BugReport;
+import com.njlabs.amrita.aid.gpms.client.AbstractGpms;
 import com.njlabs.amrita.aid.gpms.client.Gpms;
+import com.njlabs.amrita.aid.gpms.envoy.GpmsEnvoy;
+import com.njlabs.amrita.aid.gpms.models.Relay;
 import com.njlabs.amrita.aid.gpms.responses.InfoResponse;
 import com.njlabs.amrita.aid.landing.Landing;
+import com.njlabs.amrita.aid.util.Identifier;
 import com.njlabs.amrita.aid.util.ark.Security;
 import com.njlabs.amrita.aid.util.ark.logging.Ln;
 import com.squareup.picasso.Downloader;
@@ -44,6 +48,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -55,7 +60,7 @@ import okhttp3.OkHttpClient;
 
 public class GpmsActivity extends BaseActivity {
 
-    Gpms gpms;
+    AbstractGpms gpms;
     EditText rollNoEditText;
     EditText passwordEditText;
     private ProgressDialog dialog;
@@ -66,10 +71,12 @@ public class GpmsActivity extends BaseActivity {
     SharedPreferences preferences;
     private static long backPress;
 
+    public String identifier;
+    public ArrayList<Relay> relays;
+
     @Override
     public void init(Bundle savedInstanceState) {
         setupLayout(R.layout.activity_gpms_login, Color.parseColor("#009688"));
-        gpms = new Gpms(baseContext);
         rollNoEditText = (EditText) findViewById(R.id.roll_no);
         passwordEditText = (EditText) findViewById(R.id.pwd);
 
@@ -82,6 +89,8 @@ public class GpmsActivity extends BaseActivity {
                 .setPositiveButton("Got it !", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
+                        hideSoftKeyboard();
+                        showConnectToAmritaAlert();
                     }
                 });
         AlertDialog alert = builder.create();
@@ -115,8 +124,44 @@ public class GpmsActivity extends BaseActivity {
             passwordEditText.setText(Security.decrypt(encodedPassword, MainApplication.key));
             hideSoftKeyboard();
         }
-
     }
+
+    private void initialiseGpms() {
+        if(Identifier.isConnectedToAmrita(baseContext)) {
+            gpms = new Gpms(baseContext);
+        } else {
+            gpms = new GpmsEnvoy(baseContext);
+        }
+    }
+
+    private void showConnectToAmritaAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(baseContext);
+        builder .setMessage("Connect to the Amrita WiFi if possible, for a reliable connection to the GPMS Server.")
+                .setCancelable(true)
+                .setIcon(R.drawable.ic_action_info_small)
+                .setPositiveButton("Ok. I'll connect.", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_WIFI_SETTINGS));
+                        finish();
+                    }
+                })
+                .setNegativeButton("No. I won't.", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                        initialiseGpms();
+                        hideSoftKeyboard();
+                    }
+                });
+
+        AlertDialog alert = builder.create();
+        alert.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        if(!Identifier.isConnectedToAmrita(baseContext)) {
+            alert.show();
+        } else {
+            initialiseGpms();
+        }
+    }
+
 
     public void reset(View v) {
         rollNoEditText.setText("");
@@ -160,7 +205,7 @@ public class GpmsActivity extends BaseActivity {
 
                 @SuppressWarnings("ConstantConditions")
                 @Override
-                public void onSuccess(String regNo, String name, String hostel, String hostelCode, String roomNo, String mobile, String email, String photoUrl, String numPasses) {
+                public void onSuccess(String regNo, String name, String hostel, String roomNo, String mobile, String email, String photoUrl, String numPasses) {
                     setupLayout(R.layout.activity_gpms_profile, Color.parseColor("#009688"));
                     ((TextView) findViewById(R.id.name)).setText(name);
                     ((TextView) findViewById(R.id.roll_no)).setText(regNo);
@@ -170,7 +215,7 @@ public class GpmsActivity extends BaseActivity {
                     studentName = name;
                     ImageView profilePic = (ImageView) findViewById(R.id.profile_pic);
                     Picasso picasso = getUnsecuredPicassoDownloader();
-                    picasso.load(photoUrl).into(profilePic);
+                    picasso.load(photoUrl).error(R.drawable.user).into(profilePic);
                     hideProgress();
                     loggedIn = true;
 
@@ -200,6 +245,10 @@ public class GpmsActivity extends BaseActivity {
             public void onClick(DialogInterface dialogList, int item) {
                 Intent intent = new Intent(baseContext, PassApplyActivity.class);
                 intent.putExtra("pass_type", items[item]);
+                if(relays != null && relays.size() > 0 && identifier != null) {
+                    intent.putParcelableArrayListExtra("relays", relays);
+                    intent.putExtra("identifier", identifier);
+                }
                 startActivity(intent);
             }
         });
@@ -208,11 +257,22 @@ public class GpmsActivity extends BaseActivity {
     }
 
     public void openPassStatus(View v) {
-        startActivity(new Intent(baseContext, PendingPassActivity.class));
+        Intent pendingPassActivityIntent = new Intent(baseContext, PendingPassActivity.class);
+        if(relays != null && relays.size() > 0 && identifier != null) {
+            pendingPassActivityIntent.putParcelableArrayListExtra("relays", relays);
+            pendingPassActivityIntent.putExtra("identifier", identifier);
+        }
+        startActivity(pendingPassActivityIntent);
     }
 
     public void openPassesHistory(View v) {
-        startActivity(new Intent(baseContext, PassHistoryActivity.class));
+
+        Intent passHistoryActivityIntent = new Intent(baseContext, PassHistoryActivity.class);
+        if(relays != null && relays.size() > 0 && identifier != null) {
+            passHistoryActivityIntent.putParcelableArrayListExtra("relays", relays);
+            passHistoryActivityIntent.putExtra("identifier", identifier);
+        }
+        startActivity(passHistoryActivityIntent);
     }
 
     private void showError() {

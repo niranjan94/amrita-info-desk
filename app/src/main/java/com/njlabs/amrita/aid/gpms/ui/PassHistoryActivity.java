@@ -4,6 +4,8 @@
 
 package com.njlabs.amrita.aid.gpms.ui;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -14,27 +16,33 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.njlabs.amrita.aid.BaseActivity;
+import com.njlabs.amrita.aid.MainApplication;
 import com.njlabs.amrita.aid.R;
+import com.njlabs.amrita.aid.gpms.client.AbstractGpms;
 import com.njlabs.amrita.aid.gpms.client.Gpms;
+import com.njlabs.amrita.aid.gpms.envoy.GpmsEnvoy;
 import com.njlabs.amrita.aid.gpms.models.HistoryEntry;
+import com.njlabs.amrita.aid.gpms.models.Relay;
 import com.njlabs.amrita.aid.gpms.responses.HistoryResponse;
 import com.njlabs.amrita.aid.util.ExtendedSwipeRefreshLayout;
+import com.njlabs.amrita.aid.util.Identifier;
+import com.njlabs.amrita.aid.util.ark.Security;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PassHistoryActivity extends BaseActivity {
 
     private ExtendedSwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
-    private Gpms gpms;
+    private AbstractGpms gpms;
 
     @Override
     public void init(Bundle savedInstanceState) {
         setupLayout(R.layout.activity_gpms_list, Color.parseColor("#009688"));
-
-        gpms = new Gpms(baseContext);
 
         swipeRefreshLayout = (ExtendedSwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         recyclerView = (RecyclerView) findViewById(R.id.list);
@@ -59,7 +67,27 @@ public class PassHistoryActivity extends BaseActivity {
                 super.onScrolled(recyclerView, dx, dy);
             }
         });
+
         swipeRefreshLayout.setRefreshing(true);
+
+        SharedPreferences preferences = getSharedPreferences("gpms_prefs", Context.MODE_PRIVATE);
+        String rollNo = preferences.getString("roll_no", "");
+        String password = Security.decrypt(preferences.getString("password", ""), MainApplication.key);
+
+        if(Identifier.isConnectedToAmrita(baseContext)) {
+            gpms = new Gpms(baseContext);
+        } else {
+            if(!getIntent().hasExtra("relays") || !getIntent().hasExtra("identifier")) {
+                Toast.makeText(baseContext, "An unexpected error occurred. Please try again later.", Toast.LENGTH_LONG).show();
+                finish();
+            }
+
+            ArrayList<Relay> relays = getIntent().getParcelableArrayListExtra("relays");
+            String identifier = getIntent().getStringExtra("identifier");
+
+            gpms = new GpmsEnvoy(baseContext, rollNo, password, identifier, relays);
+        }
+
         loadData();
     }
 

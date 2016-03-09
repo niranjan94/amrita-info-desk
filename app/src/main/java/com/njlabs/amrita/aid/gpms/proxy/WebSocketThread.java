@@ -24,7 +24,9 @@ public class WebSocketThread extends Thread {
     }
 
     public void run() {
+        Ln.d("run");
         if (WebSocketThread.lock.tryLock()) {
+            Ln.d("connect");
             try {
                 webSocket.connect();
             } catch (WebSocketException e) {

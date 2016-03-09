@@ -15,9 +15,8 @@ import android.support.v4.content.ContextCompat;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 import com.neovisionaries.ws.client.WebSocket;
-import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
@@ -32,13 +31,16 @@ import com.njlabs.amrita.aid.gpms.responses.PendingResponse;
 import com.njlabs.amrita.aid.util.Identifier;
 import com.njlabs.amrita.aid.util.ark.logging.Ln;
 import com.njlabs.amrita.aid.util.okhttp.responses.SuccessResponse;
+import com.njlabs.amrita.aid.util.socket.Listener;
 
 import org.joda.time.DateTime;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +60,7 @@ public class BackgroundSocketService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Ln.d("onStartCommand");
         if(intent != null && intent.getBooleanExtra("stop", false)) {
             if(webSocket != null) {
                 webSocket.disconnect();
@@ -76,6 +79,7 @@ public class BackgroundSocketService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        Ln.d("onCreate");
         context = this;
         gson = new GsonBuilder()
                 .excludeFieldsWithModifiers(Modifier.FINAL, Modifier.TRANSIENT, Modifier.STATIC)
@@ -100,6 +104,7 @@ public class BackgroundSocketService extends Service {
 
 
     private WebSocket buildWebSocket() throws IOException {
+        Ln.d("buildWebSocket");
         proxyWebsocketAdapter = new ProxyWebsocketAdapter();
         return new WebSocketFactory()
                 .setConnectionTimeout(15 * 1000)
@@ -107,7 +112,7 @@ public class BackgroundSocketService extends Service {
                 .addListener(proxyWebsocketAdapter);
     }
 
-    public class ProxyWebsocketAdapter extends WebSocketAdapter {
+    public class ProxyWebsocketAdapter extends Listener {
 
         @Override
         public void onTextMessage(WebSocket webSocket, String message) {
@@ -142,6 +147,7 @@ public class BackgroundSocketService extends Service {
 
 
     public void startWebsocketComm() {
+        Ln.d("startWebsocketComm");
         try {
             webSocket = buildWebSocket();
             new WebSocketThread(webSocket, proxyWebsocketAdapter).start();
@@ -179,12 +185,13 @@ public class BackgroundSocketService extends Service {
                 case "respond_if_available":
                     String[] wifiDetails = Identifier.getWifiInfo(context);
                     if (Identifier.isConnectedToAmrita(context)) {
+                        Ln.d("Connected to Amrita WiFi");
                         JSONObject response = new JSONObject();
                         response.put("action", "respond_back");
                         response.put("from", identifier);
-                        response.put("respond_to", request.getString("caller"));
+                        response.put("respond_to", request.getString("from"));
                         response.put("signal_strength", wifiDetails[1]);
-                        Ln.d(response.toString());
+                        Ln.d("Connected to Amrita WiFi " + response.toString());
                         webSocket.sendText(response.toString());
                     }
                     break;
@@ -206,7 +213,8 @@ public class BackgroundSocketService extends Service {
                     final JSONObject responsePayload = new JSONObject();
                     responsePayload.put("activity", activity + "_response");
 
-
+                    Ln.d("Activity {%s}", activity);
+                    Ln.d("RollNo {%s}", rollNo);
                     switch (activity) {
                         case "login": {
                             gpms.login(rollNo, password, new InfoResponse() {
@@ -222,7 +230,7 @@ public class BackgroundSocketService extends Service {
                                 }
 
                                 @Override
-                                public void onSuccess(String regNo, String name, String hostel, String hostelCode, String roomNo, String mobile, String email, String photoUrl, String numPasses) {
+                                public void onSuccess(String regNo, String name, String hostel, String roomNo, String mobile, String email, String photoUrl, String numPasses) {
                                     try {
                                         responsePayload.put("response", "success");
                                         responsePayload.put("name", name);
@@ -264,7 +272,7 @@ public class BackgroundSocketService extends Service {
                         }
 
                         case "apply_day_pass": {
-                            DateTime fromDate = DateTime.parse(requestPayload.getString("from_date"));
+                            DateTime fromDate = DateTime.parse(requestPayload.getString("from_date"), gpms.getLongDateTimeFormatter());
                             String occasion = requestPayload.getString("occasion");
                             String leaveReason = requestPayload.getString("leave_reason");
                             GpmsSlave.applyDayPass(gpms, rollNo, password, fromDate, occasion, leaveReason, new SuccessResponse() {
@@ -295,8 +303,8 @@ public class BackgroundSocketService extends Service {
                         }
 
                         case "apply_home_pass": {
-                            DateTime fromDate = DateTime.parse(requestPayload.getString("from_date"));
-                            DateTime toDate = DateTime.parse(requestPayload.getString("to_date"));
+                            DateTime fromDate = DateTime.parse(requestPayload.getString("from_date"), gpms.getLongDateTimeFormatter());
+                            DateTime toDate = DateTime.parse(requestPayload.getString("to_date"), gpms.getLongDateTimeFormatter());
                             String occasion = requestPayload.getString("occasion");
                             String leaveReason = requestPayload.getString("leave_reason");
                             GpmsSlave.applyHomePass(gpms, rollNo, password, fromDate, toDate, occasion, leaveReason, new SuccessResponse() {
@@ -332,9 +340,17 @@ public class BackgroundSocketService extends Service {
                                 public void onSuccess(List<PendingEntry> pendingEntries) {
                                     try {
                                         responsePayload.put("response", "success");
-                                        String pendingEntriesJson = gson.toJson(pendingEntries);
-                                        requestPayload.put("data", new JsonParser().parse(pendingEntriesJson).getAsJsonArray());
+
+                                        Type listType = new TypeToken<List<PendingEntry>>() {}.getType();
+                                        String pendingEntriesJson = gson.toJson(pendingEntries, listType);
+                                        responsePayload.put("data", new JSONArray(pendingEntriesJson));
+
+                                        if(!responsePayload.has("data")) {
+                                            responsePayload.put("data", new JSONArray("[]"));
+                                        }
+
                                         response.put("payload", responsePayload);
+                                        webSocket.sendText(response.toString());
                                     } catch (JSONException e) {
                                         Ln.e(e);
                                     }
@@ -346,6 +362,7 @@ public class BackgroundSocketService extends Service {
                                         responsePayload.put("response", "error");
                                         responsePayload.put("message", throwable.getMessage());
                                         response.put("payload", responsePayload);
+                                        webSocket.sendText(response.toString());
                                     } catch (JSONException e) {
                                         Ln.e(e);
                                     }
@@ -361,9 +378,16 @@ public class BackgroundSocketService extends Service {
                                 public void onSuccess(List<HistoryEntry> historyEntries) {
                                     try {
                                         responsePayload.put("response", "success");
-                                        String historyEntriesJson = gson.toJson(historyEntries);
-                                        requestPayload.put("data", new JsonParser().parse(historyEntriesJson).getAsJsonArray());
+                                        Type listType = new TypeToken<List<HistoryEntry>>() {}.getType();
+                                        String historyEntriesJson = gson.toJson(historyEntries, listType);
+                                        responsePayload.put("data", new JSONArray(historyEntriesJson));
+
+                                        if(!responsePayload.has("data")) {
+                                            responsePayload.put("data", new JSONArray("[]"));
+                                        }
+
                                         response.put("payload", responsePayload);
+                                        webSocket.sendText(response.toString());
                                     } catch (JSONException e) {
                                         Ln.e(e);
                                     }
@@ -375,6 +399,7 @@ public class BackgroundSocketService extends Service {
                                         responsePayload.put("response", "error");
                                         responsePayload.put("message", throwable.getMessage());
                                         response.put("payload", responsePayload);
+                                        webSocket.sendText(response.toString());
                                     } catch (JSONException e) {
                                         Ln.e(e);
                                     }
@@ -394,6 +419,7 @@ public class BackgroundSocketService extends Service {
                                     try {
                                         responsePayload.put("response", "success");
                                         response.put("payload", responsePayload);
+                                        webSocket.sendText(response.toString());
                                     } catch (JSONException e) {
                                         Ln.e(e);
                                     }
@@ -405,6 +431,7 @@ public class BackgroundSocketService extends Service {
                                         responsePayload.put("response", "error");
                                         responsePayload.put("message", throwable.getMessage());
                                         response.put("payload", responsePayload);
+                                        webSocket.sendText(response.toString());
                                     } catch (JSONException e) {
                                         Ln.e(e);
                                     }

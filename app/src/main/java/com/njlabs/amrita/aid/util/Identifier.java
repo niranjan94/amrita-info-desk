@@ -40,8 +40,9 @@ public class Identifier {
 
     public static boolean isConnectedToAmrita(Context context) {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        String SSID = wifiManager.getConnectionInfo().getSSID().replace("\"","");
-        return SSID.equalsIgnoreCase("Amrita");
+        String SSID = wifiManager.getConnectionInfo().getSSID().replace("\"","").trim();
+        Ln.d("{%s}", SSID);
+        return SSID.contentEquals("Amrita");
     }
 
     public static String getJsonIdentifier(Context context) {

@@ -44,8 +44,6 @@ public class MainApplication extends Application {
                 .setFontAttrId(R.attr.fontPath)
                 .build());
 
-        Ln.d("onCreate");
-
         Configuration dbConfiguration = new Configuration.Builder(this)
                 .setDatabaseName("storage.db")
                 .addModelClass(NewsModel.class)

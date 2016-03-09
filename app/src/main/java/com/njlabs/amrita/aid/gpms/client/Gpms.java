@@ -21,7 +21,8 @@ import com.njlabs.amrita.aid.util.okhttp.responses.SuccessResponse;
 import com.njlabs.amrita.aid.util.okhttp.responses.TextResponse;
 
 import org.joda.time.DateTime;
-import org.joda.time.Period;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -31,19 +32,17 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Gpms {
+public class Gpms implements AbstractGpms {
 
     public GpmsClient client;
     private String studentRollNo = null;
     private String studentName = null;
     private String studentHostelCode = null;
-    private Context context;
     private SharedPreferences cookiePrefFile;
     public static String dateFormat = "dd MMM yyyy HH:mm:ss";
     public static String shortDateFormat = "dd MMM yyyy";
 
     public Gpms(Context context) {
-        this.context = context;
         client = new GpmsClient(context);
         client.powerUp();
 
@@ -55,7 +54,6 @@ public class Gpms {
     }
 
     public Gpms(Context context, String cookiePrefFilename) {
-        this.context = context;
         client = new GpmsClient(context, cookiePrefFilename);
         client.powerUp();
 
@@ -82,10 +80,6 @@ public class Gpms {
     public void setStudentName(String studentName) {
         cookiePrefFile.edit().putString("gpms_name", studentName).apply();
         this.studentName = studentName;
-    }
-
-    public String getStudentHostelCode() {
-        return studentHostelCode;
     }
 
     public void setStudentHostelCode(String studentHostelCode) {
@@ -128,6 +122,7 @@ public class Gpms {
         });
     }
 
+    @Override
     public void login(String rollNo, String password, final InfoResponse infoResponse) {
 
         basicLogin(rollNo, password, new LoginResponse() {
@@ -173,7 +168,7 @@ public class Gpms {
                             setStudentName(name);
                             setStudentHostelCode(hostelCode);
 
-                            infoResponse.onSuccess(regNo, name, hostel, hostelCode, roomNo, mobile, email, photoUrl, numPasses);
+                            infoResponse.onSuccess(regNo, name, hostel, roomNo, mobile, email, photoUrl, numPasses);
                         } catch (Exception e) {
                             infoResponse.onFailure(e);
                         }
@@ -188,6 +183,7 @@ public class Gpms {
         });
     }
 
+    @Override
     public void applyDayPass(final DateTime fromDate, final String occasion, final String reason, final SuccessResponse successResponse) {
 
         RequestParams params = new RequestParams();
@@ -243,6 +239,7 @@ public class Gpms {
 
     }
 
+    @Override
     public void applyHomePass(final DateTime fromDate, final DateTime toDate, final String occasion, final String reason, final SuccessResponse successResponse) {
 
 
@@ -301,6 +298,7 @@ public class Gpms {
         });
     }
 
+    @Override
     public void getPendingPasses(final PendingResponse pendingResponse) {
         client.setReferer(client.getUnproxiedUrl("/home.php"));
         client.get("/leavestatus.php", null, new TextResponse() {
@@ -345,6 +343,7 @@ public class Gpms {
         });
     }
 
+    @Override
     public void cancelPass(String requestId, final SuccessResponse successResponse) {
         RequestParams params = new RequestParams();
         params.put("reqid", requestId);
@@ -363,6 +362,7 @@ public class Gpms {
         });
     }
 
+    @Override
     public void getPassesHistory(final HistoryResponse historyResponse) {
         client.setReferer(client.getUnproxiedUrl("/home.php"));
         client.get("/leavehistory.php", null, new TextResponse() {
@@ -426,18 +426,11 @@ public class Gpms {
         }
     }
 
-    private int roundedDatesDifference(DateTime date1, DateTime date2) {
-        Period p = new Period(date1, date2);
-        int days = p.getDays();
-        int hours = p.getHours();
-        if (hours > 0)
-            return (days + 1);
-        else
-            return (days);
-    }
-
     private String leftPadInteger(int val) {
         return String.format("%02d", val);
     }
 
+    public DateTimeFormatter getLongDateTimeFormatter() {
+        return DateTimeFormat.forPattern(dateFormat);
+    }
 }

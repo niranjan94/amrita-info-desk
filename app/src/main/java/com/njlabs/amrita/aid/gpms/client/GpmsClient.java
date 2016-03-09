@@ -22,7 +22,7 @@ public class GpmsClient extends Client {
     }
 
     public GpmsClient(Context context, String COOKIE_FILE) {
-        super(context);
+        this(context);
         this.COOKIE_FILE = COOKIE_FILE;
 
     }

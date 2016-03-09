@@ -5,6 +5,8 @@
 package com.njlabs.amrita.aid.gpms.ui;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -18,14 +20,21 @@ import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter;
 import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
 import com.google.android.gms.analytics.HitBuilders;
 import com.njlabs.amrita.aid.BaseActivity;
+import com.njlabs.amrita.aid.MainApplication;
 import com.njlabs.amrita.aid.R;
+import com.njlabs.amrita.aid.gpms.client.AbstractGpms;
 import com.njlabs.amrita.aid.gpms.client.Gpms;
+import com.njlabs.amrita.aid.gpms.envoy.GpmsEnvoy;
+import com.njlabs.amrita.aid.gpms.models.Relay;
+import com.njlabs.amrita.aid.util.Identifier;
+import com.njlabs.amrita.aid.util.ark.Security;
 import com.njlabs.amrita.aid.util.ark.logging.Ln;
 import com.njlabs.amrita.aid.util.okhttp.responses.SuccessResponse;
 
 import org.angmarch.views.NiceSpinner;
 import org.joda.time.DateTime;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedList;
@@ -41,7 +50,7 @@ public class PassApplyActivity extends BaseActivity {
     NiceSpinner spinner;
     String passType;
 
-    Gpms gpms;
+    AbstractGpms gpms;
     private ProgressDialog dialog;
 
     @Override
@@ -63,7 +72,23 @@ public class PassApplyActivity extends BaseActivity {
             findViewById(R.id.required_till_text).setVisibility(View.GONE);
         }
 
-        gpms = new Gpms(baseContext);
+        SharedPreferences preferences = getSharedPreferences("gpms_prefs", Context.MODE_PRIVATE);
+        String rollNo = preferences.getString("roll_no", "");
+        String password = Security.decrypt(preferences.getString("password", ""), MainApplication.key);
+
+        if(Identifier.isConnectedToAmrita(baseContext)) {
+            gpms = new Gpms(baseContext);
+        } else {
+            if(!getIntent().hasExtra("relays") || !getIntent().hasExtra("identifier")) {
+                Toast.makeText(baseContext, "An unexpected error occurred. Please try again later.", Toast.LENGTH_LONG).show();
+                finish();
+            }
+
+            ArrayList<Relay> relays = getIntent().getParcelableArrayListExtra("relays");
+            String identifier = getIntent().getStringExtra("identifier");
+
+            gpms = new GpmsEnvoy(baseContext, rollNo, password, identifier, relays);
+        }
 
         ((Button) findViewById(R.id.apply_pass)).setText("Apply for " + passType);
 
