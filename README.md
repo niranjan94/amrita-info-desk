@@ -2,4 +2,4 @@
 
 # Amrita Information Desk
 
-The best companion for every Amritian
+![Amrita Info Desk](https://github.com/niranjan94/amrita-info-desk/blob/static-files/banner.jpg?raw=true)
