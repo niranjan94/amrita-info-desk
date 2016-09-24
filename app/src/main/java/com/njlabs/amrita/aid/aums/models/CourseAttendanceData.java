@@ -4,11 +4,8 @@
 
 package com.njlabs.amrita.aid.aums.models;
 
-import com.crashlytics.android.Crashlytics;
 
-/**
- * Created by Niranjan on 22-10-2014.
- */
+import com.google.firebase.crash.FirebaseCrash;
 
 public class CourseAttendanceData {
     public String courseCode;
@@ -34,7 +31,7 @@ public class CourseAttendanceData {
         try {
             this.total = Math.round(Float.valueOf(total));
         } catch(Exception e){
-            Crashlytics.logException(e);
+            FirebaseCrash.report(e);
             this.total = 0;
         }
     }
@@ -44,7 +41,7 @@ public class CourseAttendanceData {
             this.attended = Math.round(Float.valueOf(attended));
             this.bunked = this.total-this.attended;
         } catch (Exception e){
-            Crashlytics.logException(e);
+            FirebaseCrash.report(e);
             this.attended = 0;
             this.bunked = 0;
         }
@@ -55,7 +52,7 @@ public class CourseAttendanceData {
         try{
             this.percentage = Float.parseFloat(percentage);
         } catch(Exception e){
-            Crashlytics.logException(e);
+            FirebaseCrash.report(e);
             this.percentage = 0;
         }
     }

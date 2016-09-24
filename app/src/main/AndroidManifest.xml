@@ -202,8 +202,6 @@
             android:name="com.crashlytics.ApiKey"
             android:value="37243dbea20e385bdebdc999bef0715ef594e382" />
 
-        <service android:name=".gpms.proxy.BackgroundSocketService" />
-
         <receiver
             android:name=".gpms.proxy.SocketStarterReceiver"
             android:exported="true" >

@@ -10,6 +10,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -76,7 +77,7 @@ public class AumsResourcesActivity extends BaseActivity {
         });
         final LinearLayoutManager layoutParams = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutParams);
-        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
@@ -187,6 +188,7 @@ public class AumsResourcesActivity extends BaseActivity {
     void downloadFile() {
         progressDialog.show();
         aums.downloadResource(courseId, fileNameToDownload, new FileResponse() {
+            @SuppressWarnings("ResultOfMethodCallIgnored")
             @Override
             public void onSuccess(File file) {
                 if(fileNameToDownload == null) {
@@ -207,11 +209,11 @@ public class AumsResourcesActivity extends BaseActivity {
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView name;
-        public TextView detail;
-        public TextView hidden;
+        TextView detail;
+        TextView hidden;
         public ImageView icon;
 
-        public ViewHolder(View v) {
+        ViewHolder(View v) {
             super(v);
             name = ((TextView) v.findViewById(R.id.name));
             detail = ((TextView) v.findViewById(R.id.detail));
@@ -225,7 +227,7 @@ public class AumsResourcesActivity extends BaseActivity {
 
         private List<CourseData> courseDataList;
 
-        public CoursesListAdapter(List<CourseData> courseDataList) {
+        CoursesListAdapter(List<CourseData> courseDataList) {
             this.courseDataList = courseDataList;
         }
 
@@ -255,7 +257,7 @@ public class AumsResourcesActivity extends BaseActivity {
 
         private List<CourseResource> courseResourceList;
 
-        public CourseResourcesAdapter(List<CourseResource> courseResourceList) {
+        CourseResourcesAdapter(List<CourseResource> courseResourceList) {
             this.courseResourceList = courseResourceList;
         }
 
@@ -343,13 +345,16 @@ public class AumsResourcesActivity extends BaseActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         AumsResourcesActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
     }
 
     public static String humanReadableByteCount(long bytes) {
-        boolean si = false;
+        return humanReadableByteCount(bytes, false);
+    }
+
+    public static String humanReadableByteCount(long bytes, boolean si) {
         int unit = si ? 1000 : 1024;
         if (bytes < unit) return bytes + " B";
         int exp = (int) (Math.log(bytes) / Math.log(unit));

@@ -10,9 +10,9 @@ import android.content.Context;
 import com.njlabs.amrita.aid.util.okhttp.Client;
 import com.njlabs.amrita.aid.util.okhttp.extras.PersistentCookieStore;
 
-public class AumsClient extends Client {
+class AumsClient extends Client {
 
-    public AumsClient(Context context) {
+    AumsClient(Context context) {
         super(context);
     }
 

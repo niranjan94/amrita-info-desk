@@ -4,16 +4,13 @@
 
 package com.njlabs.amrita.aid.aums.models;
 
-/**
- * Created by Niranjan on 22-10-2014.
- */
 public class CourseData {
 
-    String id;
-    String courseCode;
-    String courseName;
-    String type;
-    double credits;
+    private String id;
+    private String courseCode;
+    private String courseName;
+    private String type;
+    private double credits;
 
     public CourseData() {
     }

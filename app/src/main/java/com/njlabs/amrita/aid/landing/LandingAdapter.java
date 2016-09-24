@@ -18,17 +18,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Created by Niranjan on 06-09-2014.
- */
 @SuppressWarnings("deprecation")
-public class LandingAdapter extends BaseAdapter {
+class LandingAdapter extends BaseAdapter {
 
-    public static List<Item> items = new ArrayList<Item>();
+    private static List<Item> items = new ArrayList<>();
     private LayoutInflater inflater;
-    Context context;
+    private Context context;
 
-    public LandingAdapter(Context context, int Group) {
+    LandingAdapter(Context context) {
 
         this.context = context;
         inflater = LayoutInflater.from(context);
@@ -75,9 +72,6 @@ public class LandingAdapter extends BaseAdapter {
         picture = (ImageView) v.getTag(R.id.landing_picture);
         name = (TextView) v.getTag(R.id.landing_text);
 
-        Random rnd = new Random();
-        int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
-
         // GOOGLE MATERIAL DESIGN COLOR PALETTE
         int colors[] = {
                 Color.parseColor("#e51c23"),
@@ -101,7 +95,7 @@ public class LandingAdapter extends BaseAdapter {
                 Color.parseColor("#607d8b")
         };
 
-        color = colors[new Random().nextInt(colors.length)];
+        int color = colors[new Random().nextInt(colors.length)];
 
         holder.setBackgroundColor(color);
 
@@ -112,7 +106,7 @@ public class LandingAdapter extends BaseAdapter {
         return v;
     }
 
-    public static class Item {
+    private static class Item {
 
         final String color;
         final String name;

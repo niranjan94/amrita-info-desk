@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,10 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
-import com.google.android.gms.gcm.GcmNetworkManager;
-import com.google.android.gms.gcm.PeriodicTask;
-import com.google.android.gms.gcm.Task;
+import com.google.firebase.crash.FirebaseCrash;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.accountswitcher.AccountHeader;
@@ -37,14 +35,11 @@ import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.about.Amrita;
 import com.njlabs.amrita.aid.about.App;
 import com.njlabs.amrita.aid.aums.AumsActivity;
-import com.njlabs.amrita.aid.gpms.proxy.BackgroundSocketService;
-import com.njlabs.amrita.aid.gpms.proxy.SocketStarterService;
 import com.njlabs.amrita.aid.gpms.ui.GpmsActivity;
 import com.njlabs.amrita.aid.info.Calender;
 import com.njlabs.amrita.aid.info.Curriculum;
 import com.njlabs.amrita.aid.info.TrainBusInfo;
 import com.njlabs.amrita.aid.news.NewsActivity;
-import com.njlabs.amrita.aid.news.NewsUpdateService;
 import com.njlabs.amrita.aid.settings.SettingsActivity;
 import com.njlabs.amrita.aid.util.ark.logging.Ln;
 import com.njlabs.amrita.aid.util.okhttp.extras.PersistentCookieStore;
@@ -60,12 +55,7 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import permissions.dispatcher.NeedsPermission;
-import permissions.dispatcher.OnNeverAskAgain;
-import permissions.dispatcher.OnPermissionDenied;
-import permissions.dispatcher.RuntimePermissions;
 
-@RuntimePermissions
 public class Landing extends BaseActivity {
 
     @SuppressLint("ShortAlarm")
@@ -119,21 +109,6 @@ public class Landing extends BaseActivity {
 
         setupGrid();
 
-        long periodSecs = 21600;
-        long flexSecs = 30;
-        String tag = "periodic  | NewsUpdateService: " + periodSecs + "s, f:" + flexSecs;
-        PeriodicTask periodic = new PeriodicTask.Builder()
-                .setService(NewsUpdateService.class)
-                .setPeriod(periodSecs)
-                .setFlex(flexSecs)
-                .setTag(tag)
-                .setPersisted(true)
-                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
-                .setRequiresCharging(false)
-                .build();
-
-        GcmNetworkManager.getInstance(this).schedule(periodic);
-
         File aumsCookieFile = new File(getApplicationContext().getFilesDir().getParent()+"/shared_prefs/" + PersistentCookieStore.AUMS_COOKIE_PREFS+ ".xml" );
         if(aumsCookieFile.exists()) {
             aumsCookieFile.delete();
@@ -144,46 +119,13 @@ public class Landing extends BaseActivity {
             gpmsCookieFile.delete();
         }
 
-        LandingPermissionsDispatcher.checkPhoneStateWithCheck(this);
     }
 
-
-    @NeedsPermission(Manifest.permission.READ_PHONE_STATE)
-    void checkPhoneState() {
-        long periodSecs = 10800;
-        long flexSecs = 30;
-        String tag = "periodic  | ProxyServiceStarterService: " + periodSecs + "s, f:" + flexSecs;
-        PeriodicTask periodic = new PeriodicTask.Builder()
-                .setService(SocketStarterService.class)
-                .setPeriod(periodSecs)
-                .setFlex(flexSecs)
-                .setTag(tag)
-                .setPersisted(true)
-                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
-                .setRequiresCharging(false)
-                .build();
-
-        GcmNetworkManager.getInstance(this).schedule(periodic);
-
-        startService(new Intent(this, BackgroundSocketService.class));
-    }
-
-    @OnPermissionDenied(Manifest.permission.READ_PHONE_STATE)
-    void showDeniedForCamera() {
-        Toast.makeText(this, "Phone permission is required for Amrita Info Desk to function", Toast.LENGTH_LONG).show();
-        finish();
-    }
-
-    @OnNeverAskAgain(Manifest.permission.READ_PHONE_STATE)
-    void showNeverAskAgainForCamera() {
-        Toast.makeText(this, "Phone permission is required for Amrita Info Desk to function", Toast.LENGTH_LONG).show();
-        finish();
-    }
 
     private void setupGrid() {
 
         GridView gridView = (GridView) findViewById(R.id.landing_grid);
-        gridView.setAdapter(new LandingAdapter(baseContext, 1));
+        gridView.setAdapter(new LandingAdapter(baseContext));
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -291,7 +233,7 @@ public class Landing extends BaseActivity {
                                     Latest = response.getDouble("version");
                                     Description = response.getString("description");
                                 } catch (JSONException e) {
-                                    Crashlytics.logException(e);
+                                    FirebaseCrash.report(e);
                                 }
                                 if (Latest > BuildConfig.VERSION_CODE) {
 
@@ -342,9 +284,4 @@ public class Landing extends BaseActivity {
         });
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        LandingPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
-    }
 }

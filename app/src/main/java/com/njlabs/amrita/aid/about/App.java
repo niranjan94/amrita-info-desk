@@ -10,11 +10,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.BuildConfig;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.bugs.BugReport;
-import com.parse.ParseInstallation;
 
 
 public class App extends BaseActivity {
@@ -22,8 +22,8 @@ public class App extends BaseActivity {
     @Override
     public void init(Bundle savedInstanceState) {
         setupLayout(R.layout.activity_about_app, Color.parseColor("#5B96E7"));
-        ((TextView) findViewById(R.id.version)).setText("Version "+BuildConfig.VERSION_NAME);
-        ((TextView) findViewById(R.id.install_id_view)).setText("Installation ID: "+ ParseInstallation.getCurrentInstallation().getInstallationId());
+        ((TextView) findViewById(R.id.version)).setText("Version " + BuildConfig.VERSION_NAME);
+        ((TextView) findViewById(R.id.install_id_view)).setText("Installation ID: " + FirebaseInstanceId.getInstance().getId());
     }
 
     @Override

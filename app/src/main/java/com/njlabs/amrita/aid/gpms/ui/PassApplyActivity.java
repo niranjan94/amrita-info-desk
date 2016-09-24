@@ -18,15 +18,12 @@ import android.widget.Toast;
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
 import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter;
 import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
-import com.google.android.gms.analytics.HitBuilders;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.MainApplication;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.gpms.client.AbstractGpms;
 import com.njlabs.amrita.aid.gpms.client.Gpms;
-import com.njlabs.amrita.aid.gpms.envoy.GpmsEnvoy;
-import com.njlabs.amrita.aid.gpms.models.Relay;
-import com.njlabs.amrita.aid.util.Identifier;
 import com.njlabs.amrita.aid.util.ark.Security;
 import com.njlabs.amrita.aid.util.ark.logging.Ln;
 import com.njlabs.amrita.aid.util.okhttp.responses.SuccessResponse;
@@ -34,7 +31,6 @@ import com.njlabs.amrita.aid.util.okhttp.responses.SuccessResponse;
 import org.angmarch.views.NiceSpinner;
 import org.joda.time.DateTime;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedList;
@@ -76,19 +72,7 @@ public class PassApplyActivity extends BaseActivity {
         String rollNo = preferences.getString("roll_no", "");
         String password = Security.decrypt(preferences.getString("password", ""), MainApplication.key);
 
-        if(Identifier.isConnectedToAmrita(baseContext)) {
-            gpms = new Gpms(baseContext);
-        } else {
-            if(!getIntent().hasExtra("relays") || !getIntent().hasExtra("identifier")) {
-                Toast.makeText(baseContext, "An unexpected error occurred. Please try again later.", Toast.LENGTH_LONG).show();
-                finish();
-            }
-
-            ArrayList<Relay> relays = getIntent().getParcelableArrayListExtra("relays");
-            String identifier = getIntent().getStringExtra("identifier");
-
-            gpms = new GpmsEnvoy(baseContext, rollNo, password, identifier, relays);
-        }
+        gpms = new Gpms(baseContext);
 
         ((Button) findViewById(R.id.apply_pass)).setText("Apply for " + passType);
 
@@ -128,11 +112,12 @@ public class PassApplyActivity extends BaseActivity {
                         Toast.makeText(baseContext, "Your pass has been applied.", Toast.LENGTH_LONG).show();
                         finish();
 
-                        tracker.send(new HitBuilders.EventBuilder()
-                                .setCategory("GPMS")
-                                .setAction("Day Pass")
-                                .setLabel(gpms.getStudentName() + " - " + gpms.getStudentRollNo())
-                                .build());
+                        Bundle bundle = new Bundle();
+                        bundle.putString(FirebaseAnalytics.Param.ITEM_CATEGORY, "GPMS");
+                        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Day Pass");
+                        bundle.putString(FirebaseAnalytics.Param.CHARACTER, gpms.getStudentName() + " - " + gpms.getStudentRollNo());
+                        tracker.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+
                     }
 
                     @Override
@@ -159,11 +144,11 @@ public class PassApplyActivity extends BaseActivity {
                         Toast.makeText(baseContext, "Your pass has been applied.", Toast.LENGTH_LONG).show();
                         finish();
 
-                        tracker.send(new HitBuilders.EventBuilder()
-                                .setCategory("GPMS")
-                                .setAction("Home Pass")
-                                .setLabel(gpms.getStudentName() + " - " + gpms.getStudentRollNo())
-                                .build());
+                        Bundle bundle = new Bundle();
+                        bundle.putString(FirebaseAnalytics.Param.ITEM_CATEGORY, "GPMS");
+                        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Home Pass");
+                        bundle.putString(FirebaseAnalytics.Param.CHARACTER, gpms.getStudentName() + " - " + gpms.getStudentRollNo());
+                        tracker.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
 
                     }
 
@@ -219,14 +204,8 @@ public class PassApplyActivity extends BaseActivity {
                 .setFirstDayOfWeek(Calendar.SUNDAY)
                 .setPreselectedDate(startDate.getYear(), startDate.getMonthOfYear()-1, startDate.getDayOfMonth())
                 .setDateRange(calendarDay, null)
-                .setThemeDark(false);
+                .setThemeLight();
         cdp.show(getSupportFragmentManager(), "FRAG_TAG_DATE_PICKER");
 
     }
-
-    /*private DateTime roundOffDate(DateTime target) {
-        if(target.getMinuteOfHour() > 0 && target.getMinuteOfHour() < 15) {
-
-        }
-    }*/
 }

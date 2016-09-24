@@ -4,6 +4,7 @@
 
 package com.njlabs.amrita.aid.news;
 
+import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -15,11 +16,6 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
 import com.activeandroid.ActiveAndroid;
-import com.google.android.gms.gcm.GcmNetworkManager;
-import com.google.android.gms.gcm.GcmTaskService;
-import com.google.android.gms.gcm.PeriodicTask;
-import com.google.android.gms.gcm.Task;
-import com.google.android.gms.gcm.TaskParams;
 import com.njlabs.amrita.aid.R;
 
 import org.jsoup.Jsoup;
@@ -35,34 +31,42 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class NewsUpdateService extends GcmTaskService {
+public class NewsUpdateService extends IntentService {
+
     Context mContext;
-    int status = GcmNetworkManager.RESULT_SUCCESS;
     boolean allowNotification = true;
+
+    public NewsUpdateService(String name) {
+        super(name);
+    }
+
+    public NewsUpdateService() {
+        super("NewsUpdateService");
+    }
+
     @Override
-    public int onRunTask(TaskParams taskParams) {
+    protected void onHandleIntent(Intent intent) {
         mContext = this;
         SharedPreferences preferences = getSharedPreferences("com.njlabs.amrita.aid_preferences", Context.MODE_PRIVATE);
         allowNotification = preferences.getBoolean("news_updates_notification", true);
-        return new JobTask(this).execute();
+        new JobTask(this).execute();
     }
 
     private class JobTask {
         private final NewsUpdateService jobService;
         private List<NewsModel> oldArticles;
 
-        public JobTask(NewsUpdateService jobService) {
+        JobTask(NewsUpdateService jobService) {
             this.jobService = jobService;
         }
 
-        public int execute() {
+        void execute() {
             oldArticles = NewsModel.getAll();
             if (oldArticles != null && oldArticles.size() > 0) {
                 getNews(true, oldArticles);
             } else {
                 getNews(false, oldArticles);
             }
-            return status;
         }
     }
 
@@ -85,7 +89,6 @@ public class NewsUpdateService extends GcmTaskService {
 
             if(response.isSuccessful()) {
                 String responseString = response.body().string();
-                status = GcmNetworkManager.RESULT_SUCCESS;
                 currentArticles = new ArrayList<>();
                 if(refresh){
                     NewsModel.deleteAll();
@@ -163,33 +166,11 @@ public class NewsUpdateService extends GcmTaskService {
                     }
 
                 }
-            } else {
-                status = GcmNetworkManager.RESULT_RESCHEDULE;
             }
-        } catch (IOException e) {
-            status = GcmNetworkManager.RESULT_RESCHEDULE;
+        } catch (IOException ignored) {
+
         }
 
     }
 
-    @Override
-    public void onInitializeTasks() {
-
-        long periodSecs = 21600L;
-        long flexSecs = 30L;
-        String tag = "periodic  | NewsUpdateService: " + periodSecs + "s, f:" + flexSecs;
-        PeriodicTask periodic = new PeriodicTask.Builder()
-                .setService(NewsUpdateService.class)
-                .setPeriod(periodSecs)
-                .setFlex(flexSecs)
-                .setTag(tag)
-                .setPersisted(true)
-                .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
-                .setRequiresCharging(false)
-                .build();
-
-        GcmNetworkManager.getInstance(this).schedule(periodic);
-
-        super.onInitializeTasks();
-    }
 }

@@ -53,7 +53,7 @@ public class GradesActivity extends BaseActivity {
 
         final LinearLayoutManager layoutParams = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutParams);
-        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
@@ -126,15 +126,15 @@ public class GradesActivity extends BaseActivity {
         private int HEADER = 1;
         private int ITEM = 2;
 
-        public class ViewHolder extends RecyclerView.ViewHolder {
+        class ViewHolder extends RecyclerView.ViewHolder {
 
-            public TextView courseTitle;
-            public TextView attendanceStatus;
-            public TextView percentage;
+            TextView courseTitle;
+            TextView attendanceStatus;
+            TextView percentage;
             public View indicator;
-            public View root;
+            View root;
 
-            public ViewHolder(View v) {
+            ViewHolder(View v) {
                 super(v);
                 courseTitle = ((TextView) v.findViewById(R.id.course_title));
                 attendanceStatus = ((TextView) v.findViewById(R.id.attendance_status));
@@ -145,7 +145,7 @@ public class GradesActivity extends BaseActivity {
 
         }
 
-        public GradesAdapter(List<CourseGradeData> courseGradeDataList) {
+        GradesAdapter(List<CourseGradeData> courseGradeDataList) {
             this.courseGradeDataList = courseGradeDataList;
         }
 

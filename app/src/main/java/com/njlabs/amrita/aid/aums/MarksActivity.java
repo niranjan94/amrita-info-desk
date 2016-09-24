@@ -53,7 +53,7 @@ public class MarksActivity extends BaseActivity {
         });
         final LinearLayoutManager layoutParams = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutParams);
-        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
@@ -118,15 +118,15 @@ public class MarksActivity extends BaseActivity {
         private int HEADER = 1;
         private int ITEM = 2;
 
-        public class ViewHolder extends RecyclerView.ViewHolder {
+        class ViewHolder extends RecyclerView.ViewHolder {
 
             public TextView name;
             public TextView value;
             public View indicator;
 
-            public TextView sectionHeader;
+            TextView sectionHeader;
 
-            public ViewHolder(View v) {
+            ViewHolder(View v) {
                 super(v);
                 try {
                     name = (TextView) v.findViewById(R.id.name);
@@ -141,7 +141,7 @@ public class MarksActivity extends BaseActivity {
 
         }
 
-        public MarksAdapter(List<CourseMarkData> courseMarkDataList) {
+        MarksAdapter(List<CourseMarkData> courseMarkDataList) {
             this.courseMarkDataList = courseMarkDataList;
         }
 

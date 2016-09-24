@@ -43,9 +43,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-/**
- * Created by Niranjan on 07-07-2015.
- */
 public class NewsActivity extends BaseActivity {
 
     private ExtendedSwipeRefreshLayout swipeRefreshLayout;
@@ -68,7 +65,7 @@ public class NewsActivity extends BaseActivity {
         });
         final LinearLayoutManager layoutParams = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutParams);
-        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
@@ -195,11 +192,11 @@ public class NewsActivity extends BaseActivity {
 
         private List<NewsModel> newsArticles;
 
-        public class ViewHolder extends RecyclerView.ViewHolder {
+        class ViewHolder extends RecyclerView.ViewHolder {
             public TextView title;
             public ImageView image;
             public TextView url;
-            public ViewHolder(View v) {
+            ViewHolder(View v) {
                 super(v);
                 title = (TextView) v.findViewById(R.id.title);
                 image = (ImageView) v.findViewById(R.id.image);
@@ -209,7 +206,7 @@ public class NewsActivity extends BaseActivity {
 
         }
 
-        public NewsAdapter(List<NewsModel> newsArticles) {
+        NewsAdapter(List<NewsModel> newsArticles) {
             this.newsArticles = newsArticles;
         }
 

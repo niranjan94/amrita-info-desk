@@ -2,6 +2,7 @@ package com.njlabs.amrita.aid.info;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.Html;
 import android.view.View;
 import android.view.ViewGroup;
@@ -446,8 +447,9 @@ public class TrainBusInfo extends BaseActivity {
 
     public void setupList() {
         ArrayAdapter<Transporter> aa = new ArrayAdapter<Transporter>(getBaseContext(), R.layout.list_transport_item, transporters) {
+            @NonNull
             @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
+            public View getView(int position, View convertView, @NonNull ViewGroup parent) {
                 if (convertView == null) {
                     convertView = getLayoutInflater().inflate(R.layout.list_transport_card, null);
                 }

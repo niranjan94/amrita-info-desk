@@ -24,7 +24,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.HitBuilders;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.MainApplication;
 import com.njlabs.amrita.aid.R;
@@ -196,12 +196,11 @@ public class AumsActivity extends BaseActivity {
                         loadCgpa();
                         loadPhoto();
 
-                        tracker.send(new HitBuilders.EventBuilder()
-                                .setCategory("AUMS")
-                                .setAction("Login")
-                                .setLabel(name + " - " + rollNo)
-                                .build());
-
+                        Bundle bundle = new Bundle();
+                        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "AUMS");
+                        bundle.putString(FirebaseAnalytics.Param.CHARACTER, name + " - " + rollNo);
+                        bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "screen");
+                        tracker.logEvent(FirebaseAnalytics.Event.LOGIN, bundle);
                     }
 
                     @Override

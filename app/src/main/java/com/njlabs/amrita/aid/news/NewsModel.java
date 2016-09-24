@@ -12,33 +12,33 @@ import com.activeandroid.query.Select;
 
 import java.util.List;
 
-/**
- * Created by Niranjan on 07-07-2015.
- */
 @Table(name = "News")
 public class NewsModel extends Model {
 
     @Column
+    private
     String imageUrl;
 
     @Column
+    private
     String title;
 
     @Column
+    private
     String link;
 
     public NewsModel() {
         super();
     }
 
-    public NewsModel(String imageUrl, String title, String link) {
+    NewsModel(String imageUrl, String title, String link) {
         super();
         this.imageUrl = imageUrl;
         this.title = title;
         this.link = link;
     }
 
-    public String getImageUrl() {
+    String getImageUrl() {
         return imageUrl;
     }
 
@@ -54,7 +54,7 @@ public class NewsModel extends Model {
         return new Select().from(NewsModel.class).execute();
     }
 
-    public static void deleteAll() {
+    static void deleteAll() {
         new Delete().from(NewsModel.class).execute();
     }
 }

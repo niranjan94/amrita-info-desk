@@ -26,7 +26,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.HitBuilders;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.jakewharton.picasso.OkHttp3Downloader;
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.MainApplication;
@@ -34,7 +34,6 @@ import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.bugs.BugReport;
 import com.njlabs.amrita.aid.gpms.client.AbstractGpms;
 import com.njlabs.amrita.aid.gpms.client.Gpms;
-import com.njlabs.amrita.aid.gpms.envoy.GpmsEnvoy;
 import com.njlabs.amrita.aid.gpms.models.Relay;
 import com.njlabs.amrita.aid.gpms.responses.InfoResponse;
 import com.njlabs.amrita.aid.landing.Landing;
@@ -127,11 +126,7 @@ public class GpmsActivity extends BaseActivity {
     }
 
     private void initialiseGpms() {
-        if(Identifier.isConnectedToAmrita(baseContext)) {
-            gpms = new Gpms(baseContext);
-        } else {
-            gpms = new GpmsEnvoy(baseContext);
-        }
+        gpms = new Gpms(baseContext);
     }
 
     private void showConnectToAmritaAlert() {
@@ -219,11 +214,10 @@ public class GpmsActivity extends BaseActivity {
                     hideProgress();
                     loggedIn = true;
 
-                    tracker.send(new HitBuilders.EventBuilder()
-                            .setCategory("GPMS")
-                            .setAction("Login")
-                            .setLabel(name + " - " + regNo)
-                            .build());
+                    Bundle bundle = new Bundle();
+                    bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "GPMS");
+                    bundle.putString(FirebaseAnalytics.Param.CHARACTER, name + " - " + regNo);
+                    tracker.logEvent(FirebaseAnalytics.Event.LOGIN, bundle);
 
                 }
 

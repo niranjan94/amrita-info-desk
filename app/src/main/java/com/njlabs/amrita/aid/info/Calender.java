@@ -12,7 +12,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.View;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.firebase.crash.FirebaseCrash;
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.R;
 import com.roomorama.caldroid.CaldroidFragment;
@@ -37,7 +37,7 @@ public class Calender extends BaseActivity {
         try {
             dateStr = formatter.parse(date_str);
         } catch (ParseException e) {
-            Crashlytics.logException(e);
+            FirebaseCrash.report(e);
         }
         return dateStr;
     }

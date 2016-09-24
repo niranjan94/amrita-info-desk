@@ -21,9 +21,8 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.crashlytics.android.Crashlytics;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.crash.FirebaseCrash;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -32,7 +31,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     public Context baseContext;
     public Toolbar toolbar;
     public View parentView;
-    public Tracker tracker;
+    public FirebaseAnalytics tracker;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -95,7 +94,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 activityInfo = getPackageManager().getActivityInfo(getComponentName(), PackageManager.GET_META_DATA);
                 title = activityInfo.loadLabel(getPackageManager()).toString();
             } catch (PackageManager.NameNotFoundException e) {
-                Crashlytics.logException(e);
+                FirebaseCrash.report(e);
             }
             this.setTaskDescription(new ActivityManager.TaskDescription(title, BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher), color));
         }
@@ -107,15 +106,20 @@ public abstract class BaseActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if(title!=null){
             getSupportActionBar().setTitle(title);
-            tracker.setScreenName(title);
-            tracker.send(new HitBuilders.ScreenViewBuilder().build());
+            Bundle bundle = new Bundle();
+            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, title);
+            bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "screen");
+            tracker.logEvent(FirebaseAnalytics.Event.VIEW_ITEM, bundle);
+
         } else {
-            ActivityInfo activityInfo = null;
+            ActivityInfo activityInfo;
             try {
                 activityInfo = getPackageManager().getActivityInfo(getComponentName(), PackageManager.GET_META_DATA);
                 String defaultTitle = activityInfo.loadLabel(getPackageManager()).toString();
-                tracker.setScreenName(defaultTitle);
-                tracker.send(new HitBuilders.ScreenViewBuilder().build());
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, defaultTitle);
+                bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "screen");
+                tracker.logEvent(FirebaseAnalytics.Event.VIEW_ITEM, bundle);
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
@@ -166,7 +170,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        finish(); //go back to the previous Activity
+        finish();
     }
 
     @Override

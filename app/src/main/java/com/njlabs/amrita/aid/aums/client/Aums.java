@@ -51,9 +51,9 @@ import okhttp3.Response;
 public class Aums {
 
     public AumsClient client;
-    int gradeRefIndex = 1;
-    int attendanceRefIndex = 1;
-    int markRefIndex = 1;
+    private int gradeRefIndex = 1;
+    private int attendanceRefIndex = 1;
+    private int markRefIndex = 1;
     public String studentRollNo = null;
     public String studentName = null;
     private String studentHashId = null;
@@ -573,7 +573,7 @@ public class Aums {
         });
     }
 
-    public void getCourseNameFromId(String id, final TextResponse textResponse) {
+    private void getCourseNameFromId(String id, final TextResponse textResponse) {
         client.get("/access/site/" + id + "/", new TextResponse() {
             @Override
             public void onSuccess(String responseString) {
@@ -669,11 +669,11 @@ public class Aums {
         });
     }
 
-    public boolean isNumeric(String str) {
+    private boolean isNumeric(String str) {
         return str.matches("-?\\d+(\\.\\d+)?");
     }
 
-    public void loadSemesterMapping() {
+    private void loadSemesterMapping() {
         semesterMapping.clear();
         semesterMapping.put("1", "7");
         semesterMapping.put("2", "8");
