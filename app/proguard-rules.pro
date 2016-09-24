@@ -71,4 +71,4 @@
 -dontwarn java.**
 -dontwarn okhttp3.**
 -dontwarn javax.net.ssl.**
-
+-dontwarn net.fortuna.ical4j.model.**

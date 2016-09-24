@@ -34,5 +34,6 @@
     <string name="title_activity_gpms_pending_pass">Pass Status</string>
     <string name="title_activity_gpms_pass_history">Passes History</string>
     <string name="title_activity_aums_resources">Course Resources</string>
+    <string name="calendar_note">The data provided here may be inaccurate. Please verify with a member of the Amrita staff before making any important decisions based on this Calendar.</string>
 
 </resources>

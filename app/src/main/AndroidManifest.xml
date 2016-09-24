@@ -181,39 +181,11 @@
                 android:value=".landing.Landing" />
         </activity>
 
-        <service
-            android:name=".news.NewsUpdateService"
-            android:exported="true"
-            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE" >
-            <intent-filter>
-                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY" />
-            </intent-filter>
-        </service>
-        <service
-            android:name=".gpms.proxy.SocketStarterService"
-            android:exported="true"
-            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE" >
-            <intent-filter>
-                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY" />
-            </intent-filter>
-        </service>
 
         <meta-data
             android:name="com.crashlytics.ApiKey"
             android:value="37243dbea20e385bdebdc999bef0715ef594e382" />
 
-        <receiver
-            android:name=".gpms.proxy.SocketStarterReceiver"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="com.njlabs.amrita.aid.boot" />
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.USER_PRESENT" />
-                <action android:name="android.intent.action.SCREEN_ON" />
-                <action android:name="android.intent.action.SCREEN_OFF" />
-                <action android:name="android.net.wifi.STATE_CHANGE" />
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>

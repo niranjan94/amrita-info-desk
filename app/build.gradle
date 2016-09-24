@@ -11,6 +11,10 @@ def versionMinor = 1
 def versionPatch = 8
 def versionBuild = 4
 
+configurations {
+    compile.exclude group: 'commons-logging'
+}
+
 android {
     compileSdkVersion 24
     buildToolsVersion '24.0.2'
@@ -43,6 +47,7 @@ android {
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
+        exclude('org/apache/commons/codec/language/bm/*.txt')
     }
 }
 
@@ -78,6 +83,10 @@ dependencies {
     compile 'jp.wasabeef:recyclerview-animators:2.2.1'
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     compile 'com.google.code.gson:gson:2.6.2'
+
+    compile 'org.mnode.ical4j:ical4j:1.0.5'
+    compile 'backport-util-concurrent:backport-util-concurrent:3.1'
+    compile 'commons-codec:commons-codec:1.8'
 }
 
 apply plugin: 'com.google.gms.google-services'

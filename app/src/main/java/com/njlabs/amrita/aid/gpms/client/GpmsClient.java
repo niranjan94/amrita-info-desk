@@ -57,6 +57,6 @@ public class GpmsClient extends Client {
     }
 
     protected boolean isProxyOn() {
-        return false;
+        return true;
     }
 }
