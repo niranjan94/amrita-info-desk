@@ -8,6 +8,17 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Relay implements Parcelable {
+    public static final Creator<Relay> CREATOR = new Creator<Relay>() {
+        @Override
+        public Relay createFromParcel(Parcel in) {
+            return new Relay(in);
+        }
+
+        @Override
+        public Relay[] newArray(int size) {
+            return new Relay[size];
+        }
+    };
     private String identifier;
     private int signalLevel;
 
@@ -20,18 +31,6 @@ public class Relay implements Parcelable {
         identifier = in.readString();
         signalLevel = in.readInt();
     }
-
-    public static final Creator<Relay> CREATOR = new Creator<Relay>() {
-        @Override
-        public Relay createFromParcel(Parcel in) {
-            return new Relay(in);
-        }
-
-        @Override
-        public Relay[] newArray(int size) {
-            return new Relay[size];
-        }
-    };
 
     public String getIdentifier() {
         return identifier;

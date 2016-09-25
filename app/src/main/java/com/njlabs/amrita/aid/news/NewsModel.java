@@ -38,6 +38,14 @@ public class NewsModel extends Model {
         this.link = link;
     }
 
+    public static List<NewsModel> getAll() {
+        return new Select().from(NewsModel.class).execute();
+    }
+
+    static void deleteAll() {
+        new Delete().from(NewsModel.class).execute();
+    }
+
     String getImageUrl() {
         return imageUrl;
     }
@@ -48,13 +56,5 @@ public class NewsModel extends Model {
 
     public String getLink() {
         return link;
-    }
-
-    public static List<NewsModel> getAll() {
-        return new Select().from(NewsModel.class).execute();
-    }
-
-    static void deleteAll() {
-        new Delete().from(NewsModel.class).execute();
     }
 }

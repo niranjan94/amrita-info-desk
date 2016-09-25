@@ -29,7 +29,7 @@ public class GpmsClient extends Client {
 
     @Override
     protected String getAbsoluteUrl(String relativeUrl) {
-        if(isProxyOn()) {
+        if (isProxyOn()) {
             return PROXY_URL + "&u=" + URLEncoder.encode(BASE_URL + relativeUrl);
         } else {
             return getUnproxiedUrl(relativeUrl);

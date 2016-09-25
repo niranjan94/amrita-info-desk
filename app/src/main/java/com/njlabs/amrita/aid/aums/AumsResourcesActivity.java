@@ -49,15 +49,26 @@ import permissions.dispatcher.RuntimePermissions;
 @RuntimePermissions
 public class AumsResourcesActivity extends BaseActivity {
 
+    List<CourseData> courseDatas;
     private ExtendedSwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
     private Aums aums;
-    List<CourseData> courseDatas;
-
     private String courseId = null;
     private String fileNameToDownload = null;
 
     private ProgressDialog progressDialog;
+
+    public static String humanReadableByteCount(long bytes) {
+        return humanReadableByteCount(bytes, false);
+    }
+
+    public static String humanReadableByteCount(long bytes, boolean si) {
+        int unit = si ? 1000 : 1024;
+        if (bytes < unit) return bytes + " B";
+        int exp = (int) (Math.log(bytes) / Math.log(unit));
+        String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
+        return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+    }
 
     @Override
     public void init(Bundle savedInstanceState) {
@@ -106,7 +117,7 @@ public class AumsResourcesActivity extends BaseActivity {
         aums = new Aums(baseContext, new ProgressResponseBody.ProgressListener() {
             @Override
             public void update(final long bytesRead, final long contentLength, boolean done) {
-                final int progress = (int) ((bytesRead/contentLength) * 100);
+                final int progress = (int) ((bytesRead / contentLength) * 100);
                 ((Activity) baseContext).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -122,7 +133,7 @@ public class AumsResourcesActivity extends BaseActivity {
     }
 
     private void reloadList() {
-        if(courseId == null) {
+        if (courseId == null) {
             aums.getCourses(new CoursesResponse() {
                 @Override
                 public void onSuccess(List<CourseData> courseDataList) {
@@ -173,13 +184,13 @@ public class AumsResourcesActivity extends BaseActivity {
     }
 
     public void itemClick(View v) {
-        if(courseId == null) {
+        if (courseId == null) {
             swipeRefreshLayout.setRefreshing(true);
             courseId = ((TextView) v.findViewById(R.id.hidden)).getText().toString();
             fileNameToDownload = null;
             reloadList();
         } else {
-            fileNameToDownload =  ((TextView) v.findViewById(R.id.name)).getText().toString();
+            fileNameToDownload = ((TextView) v.findViewById(R.id.name)).getText().toString();
             AumsResourcesActivityPermissionsDispatcher.downloadFileWithCheck(this);
         }
     }
@@ -191,7 +202,7 @@ public class AumsResourcesActivity extends BaseActivity {
             @SuppressWarnings("ResultOfMethodCallIgnored")
             @Override
             public void onSuccess(File file) {
-                if(fileNameToDownload == null) {
+                if (fileNameToDownload == null) {
                     file.delete();
                 } else {
                     progressDialog.dismiss();
@@ -206,12 +217,55 @@ public class AumsResourcesActivity extends BaseActivity {
         });
     }
 
+    @Override
+    public void onBackPressed() {
+        if (courseId != null) {
+            courseId = null;
+            fileNameToDownload = null;
+            CoursesListAdapter adapter = new CoursesListAdapter(courseDatas);
+            recyclerView.setAdapter(adapter);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (courseId != null) {
+            if (item.getItemId() == android.R.id.home) {
+                courseId = null;
+                fileNameToDownload = null;
+                CoursesListAdapter adapter = new CoursesListAdapter(courseDatas);
+                recyclerView.setAdapter(adapter);
+            }
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @OnPermissionDenied(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    void showDeniedForExternalStorage() {
+        Toast.makeText(this, "Storage permission is required for downloading resources", Toast.LENGTH_SHORT).show();
+    }
+
+    @OnNeverAskAgain(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    void showNeverAskForExternalStorage() {
+        Toast.makeText(this, "Storage permission is required for downloading resources", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        AumsResourcesActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView name;
+        public ImageView icon;
         TextView detail;
         TextView hidden;
-        public ImageView icon;
 
         ViewHolder(View v) {
             super(v);
@@ -221,7 +275,6 @@ public class AumsResourcesActivity extends BaseActivity {
             icon = ((ImageView) v.findViewById(R.id.icon));
         }
     }
-
 
     public class CoursesListAdapter extends RecyclerView.Adapter<ViewHolder> {
 
@@ -282,17 +335,17 @@ public class AumsResourcesActivity extends BaseActivity {
             String[] image = {"png", "gif", "jpg", "jpeg", "bmp"};
             String[] video = {"mp4", "mp3", "avi", "mov", "mpg", "mkv", "wmv"};
 
-            if(FilenameUtils.isExtension(filename, web)) {
+            if (FilenameUtils.isExtension(filename, web)) {
                 holder.icon.setImageResource(R.drawable.ic_aums_web);
-            } else if(FilenameUtils.isExtension(filename, computer)) {
+            } else if (FilenameUtils.isExtension(filename, computer)) {
                 holder.icon.setImageResource(R.drawable.ic_aums_computer);
-            }  else if(FilenameUtils.isExtension(filename, document)) {
+            } else if (FilenameUtils.isExtension(filename, document)) {
                 holder.icon.setImageResource(R.drawable.ic_aums_document);
-            } else if(FilenameUtils.isExtension(filename, font)) {
+            } else if (FilenameUtils.isExtension(filename, font)) {
                 holder.icon.setImageResource(R.drawable.ic_aums_font);
-            } else if(FilenameUtils.isExtension(filename, image)) {
+            } else if (FilenameUtils.isExtension(filename, image)) {
                 holder.icon.setImageResource(R.drawable.ic_aums_image);
-            } else if(FilenameUtils.isExtension(filename, video)) {
+            } else if (FilenameUtils.isExtension(filename, video)) {
                 holder.icon.setImageResource(R.drawable.ic_aums_video);
             } else {
                 holder.icon.setImageResource(R.drawable.ic_aums_file);
@@ -304,61 +357,5 @@ public class AumsResourcesActivity extends BaseActivity {
         public int getItemCount() {
             return courseResourceList.size();
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        if(courseId != null) {
-            courseId = null;
-            fileNameToDownload = null;
-            CoursesListAdapter adapter = new CoursesListAdapter(courseDatas);
-            recyclerView.setAdapter(adapter);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if(courseId != null) {
-            if(item.getItemId() == android.R.id.home) {
-                courseId = null;
-                fileNameToDownload = null;
-                CoursesListAdapter adapter = new CoursesListAdapter(courseDatas);
-                recyclerView.setAdapter(adapter);
-            }
-            return true;
-        } else {
-            return super.onOptionsItemSelected(item);
-        }
-    }
-
-
-    @OnPermissionDenied(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    void showDeniedForExternalStorage() {
-        Toast.makeText(this, "Storage permission is required for downloading resources", Toast.LENGTH_SHORT).show();
-    }
-
-    @OnNeverAskAgain(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    void showNeverAskForExternalStorage() {
-        Toast.makeText(this, "Storage permission is required for downloading resources", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        AumsResourcesActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
-    }
-
-    public static String humanReadableByteCount(long bytes) {
-        return humanReadableByteCount(bytes, false);
-    }
-
-    public static String humanReadableByteCount(long bytes, boolean si) {
-        int unit = si ? 1000 : 1024;
-        if (bytes < unit) return bytes + " B";
-        int exp = (int) (Math.log(bytes) / Math.log(unit));
-        String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "i");
-        return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
     }
 }

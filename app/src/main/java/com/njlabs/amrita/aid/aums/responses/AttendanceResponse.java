@@ -10,5 +10,6 @@ import java.util.List;
 
 public abstract class AttendanceResponse extends AumsBaseResponse {
     public abstract void onSuccess(List<CourseAttendanceData> attendanceDataList);
+
     public abstract void onDataUnavailable();
 }

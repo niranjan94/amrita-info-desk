@@ -46,82 +46,9 @@ public abstract class ObscuredSharedPreferences implements SharedPreferences {
 
     protected abstract char[] getSpecialCode();
 
-    public class Editor implements SharedPreferences.Editor {
-
-        protected SharedPreferences.Editor delegate;
-
-        public Editor() {
-            this.delegate = ObscuredSharedPreferences.this.delegate.edit();
-        }
-
-        @Override
-        public Editor putBoolean(String key, boolean value) {
-            delegate.putString(key, encrypt(Boolean.toString(value)));
-            return this;
-        }
-
-        @Override
-        public Editor putFloat(String key, float value) {
-            delegate.putString(key, encrypt(Float.toString(value)));
-            return this;
-        }
-
-        @Override
-        public Editor putInt(String key, int value) {
-            delegate.putString(key, encrypt(Integer.toString(value)));
-            return this;
-        }
-
-        @Override
-        public Editor putLong(String key, long value) {
-            delegate.putString(key, encrypt(Long.toString(value)));
-            return this;
-        }
-
-        @Override
-        public Editor putString(String key, String value) {
-            delegate.putString(key, encrypt(value));
-            return this;
-        }
-
-//        @Override
-        public SharedPreferences.Editor putStringSet(String s, Set<String> strings) {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-//      commented out for 2.1 compatibility
-//        @Override
-//        public void apply() {
-//            delegate.apply();
-//        }
-
-        @Override
-        public Editor clear() {
-            delegate.clear();
-            return this;
-        }
-
-        @Override
-        public boolean commit() {
-            return delegate.commit();
-        }
-
-//        @Override
-        public void apply() {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public Editor remove(String s) {
-            delegate.remove(s);
-            return this;
-        }
-    }
-
     public Editor edit() {
         return new Editor();
     }
-
 
     @Override
     public Map<String, ?> getAll() {
@@ -175,7 +102,6 @@ public abstract class ObscuredSharedPreferences implements SharedPreferences {
         delegate.unregisterOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener);
     }
 
-
     protected String encrypt(String value) {
 
         try {
@@ -213,6 +139,78 @@ public abstract class ObscuredSharedPreferences implements SharedPreferences {
 
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public class Editor implements SharedPreferences.Editor {
+
+        protected SharedPreferences.Editor delegate;
+
+        public Editor() {
+            this.delegate = ObscuredSharedPreferences.this.delegate.edit();
+        }
+
+        @Override
+        public Editor putBoolean(String key, boolean value) {
+            delegate.putString(key, encrypt(Boolean.toString(value)));
+            return this;
+        }
+
+        @Override
+        public Editor putFloat(String key, float value) {
+            delegate.putString(key, encrypt(Float.toString(value)));
+            return this;
+        }
+
+        @Override
+        public Editor putInt(String key, int value) {
+            delegate.putString(key, encrypt(Integer.toString(value)));
+            return this;
+        }
+
+        @Override
+        public Editor putLong(String key, long value) {
+            delegate.putString(key, encrypt(Long.toString(value)));
+            return this;
+        }
+
+        @Override
+        public Editor putString(String key, String value) {
+            delegate.putString(key, encrypt(value));
+            return this;
+        }
+
+        //        @Override
+        public SharedPreferences.Editor putStringSet(String s, Set<String> strings) {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+//      commented out for 2.1 compatibility
+//        @Override
+//        public void apply() {
+//            delegate.apply();
+//        }
+
+        @Override
+        public Editor clear() {
+            delegate.clear();
+            return this;
+        }
+
+        @Override
+        public boolean commit() {
+            return delegate.commit();
+        }
+
+        //        @Override
+        public void apply() {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        public Editor remove(String s) {
+            delegate.remove(s);
+            return this;
         }
     }
 }

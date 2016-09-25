@@ -20,7 +20,7 @@ public class MapQuery {
 
     public static String urlEncode(Map<String, String> map) {
         StringBuilder sb = new StringBuilder();
-        for (Map.Entry<?,?> entry : map.entrySet()) {
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
             if (sb.length() > 0) {
                 sb.append("&");
             }

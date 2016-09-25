@@ -30,17 +30,17 @@ public class CourseAttendanceData {
     public void setTotal(String total) {
         try {
             this.total = Math.round(Float.valueOf(total));
-        } catch(Exception e){
+        } catch (Exception e) {
             FirebaseCrash.report(e);
             this.total = 0;
         }
     }
 
     public void setAttended(String attended) {
-        try{
+        try {
             this.attended = Math.round(Float.valueOf(attended));
-            this.bunked = this.total-this.attended;
-        } catch (Exception e){
+            this.bunked = this.total - this.attended;
+        } catch (Exception e) {
             FirebaseCrash.report(e);
             this.attended = 0;
             this.bunked = 0;
@@ -49,9 +49,9 @@ public class CourseAttendanceData {
     }
 
     public void setPercentage(String percentage) {
-        try{
+        try {
             this.percentage = Float.parseFloat(percentage);
-        } catch(Exception e){
+        } catch (Exception e) {
             FirebaseCrash.report(e);
             this.percentage = 0;
         }

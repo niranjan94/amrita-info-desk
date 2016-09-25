@@ -76,7 +76,7 @@ public class PendingPassActivity extends BaseActivity {
             public void onSuccess(List<PendingEntry> pendingEntries) {
                 recyclerView.setAdapter(new PassAdapter(pendingEntries));
                 swipeRefreshLayout.setRefreshing(false);
-                if(pendingEntries.size() == 0) {
+                if (pendingEntries.size() == 0) {
                     findViewById(R.id.no_data_view).setVisibility(View.VISIBLE);
                 } else {
                     findViewById(R.id.no_data_view).setVisibility(View.GONE);
@@ -102,7 +102,7 @@ public class PendingPassActivity extends BaseActivity {
             }
         }
 
-        if(progressBar != null) {
+        if (progressBar != null) {
             progressBar.setVisibility(View.VISIBLE);
             v.setVisibility(View.GONE);
         }
@@ -126,7 +126,7 @@ public class PendingPassActivity extends BaseActivity {
             @Override
             public void onFailure(Throwable throwable) {
                 Ln.e(throwable);
-                if(finalProgressBar != null) {
+                if (finalProgressBar != null) {
                     finalProgressBar.setVisibility(View.GONE);
                     v.setVisibility(View.VISIBLE);
                 }
@@ -138,25 +138,6 @@ public class PendingPassActivity extends BaseActivity {
     public class PassAdapter extends RecyclerView.Adapter<PassAdapter.ViewHolder> {
 
         private List<PendingEntry> pendingEntries;
-
-        public class ViewHolder extends RecyclerView.ViewHolder {
-            public TextView to;
-            public TextView from;
-            public TextView applied_to;
-            public TextView status;
-            public TextView id;
-            public Button cancel_button;
-            public ViewHolder(View v) {
-                super(v);
-                to = (TextView) v.findViewById(R.id.to);
-                from = (TextView) v.findViewById(R.id.from);
-                applied_to = (TextView) v.findViewById(R.id.applied_to);
-                status = (TextView) v.findViewById(R.id.status);
-                id = (TextView) v.findViewById(R.id.id);
-                cancel_button = (Button) v.findViewById(R.id.cancel_button);
-            }
-
-        }
 
         public PassAdapter(List<PendingEntry> pendingEntries) {
             this.pendingEntries = pendingEntries;
@@ -176,9 +157,9 @@ public class PendingPassActivity extends BaseActivity {
             holder.applied_to.setText(pendingEntry.getRequestedWith());
             holder.status.setText(pendingEntry.getApprovalStatus());
 
-            if(pendingEntry.getApprovalStatus().toLowerCase().equals("pending")) {
+            if (pendingEntry.getApprovalStatus().toLowerCase().equals("pending")) {
                 holder.status.setTextColor(getResources().getColor(R.color.md_amber_800));
-            } else if(pendingEntry.getApprovalStatus().toLowerCase().equals("issued")) {
+            } else if (pendingEntry.getApprovalStatus().toLowerCase().equals("issued")) {
                 holder.status.setTextColor(getResources().getColor(R.color.md_green_500));
             } else {
                 holder.status.setTextColor(getResources().getColor(R.color.md_red_500));
@@ -191,6 +172,26 @@ public class PendingPassActivity extends BaseActivity {
         @Override
         public int getItemCount() {
             return pendingEntries.size();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            public TextView to;
+            public TextView from;
+            public TextView applied_to;
+            public TextView status;
+            public TextView id;
+            public Button cancel_button;
+
+            public ViewHolder(View v) {
+                super(v);
+                to = (TextView) v.findViewById(R.id.to);
+                from = (TextView) v.findViewById(R.id.from);
+                applied_to = (TextView) v.findViewById(R.id.applied_to);
+                status = (TextView) v.findViewById(R.id.status);
+                id = (TextView) v.findViewById(R.id.id);
+                cancel_button = (Button) v.findViewById(R.id.cancel_button);
+            }
+
         }
     }
 }

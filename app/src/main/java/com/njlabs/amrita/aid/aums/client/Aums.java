@@ -51,11 +51,11 @@ import okhttp3.Response;
 public class Aums {
 
     public AumsClient client;
+    public String studentRollNo = null;
+    public String studentName = null;
     private int gradeRefIndex = 1;
     private int attendanceRefIndex = 1;
     private int markRefIndex = 1;
-    public String studentRollNo = null;
-    public String studentName = null;
     private String studentHashId = null;
     private Context context;
     private Map<String, String> semesterMapping;
@@ -88,12 +88,12 @@ public class Aums {
         client.setBaseURL(AumsServer.get(server));
     }
 
-    public void setServer(String serverUrl) {
-        client.setBaseURL(serverUrl);
-    }
-
     public String getServer() {
         return client.BASE_URL;
+    }
+
+    public void setServer(String serverUrl) {
+        client.setBaseURL(serverUrl);
     }
 
     public void getSessionId(final SessionResponse response) {
@@ -428,7 +428,7 @@ public class Aums {
                         try {
                             Element table = doc.select("table[width=75%]").first();
 
-                            if(table == null) {
+                            if (table == null) {
                                 marksResponse.onDataUnavailable();
                                 return;
                             }
@@ -436,38 +436,38 @@ public class Aums {
                             Elements rows = table.select("tr");
                             Elements headerRowCells = rows.get(0).select("td");
 
-                            for(int i=3; i < headerRowCells.size(); i++){
+                            for (int i = 3; i < headerRowCells.size(); i++) {
                                 Element cell = headerRowCells.get(i);
-                                if(cell.text().trim().length()>0){
+                                if (cell.text().trim().length() > 0) {
                                     subjects.add(cell.text().trim());
                                 }
                             }
 
-                            if(subjects.size() == 0) {
+                            if (subjects.size() == 0) {
                                 marksResponse.onDataUnavailable();
                                 return;
                             }
 
-                            for(int i=1; i < rows.size(); i++) {
+                            for (int i = 1; i < rows.size(); i++) {
                                 boolean hasMarks = false;
                                 Elements cells = rows.get(i).select("td");
                                 String exam = cells.get(0).text();
                                 int k = 0;
-                                for(int j=3; j < cells.size(); j++){
+                                for (int j = 3; j < cells.size(); j++) {
                                     Element cell = cells.get(j);
                                     String mark = cell.text();
-                                    if(isNumeric(mark)) {
+                                    if (isNumeric(mark)) {
                                         hasMarks = true;
                                     }
                                     k++;
                                 }
-                                if(hasMarks) {
+                                if (hasMarks) {
                                     markDataList.add(new CourseMarkData(exam));
                                     k = 0;
-                                    for(int j=3; j < cells.size(); j++){
+                                    for (int j = 3; j < cells.size(); j++) {
                                         Element cell = cells.get(j);
                                         String mark = cell.text();
-                                        if(isNumeric(mark)) {
+                                        if (isNumeric(mark)) {
                                             markDataList.add(new CourseMarkData(subjects.get(k), mark, exam));
                                         }
                                         k++;
@@ -475,7 +475,7 @@ public class Aums {
                                 }
                             }
 
-                            if(markDataList.size() > 0) {
+                            if (markDataList.size() > 0) {
                                 marksResponse.onSuccess(markDataList);
                             } else {
                                 marksResponse.onDataUnavailable();
@@ -490,7 +490,7 @@ public class Aums {
         });
     }
 
-    public void getCourses(final CoursesResponse response){
+    public void getCourses(final CoursesResponse response) {
         RequestParams params = new RequestParams();
         params.put("action", "UMS-EVAL_CLASSHEADER_SCREEN_INIT");
         client.get("/aums/Jsp/DefineComponent/ClassHeader.jsp", params, new TextResponse() {
@@ -504,7 +504,7 @@ public class Aums {
                 mainCells.remove(0);
                 Elements options = tr.select("td > select > option");
                 final List<CourseData> courseDataList = new ArrayList<>();
-                for (Element mainCell: mainCells) {
+                for (Element mainCell : mainCells) {
 
                     String fullName = mainCell.select("a").first().text().trim();
                     String fullUrl = mainCell.select("a").first().attr("href").trim();
@@ -517,8 +517,8 @@ public class Aums {
                     courseData.setId(fullUrlArray[fullUrlArray.length - 1]);
                     courseData.setType("regular");
 
-                    for (String fullNameArrayPart: fullNameArray) {
-                        if(fullNameArrayPart.trim().equals("Re")) {
+                    for (String fullNameArrayPart : fullNameArray) {
+                        if (fullNameArrayPart.trim().equals("Re")) {
                             courseData.setType("re_reg");
                             break;
                         }
@@ -527,8 +527,8 @@ public class Aums {
                     courseDataList.add(courseData);
                 }
 
-                for (Element option: options) {
-                    if(!option.attr("value").equals("0")) {
+                for (Element option : options) {
+                    if (!option.attr("value").equals("0")) {
                         String fullName = option.text().trim();
                         String[] fullNameArray = fullName.split("\\.");
                         CourseData courseData = new CourseData();
@@ -536,8 +536,8 @@ public class Aums {
                         courseData.setId(option.attr("value").trim());
                         courseData.setType("regular");
 
-                        for (String fullNameArrayPart: fullNameArray) {
-                            if(fullNameArrayPart.trim().equals("Re")) {
+                        for (String fullNameArrayPart : fullNameArray) {
+                            if (fullNameArrayPart.trim().equals("Re")) {
                                 courseData.setType("re_reg");
                                 break;
                             }
@@ -547,13 +547,13 @@ public class Aums {
                 }
 
                 final int[] responded = {0};
-                for (final CourseData courseData: courseDataList) {
+                for (final CourseData courseData : courseDataList) {
                     getCourseNameFromId(courseData.getId(), new TextResponse() {
                         @Override
                         public void onSuccess(String responseString) {
                             responded[0]++;
                             courseData.setCourseName(responseString);
-                            if(responded[0] == courseDataList.size()) {
+                            if (responded[0] == courseDataList.size()) {
                                 response.onSuccess(courseDataList);
                             }
                         }
@@ -604,7 +604,7 @@ public class Aums {
 
                 final List<CourseResource> courseResourceList = new ArrayList<>();
 
-                for(Element row: tRows) {
+                for (Element row : tRows) {
                     courseResourceList.add(new CourseResource(courseId, row.select("td:nth-child(1) > a").first().text().trim()));
                 }
                 response.onSuccess(courseResourceList);
@@ -639,7 +639,8 @@ public class Aums {
 
                 try {
                     rawResponse.body().close();
-                } catch (Exception ignored) { }
+                } catch (Exception ignored) {
+                }
             }
 
             @Override

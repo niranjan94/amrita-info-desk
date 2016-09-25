@@ -28,11 +28,12 @@ public class App extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater=getMenuInflater();
+        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.aums, menu);
         return true;//return true so that the menu pop up is opened
 
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
@@ -45,8 +46,8 @@ public class App extends BaseActivity {
                 String RollNo = preferences.getString("RollNo", "0");
 
                 Intent intent = new Intent(getApplicationContext(), BugReport.class);
-                intent.putExtra("studentName",("Anonymous"));
-                intent.putExtra("studentRollNo",RollNo);
+                intent.putExtra("studentName", ("Anonymous"));
+                intent.putExtra("studentRollNo", RollNo);
                 startActivity(intent);
                 return true;
             default:

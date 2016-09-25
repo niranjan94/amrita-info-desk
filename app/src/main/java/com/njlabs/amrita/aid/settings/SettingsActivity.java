@@ -15,29 +15,6 @@ import com.njlabs.amrita.aid.R;
 
 public class SettingsActivity extends BaseActivity {
 
-    @Override
-    public void init(Bundle savedInstanceState) {
-        setupLayout(R.layout.activity_settings, Color.parseColor("#5B96E7"));
-
-        FragmentManager mFragmentManager = getFragmentManager();
-        FragmentTransaction mFragmentTransaction = mFragmentManager.beginTransaction();
-        PrefsFragment mPrefsFragment = new PrefsFragment();
-        mFragmentTransaction.replace(R.id.container, mPrefsFragment);
-        mFragmentTransaction.commit();
-    }
-
-    public static class PrefsFragment extends PreferenceFragment {
-
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_general);
-            bindPreferenceSummaryToValue(findPreference("name"));
-            bindPreferenceSummaryToValue(findPreference("department"));
-        }
-    }
-
-
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
@@ -65,6 +42,28 @@ public class SettingsActivity extends BaseActivity {
                 PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), ""));
+    }
+
+    @Override
+    public void init(Bundle savedInstanceState) {
+        setupLayout(R.layout.activity_settings, Color.parseColor("#5B96E7"));
+
+        FragmentManager mFragmentManager = getFragmentManager();
+        FragmentTransaction mFragmentTransaction = mFragmentManager.beginTransaction();
+        PrefsFragment mPrefsFragment = new PrefsFragment();
+        mFragmentTransaction.replace(R.id.container, mPrefsFragment);
+        mFragmentTransaction.commit();
+    }
+
+    public static class PrefsFragment extends PreferenceFragment {
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.pref_general);
+            bindPreferenceSummaryToValue(findPreference("name"));
+            bindPreferenceSummaryToValue(findPreference("department"));
+        }
     }
 
 }

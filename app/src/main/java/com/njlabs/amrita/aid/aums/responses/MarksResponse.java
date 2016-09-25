@@ -10,5 +10,6 @@ import java.util.List;
 
 public abstract class MarksResponse extends AumsBaseResponse {
     public abstract void onSuccess(List<CourseMarkData> markDataList);
+
     public abstract void onDataUnavailable();
 }

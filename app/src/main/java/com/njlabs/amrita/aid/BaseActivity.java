@@ -50,7 +50,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public abstract void init(Bundle savedInstanceState);
 
-    public void setupLayout(int layoutRef, int primaryColor){
+    public void setupLayout(int layoutRef, int primaryColor) {
         setContentView(layoutRef);
         setupToolbar(null);
         toolbar.setBackgroundColor(primaryColor);
@@ -59,19 +59,19 @@ public abstract class BaseActivity extends AppCompatActivity {
         parentView = (View) toolbar.getParent();
     }
 
-    public void setupLayout(int layoutRef){
+    public void setupLayout(int layoutRef) {
         setContentView(layoutRef);
         setupToolbar(null);
         parentView = (View) toolbar.getParent();
     }
 
-    public void setupLayout(int layoutRef, String title){
+    public void setupLayout(int layoutRef, String title) {
         setContentView(layoutRef);
         setupToolbar(title);
         parentView = (View) toolbar.getParent();
     }
 
-    public void setupLayout(int layoutRef, String title, int primaryColor){
+    public void setupLayout(int layoutRef, String title, int primaryColor) {
         setContentView(layoutRef);
         setupToolbar(title);
         toolbar.setBackgroundColor(primaryColor);
@@ -81,13 +81,13 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
 
-    public void setupLayoutNoActionBar(int layoutRef){
+    public void setupLayoutNoActionBar(int layoutRef) {
         setContentView(layoutRef);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public void setRecentHeaderColor(int color){
-        if(isLollipop()){
+    public void setRecentHeaderColor(int color) {
+        if (isLollipop()) {
             ActivityInfo activityInfo = null;
             String title = "Amrita Info Desk";
             try {
@@ -101,10 +101,10 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     @SuppressWarnings("ConstantConditions")
-    private void setupToolbar(String title){
+    private void setupToolbar(String title) {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        if(title!=null){
+        if (title != null) {
             getSupportActionBar().setTitle(title);
             Bundle bundle = new Bundle();
             bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, title);
@@ -129,7 +129,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     }
 
-    public void setStatusbarColor(int color){
+    public void setStatusbarColor(int color) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -138,10 +138,10 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
-    public int darkenColor(int color){
+    public int darkenColor(int color) {
         float[] hsv = new float[3];
         Color.colorToHSV(color, hsv);
-        hsv[2] *= 0.8f; // value component
+        hsv[2] *= 0.8f;
         return Color.HSVToColor(hsv);
     }
 
@@ -157,12 +157,13 @@ public abstract class BaseActivity extends AppCompatActivity {
         createSnackbar(text, Snackbar.LENGTH_LONG);
     }
 
-    public boolean isLollipop(){
-        return Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP;
+    public boolean isLollipop() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     }
+
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        if(item.getItemId() == android.R.id.home) {
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
             finish();
         }
         return true;

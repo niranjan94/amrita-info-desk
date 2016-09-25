@@ -87,7 +87,7 @@ public class NewsActivity extends BaseActivity {
                 uiHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        if(articles != null && articles.size()>0){
+                        if (articles != null && articles.size() > 0) {
                             recyclerView.setAdapter(new NewsAdapter(articles));
                             swipeRefreshLayout.setRefreshing(false);
                         } else {
@@ -117,7 +117,7 @@ public class NewsActivity extends BaseActivity {
                     @Override
                     public void run() {
                         swipeRefreshLayout.setRefreshing(false);
-                        Snackbar.make(parentView,"Can't establish a reliable connection to the server.", Snackbar.LENGTH_SHORT)
+                        Snackbar.make(parentView, "Can't establish a reliable connection to the server.", Snackbar.LENGTH_SHORT)
                                 .setAction("Retry", new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
@@ -135,7 +135,7 @@ public class NewsActivity extends BaseActivity {
                     @Override
                     public void run() {
 
-                        if(refresh){
+                        if (refresh) {
                             (new Thread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -148,13 +148,13 @@ public class NewsActivity extends BaseActivity {
 
                         Document doc = Jsoup.parse(responseString);
                         Elements articles = doc.select("article");
-                        for(Element article : articles){
+                        for (Element article : articles) {
                             Element header = article.select(".flexslider").first();
                             Element content = article.select(".group-blog-content").first();
                             Element footer = article.select(".group-blog-footer").first();
                             String imageUrl = header.select("ul > li > img").first().attr("src");
                             String title = content.select(".field-name-title > div > div > h2").first().text();
-                            String url = "https://www.amrita.edu"+footer.select(".field-name-node-link > div > div > a").first().attr("href");
+                            String url = "https://www.amrita.edu" + footer.select(".field-name-node-link > div > div > a").first().attr("href");
                             newsArticles.add(new NewsModel(imageUrl, title, url));
                         }
 
@@ -163,12 +163,11 @@ public class NewsActivity extends BaseActivity {
                             public void run() {
                                 ActiveAndroid.beginTransaction();
                                 try {
-                                    for(NewsModel newsModel: newsArticles) {
+                                    for (NewsModel newsModel : newsArticles) {
                                         newsModel.save();
                                     }
                                     ActiveAndroid.setTransactionSuccessful();
-                                }
-                                finally {
+                                } finally {
                                     ActiveAndroid.endTransaction();
                                 }
                             }
@@ -182,29 +181,15 @@ public class NewsActivity extends BaseActivity {
         });
     }
 
-    public void articleClick(View v){
-        Uri uri = Uri.parse(((TextView)v.findViewById(R.id.url)).getText().toString());
-        Intent it  = new Intent(Intent.ACTION_VIEW,uri);
+    public void articleClick(View v) {
+        Uri uri = Uri.parse(((TextView) v.findViewById(R.id.url)).getText().toString());
+        Intent it = new Intent(Intent.ACTION_VIEW, uri);
         startActivity(it);
     }
 
     public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
         private List<NewsModel> newsArticles;
-
-        class ViewHolder extends RecyclerView.ViewHolder {
-            public TextView title;
-            public ImageView image;
-            public TextView url;
-            ViewHolder(View v) {
-                super(v);
-                title = (TextView) v.findViewById(R.id.title);
-                image = (ImageView) v.findViewById(R.id.image);
-                url = (TextView) v.findViewById(R.id.url);
-
-            }
-
-        }
 
         NewsAdapter(List<NewsModel> newsArticles) {
             this.newsArticles = newsArticles;
@@ -227,6 +212,21 @@ public class NewsActivity extends BaseActivity {
         @Override
         public int getItemCount() {
             return newsArticles.size();
+        }
+
+        class ViewHolder extends RecyclerView.ViewHolder {
+            public TextView title;
+            public ImageView image;
+            public TextView url;
+
+            ViewHolder(View v) {
+                super(v);
+                title = (TextView) v.findViewById(R.id.title);
+                image = (ImageView) v.findViewById(R.id.image);
+                url = (TextView) v.findViewById(R.id.url);
+
+            }
+
         }
     }
 }

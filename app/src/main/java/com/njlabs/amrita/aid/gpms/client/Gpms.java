@@ -34,13 +34,13 @@ import java.util.List;
 
 public class Gpms implements AbstractGpms {
 
+    public static String dateFormat = "dd MMM yyyy HH:mm:ss";
+    public static String shortDateFormat = "dd MMM yyyy";
     public GpmsClient client;
     private String studentRollNo = null;
     private String studentName = null;
     private String studentHostelCode = null;
     private SharedPreferences cookiePrefFile;
-    public static String dateFormat = "dd MMM yyyy HH:mm:ss";
-    public static String shortDateFormat = "dd MMM yyyy";
 
     public Gpms(Context context) {
         client = new GpmsClient(context);
@@ -68,6 +68,11 @@ public class Gpms implements AbstractGpms {
         return studentName;
     }
 
+    public void setStudentName(String studentName) {
+        cookiePrefFile.edit().putString("gpms_name", studentName).apply();
+        this.studentName = studentName;
+    }
+
     public String getStudentRollNo() {
         return studentRollNo;
     }
@@ -75,11 +80,6 @@ public class Gpms implements AbstractGpms {
     public void setStudentRollNo(String studentRollNo) {
         cookiePrefFile.edit().putString("gpms_roll_no", studentRollNo).apply();
         this.studentRollNo = studentRollNo;
-    }
-
-    public void setStudentName(String studentName) {
-        cookiePrefFile.edit().putString("gpms_name", studentName).apply();
-        this.studentName = studentName;
     }
 
     public void setStudentHostelCode(String studentHostelCode) {
@@ -98,7 +98,8 @@ public class Gpms implements AbstractGpms {
             @SuppressLint("SdCardPath")
             File deletePrefFile = new File("/data/data/com.njlabs.amrita.aid/shared_prefs/" + client.COOKIE_FILE + ".xml");
             deletePrefFile.delete();
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+        }
     }
 
     public void basicLogin(String rollNo, String password, final LoginResponse loginResponse) {
@@ -145,7 +146,7 @@ public class Gpms implements AbstractGpms {
                             Document doc = Jsoup.parse(responseString);
 
                             Elements forgotPassword = doc.select("p.forgot");
-                            if(forgotPassword.size() != 0) {
+                            if (forgotPassword.size() != 0) {
                                 infoResponse.onFailedAuthentication();
                                 return;
                             }
@@ -210,7 +211,7 @@ public class Gpms implements AbstractGpms {
                 Elements formInputs = doc.select("form[action=applyleave.php]").first().select("input");
                 RequestParams params = new RequestParams();
 
-                for(Element formInput: formInputs) {
+                for (Element formInput : formInputs) {
                     params.put(formInput.attr("name"), formInput.val());
                 }
 
@@ -269,7 +270,7 @@ public class Gpms implements AbstractGpms {
                 Elements formInputs = doc.select("form[action=applyleave.php]").first().select("input");
                 RequestParams params = new RequestParams();
 
-                for(Element formInput: formInputs) {
+                for (Element formInput : formInputs) {
                     params.put(formInput.attr("name"), formInput.val());
                 }
 
@@ -316,11 +317,11 @@ public class Gpms implements AbstractGpms {
                 Element tBody = doc.select("body > div:nth-child(7) > table > tbody").first();
                 Elements rows = tBody.select("tr");
                 Ln.d(rows.size());
-                if(rows.size() == 1) {
+                if (rows.size() == 1) {
                     pendingResponse.onSuccess(new ArrayList<PendingEntry>());
                 } else {
                     List<PendingEntry> pendingEntries = new ArrayList<>();
-                    for(int i = 1; i < rows.size(); i++) {
+                    for (int i = 1; i < rows.size(); i++) {
                         try {
                             Element row = rows.get(i);
                             PendingEntry pendingEntry = new PendingEntry();
@@ -379,11 +380,11 @@ public class Gpms implements AbstractGpms {
                 Element tBody = doc.select("#FilterForm > label > table > tbody").first();
                 Elements rows = tBody.select("tr");
                 Ln.d(responseString);
-                if(rows.size() == 1) {
+                if (rows.size() == 1) {
                     historyResponse.onSuccess(new ArrayList<HistoryEntry>());
                 } else {
                     List<HistoryEntry> historyEntries = new ArrayList<>();
-                    for(int i = 1; i < rows.size(); i++) {
+                    for (int i = 1; i < rows.size(); i++) {
                         Element row = rows.get(i);
                         HistoryEntry historyEntry = new HistoryEntry();
                         historyEntry.setDepartureTime(row.select("td:nth-child(2)").first().text().trim());
@@ -397,7 +398,7 @@ public class Gpms implements AbstractGpms {
                         historyEntry.setGateApproval(row.select("td:nth-child(10)").first().text().trim());
                         historyEntry.setCancellation(row.select("td:nth-child(11)").first().text().trim());
 
-                        if(historyEntry.getCancellation().equals("No") && !historyEntry.getApprovalStatus().equals("Rejected") && !historyEntry.getApprovalStatus().equals("Pending")) {
+                        if (historyEntry.getCancellation().equals("No") && !historyEntry.getApprovalStatus().equals("Rejected") && !historyEntry.getApprovalStatus().equals("Pending")) {
                             historyEntries.add(historyEntry);
                         }
                     }
@@ -409,14 +410,14 @@ public class Gpms implements AbstractGpms {
 
     private DateTime roundOffDate(DateTime target) {
         int minutes = target.getMinuteOfHour();
-        if(minutes > 0 && minutes < 15) {
+        if (minutes > 0 && minutes < 15) {
             return target.withMinuteOfHour(15);
-        } else if(minutes > 15 && minutes < 30) {
+        } else if (minutes > 15 && minutes < 30) {
             return target.withMinuteOfHour(30);
-        } else if(minutes > 30 && minutes < 45) {
+        } else if (minutes > 30 && minutes < 45) {
             return target.withMinuteOfHour(45);
-        } else if(minutes > 45 && minutes <= 59) {
-            if(target.getHourOfDay() == 23) {
+        } else if (minutes > 45 && minutes <= 59) {
+            if (target.getHourOfDay() == 23) {
                 return target.plusDays(1).withHourOfDay(0).withMinuteOfHour(0);
             } else {
                 return target.plusHours(1).withMinuteOfHour(0);

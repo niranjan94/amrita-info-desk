@@ -25,7 +25,7 @@ public class HackyViewPager extends ViewPager {
     }
 
     public HackyViewPager(Context context, AttributeSet attrs) {
-        super(context,attrs);
+        super(context, attrs);
     }
 
     @Override

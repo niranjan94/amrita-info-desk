@@ -72,7 +72,7 @@ public class PassHistoryActivity extends BaseActivity {
             public void onSuccess(List<HistoryEntry> historyEntries) {
                 recyclerView.setAdapter(new PassAdapter(historyEntries));
                 swipeRefreshLayout.setRefreshing(false);
-                if(historyEntries.size() == 0) {
+                if (historyEntries.size() == 0) {
                     findViewById(R.id.no_data_view).setVisibility(View.VISIBLE);
                 } else {
                     findViewById(R.id.no_data_view).setVisibility(View.GONE);
@@ -89,23 +89,6 @@ public class PassHistoryActivity extends BaseActivity {
     public class PassAdapter extends RecyclerView.Adapter<PassAdapter.ViewHolder> {
 
         private List<HistoryEntry> historyEntries;
-
-        public class ViewHolder extends RecyclerView.ViewHolder {
-            public TextView departure;
-            public TextView applied_days;
-            public TextView actual_days;
-            public TextView occasion;
-            public TextView arrival;
-            public ViewHolder(View v) {
-                super(v);
-                departure = (TextView) v.findViewById(R.id.departure);
-                arrival = (TextView) v.findViewById(R.id.arrival);
-                applied_days = (TextView) v.findViewById(R.id.applied_days);
-                actual_days = (TextView) v.findViewById(R.id.actual_days);
-                occasion = (TextView) v.findViewById(R.id.occasion);
-            }
-
-        }
 
         public PassAdapter(List<HistoryEntry> historyEntries) {
             this.historyEntries = historyEntries;
@@ -130,6 +113,24 @@ public class PassHistoryActivity extends BaseActivity {
         @Override
         public int getItemCount() {
             return historyEntries.size();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            public TextView departure;
+            public TextView applied_days;
+            public TextView actual_days;
+            public TextView occasion;
+            public TextView arrival;
+
+            public ViewHolder(View v) {
+                super(v);
+                departure = (TextView) v.findViewById(R.id.departure);
+                arrival = (TextView) v.findViewById(R.id.arrival);
+                applied_days = (TextView) v.findViewById(R.id.applied_days);
+                actual_days = (TextView) v.findViewById(R.id.actual_days);
+                occasion = (TextView) v.findViewById(R.id.occasion);
+            }
+
         }
     }
 }

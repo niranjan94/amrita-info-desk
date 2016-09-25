@@ -28,7 +28,7 @@ public class Util {
         return query_pairs;
     }
 
-    public static Map<String, List<String>> splitQuery(URL url,int flag) throws UnsupportedEncodingException {
+    public static Map<String, List<String>> splitQuery(URL url, int flag) throws UnsupportedEncodingException {
         final Map<String, List<String>> query_pairs = new LinkedHashMap<String, List<String>>();
         final String[] pairs = url.getQuery().split("&");
         for (String pair : pairs) {

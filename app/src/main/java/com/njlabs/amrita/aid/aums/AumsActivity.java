@@ -53,18 +53,17 @@ import java.util.List;
 @SuppressWarnings("ConstantConditions")
 public class AumsActivity extends BaseActivity {
 
+    private static long backPressTime;
     EditText rollNoEditText;
     EditText passwordEditText;
     NiceSpinner campusSpinner;
-
     private ProgressDialog dialog = null;
-    private static long backPressTime;
-
     private Aums aums;
     private SharedPreferences aumsPreferences;
 
     private boolean isLoggedIn = false;
     private List<String> campusDataSet;
+    private Toast toast;
 
     @Override
     public void init(Bundle savedInstanceState) {
@@ -88,7 +87,7 @@ public class AumsActivity extends BaseActivity {
         campusSpinner.setBackgroundResource(R.drawable.selector_modded);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(baseContext);
-        builder .setMessage("Amrita University does not provide an API for accessing AUMS data. " +
+        builder.setMessage("Amrita University does not provide an API for accessing AUMS data. " +
                 "So, if any changes are made to the AUMS Website, please be patient while I try to catch up.")
                 .setCancelable(true)
                 .setIcon(R.drawable.ic_action_info_small)
@@ -112,7 +111,7 @@ public class AumsActivity extends BaseActivity {
 
         aumsPreferences = getSharedPreferences("aums_prefs", Context.MODE_PRIVATE);
         String rollNo = aumsPreferences.getString("RollNo", "");
-        String encodedPassword = aumsPreferences.getString("Password","");
+        String encodedPassword = aumsPreferences.getString("Password", "");
         campusSpinner.setText(campusDataSet.get(aumsPreferences.getInt("server_ordinal", 0)));
 
         aums = new Aums(baseContext);
@@ -123,8 +122,8 @@ public class AumsActivity extends BaseActivity {
             hideSoftKeyboard();
         }
 
-        if(!encodedPassword.equals("")) {
-            ((EditText)findViewById(R.id.pwd)).setText(Security.decrypt(encodedPassword, MainApplication.key));
+        if (!encodedPassword.equals("")) {
+            ((EditText) findViewById(R.id.pwd)).setText(Security.decrypt(encodedPassword, MainApplication.key));
             hideSoftKeyboard();
         }
 
@@ -138,17 +137,17 @@ public class AumsActivity extends BaseActivity {
         String rollNo = rollNoEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
 
-        if(StringUtils.isEmpty(rollNo)) {
+        if (StringUtils.isEmpty(rollNo)) {
             hasError = true;
             rollNoEditText.setError("Your Roll Number is required");
         }
 
-        if(StringUtils.isEmpty(password)) {
+        if (StringUtils.isEmpty(password)) {
             hasError = true;
             passwordEditText.setError("Your AUMS password is required");
         }
 
-        if(!hasError) {
+        if (!hasError) {
             hideSoftKeyboard();
             SharedPreferences.Editor editor = aumsPreferences.edit();
             editor.putString("RollNo", rollNoEditText.getText().toString());
@@ -164,7 +163,7 @@ public class AumsActivity extends BaseActivity {
         }
     }
 
-    private void getSessionIdAndLogin(final String rollNo,final String password, AumsServer.Server server) {
+    private void getSessionIdAndLogin(final String rollNo, final String password, AumsServer.Server server) {
 
         aums.logout();
         aums.switchServer(server);
@@ -183,7 +182,7 @@ public class AumsActivity extends BaseActivity {
                         TextView nameView = (TextView) findViewById(R.id.student_name);
                         TextView rollNoView = (TextView) findViewById(R.id.student_roll_no);
 
-                        if(getCurrentFocus() != null) {
+                        if (getCurrentFocus() != null) {
                             InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
                             inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
                         }
@@ -330,7 +329,7 @@ public class AumsActivity extends BaseActivity {
     }
 
     private void semesterPicker(final StringCallback stringCallback) {
-        final String[] items = {"1","2","Vacation 1","3","4","Vacation 2","5","6","Vacation 3","7","8","Vacation 4","9","10","Vacation 5","11","12","Vacation 6","13","14","15"};
+        final String[] items = {"1", "2", "Vacation 1", "3", "4", "Vacation 2", "5", "6", "Vacation 3", "7", "8", "Vacation 4", "9", "10", "Vacation 5", "11", "12", "Vacation 6", "13", "14", "15"};
         AlertDialog.Builder builder = new AlertDialog.Builder(baseContext);
         builder.setCancelable(true);
         builder.setTitle("Select a Semester");
@@ -346,11 +345,12 @@ public class AumsActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater=getMenuInflater();
+        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.aums, menu);
         return true;
 
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -382,7 +382,6 @@ public class AumsActivity extends BaseActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    private Toast toast;
     private void exitAums() {
         if (isLoggedIn) {
             if (backPressTime + 2000 > System.currentTimeMillis()) {
@@ -404,9 +403,9 @@ public class AumsActivity extends BaseActivity {
         }
     }
 
-    private void hideSoftKeyboard(){
+    private void hideSoftKeyboard() {
         View view = this.getCurrentFocus();
-        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         if (view != null) {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
@@ -415,7 +414,7 @@ public class AumsActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(aums != null) {
+        if (aums != null) {
             try {
                 aums.logout();
             } catch (Exception ignored) {

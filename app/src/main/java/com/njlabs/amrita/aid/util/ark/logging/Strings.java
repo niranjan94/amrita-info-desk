@@ -35,14 +35,10 @@ public final class Strings {
      * sentences such as "Alice, Bob and Charlie" use ", " and " and " as the
      * delimiters.
      *
-     * @param delimiter
-     *            usually ", "
-     * @param lastDelimiter
-     *            usually " and "
-     * @param objs
-     *            the objects
-     * @param <T>
-     *            the type
+     * @param delimiter     usually ", "
+     * @param lastDelimiter usually " and "
+     * @param objs          the objects
+     * @param <T>           the type
      * @return a string
      */
     public static <T> String joinAnd(final String delimiter, final String lastDelimiter, final Collection<T> objs) {
@@ -54,8 +50,8 @@ public final class Strings {
         while (iter.hasNext()) {
             final T obj = iter.next();
             if (notEmpty(obj)) {
-                if( buffer.length() != 0 ) {
-                    buffer.append( iter.hasNext() ? delimiter : lastDelimiter );
+                if (buffer.length() != 0) {
+                    buffer.append(iter.hasNext() ? delimiter : lastDelimiter);
                 }
                 buffer.append(Strings.toString(obj));
             }
@@ -77,7 +73,7 @@ public final class Strings {
         while (iter.hasNext()) {
             final T obj = iter.next();
             if (notEmpty(obj)) {
-                if( buffer.length() != 0 ) {
+                if (buffer.length() != 0) {
                     buffer.append(delimiter);
                 }
                 buffer.append(Strings.toString(obj));
@@ -192,7 +188,7 @@ public final class Strings {
     }
 
     public static String namedFormat(String str, Map<String, String> substitutions) {
-        for (Map.Entry<String,String> entry : substitutions.entrySet())
+        for (Map.Entry<String, String> entry : substitutions.entrySet())
             str = str.replace('$' + entry.getKey(), entry.getValue());
 
         return str;

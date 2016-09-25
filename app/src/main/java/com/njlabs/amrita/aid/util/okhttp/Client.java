@@ -51,13 +51,44 @@ import okhttp3.ResponseBody;
 
 abstract public class Client {
 
+    public String BASE_URL;
     protected OkHttpClient client;
     protected String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/47.0.2526.106 Chrome/47.0.2526.106 Safari/537.36";
     protected Context context;
     protected String referer = null;
-    public String BASE_URL;
     private ProgressResponseBody.ProgressListener progressListener = null;
     private SharedPreferences cookiePrefs;
+    Interceptor interceptor = new Interceptor() {
+        @SuppressLint("DefaultLocale")
+        @Override
+        public Response intercept(Interceptor.Chain chain) throws IOException {
+            if (setLoggingEnabled()) {
+                Request request = chain.request();
+                long t1 = System.nanoTime();
+                Ln.d(String.format("Sending request %s on %s%n%s", request.url(), chain.connection(), request.headers()));
+                Response response = chain.proceed(request);
+                ResponseBody responseBody = response.body();
+                String responseBodyString = response.body().string();
+                long t2 = System.nanoTime();
+                Ln.d(String.format("Received response for %s in %.1fms%n%s", response.request().url(), (t2 - t1) / 1e6d, response.headers()));
+                Ln.d(responseBodyString);
+
+                Map<String, ?> cookies = cookiePrefs.getAll();
+                for (String key : cookies.keySet()) {
+                    Ln.d(key + "::" + cookies.get(key));
+                }
+
+                return response.newBuilder()
+                        .body(ResponseBody.create(responseBody.contentType(), responseBodyString.getBytes()))
+                        .headers(response.headers())
+                        .protocol(response.protocol())
+                        .handshake(response.handshake())
+                        .build();
+            } else {
+                return chain.proceed(chain.request());
+            }
+        }
+    };
 
     public Client(Context context) {
         this.context = context;
@@ -68,15 +99,16 @@ abstract public class Client {
         cookiePrefs = context.getSharedPreferences(getCookieFile(), 0);
         OkHttpClient.Builder builder;
 
-        if(shouldVerifySSL()) {
+        if (shouldVerifySSL()) {
             builder = new OkHttpClient.Builder();
         } else {
             builder = getUnsecuredOkHttpBuilder();
         }
 
-        if(progressListener != null) {
+        if (progressListener != null) {
             builder.addNetworkInterceptor(new Interceptor() {
-                @Override public Response intercept(Chain chain) throws IOException {
+                @Override
+                public Response intercept(Chain chain) throws IOException {
                     Response originalResponse = chain.proceed(chain.request());
                     return originalResponse.newBuilder()
                             .body(new ProgressResponseBody(originalResponse.body(), progressListener))
@@ -106,7 +138,7 @@ abstract public class Client {
                         }
 
                         String origin = "https://www.google.com/";
-                        if(url != null) {
+                        if (url != null) {
                             origin = url.getProtocol() + "://" + url.getHost();
                         }
 
@@ -115,7 +147,7 @@ abstract public class Client {
                         newRequest.addHeader("Origin", origin);
                         newRequest.addHeader("User-Agent", userAgent);
 
-                        if(referer != null) {
+                        if (referer != null) {
                             newRequest.addHeader("Referer", referer);
                         } else {
                             newRequest.removeHeader("Referer");
@@ -145,7 +177,7 @@ abstract public class Client {
     public void get(String path, RequestParams params, final TextResponse responseHandler) {
 
         String queryString = "?";
-        if(params != null) {
+        if (params != null) {
             queryString += MapQuery.urlEncode(params);
         }
 
@@ -170,7 +202,7 @@ abstract public class Client {
                 runOnCorrectThread(new Runnable() {
                     @Override
                     public void run() {
-                        if(response.isSuccessful()) {
+                        if (response.isSuccessful()) {
                             responseHandler.onSuccess(responseString);
                         } else {
                             responseHandler.onFailure(new IOException(responseString));
@@ -184,7 +216,7 @@ abstract public class Client {
 
     public void get(String path, RequestParams params, final RawResponse responseHandler) {
         String queryString = "?";
-        if(params != null) {
+        if (params != null) {
             queryString += MapQuery.urlEncode(params);
         }
 
@@ -206,7 +238,7 @@ abstract public class Client {
             @Override
             public void onResponse(final Call call, final Response response) throws IOException {
 
-                if(response.isSuccessful()) {
+                if (response.isSuccessful()) {
                     responseHandler.onSuccess(response);
                 } else {
                     runOnCorrectThread(new Runnable() {
@@ -223,7 +255,7 @@ abstract public class Client {
     public void get(String path, RequestParams params, final FileResponse responseHandler) {
 
         String queryString = "?";
-        if(params != null) {
+        if (params != null) {
             queryString += MapQuery.urlEncode(params);
         }
 
@@ -275,7 +307,7 @@ abstract public class Client {
                 runOnCorrectThread(new Runnable() {
                     @Override
                     public void run() {
-                        if(finalResponse.isSuccessful()) {
+                        if (finalResponse.isSuccessful()) {
                             responseHandler.onSuccess(finalCacheFile);
                         } else {
                             responseHandler.onFailure(new IOException());
@@ -300,7 +332,7 @@ abstract public class Client {
 
         Iterator iterator = params.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry pair = (Map.Entry)iterator.next();
+            Map.Entry pair = (Map.Entry) iterator.next();
             formBody.add((String) pair.getKey(), (String) pair.getValue());
             iterator.remove();
         }
@@ -328,7 +360,7 @@ abstract public class Client {
                 runOnCorrectThread(new Runnable() {
                     @Override
                     public void run() {
-                        if(response.isSuccessful()) {
+                        if (response.isSuccessful()) {
                             responseHandler.onSuccess(responseString);
                         } else {
                             responseHandler.onFailure(new IOException(responseString));
@@ -352,44 +384,12 @@ abstract public class Client {
     }
 
     public void runOnCorrectThread(Runnable runnable) {
-        if(context instanceof Activity) {
+        if (context instanceof Activity) {
             ((Activity) context).runOnUiThread(runnable);
         } else {
             runnable.run();
         }
     }
-
-    Interceptor interceptor = new Interceptor() {
-        @SuppressLint("DefaultLocale")
-        @Override
-        public Response intercept(Interceptor.Chain chain) throws IOException {
-            if(setLoggingEnabled()) {
-                Request request = chain.request();
-                long t1 = System.nanoTime();
-                Ln.d(String.format("Sending request %s on %s%n%s", request.url(), chain.connection(), request.headers()));
-                Response response = chain.proceed(request);
-                ResponseBody responseBody = response.body();
-                String responseBodyString = response.body().string();
-                long t2 = System.nanoTime();
-                Ln.d(String.format("Received response for %s in %.1fms%n%s", response.request().url(), (t2 - t1) / 1e6d, response.headers()));
-                Ln.d(responseBodyString);
-
-                Map<String, ?> cookies = cookiePrefs.getAll();
-                for(String key: cookies.keySet()) {
-                    Ln.d(key + "::" + cookies.get(key));
-                }
-
-                return response.newBuilder()
-                        .body(ResponseBody.create(responseBody.contentType(), responseBodyString.getBytes()))
-                        .headers(response.headers())
-                        .protocol(response.protocol())
-                        .handshake(response.handshake())
-                        .build();
-            } else {
-                return chain.proceed(chain.request());
-            }
-        }
-    };
 
     private OkHttpClient.Builder getUnsecuredOkHttpBuilder() {
         OkHttpClient.Builder builder;
@@ -438,6 +438,8 @@ abstract public class Client {
     }
 
     abstract protected String getCookieFile();
+
     abstract protected boolean setLoggingEnabled();
+
     abstract protected boolean shouldVerifySSL();
 }

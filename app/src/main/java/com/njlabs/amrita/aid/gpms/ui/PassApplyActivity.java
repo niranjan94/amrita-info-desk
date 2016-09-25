@@ -63,7 +63,7 @@ public class PassApplyActivity extends BaseActivity {
         toDateBtn = (Button) findViewById(R.id.to_date_btn);
         reasonEditText = (EditText) findViewById(R.id.reason);
 
-        if(passType.equals("Day Pass")) {
+        if (passType.equals("Day Pass")) {
             toDateBtn.setVisibility(View.GONE);
             findViewById(R.id.required_till_text).setVisibility(View.GONE);
         }
@@ -94,14 +94,14 @@ public class PassApplyActivity extends BaseActivity {
     }
 
     public void applyPass(View v) {
-        if(passType.equals("Day Pass")) {
-            if(fromDate == null) {
+        if (passType.equals("Day Pass")) {
+            if (fromDate == null) {
                 Snackbar.make(parentView, "Select the from date", Snackbar.LENGTH_LONG).show();
-            } else if(reasonEditText.getText().toString().split("\\s+").length < 2) {
+            } else if (reasonEditText.getText().toString().split("\\s+").length < 2) {
                 reasonEditText.setError("A minimum of two words is required for the reason");
-            } else if(fromDate.getHourOfDay()>=19) {
+            } else if (fromDate.getHourOfDay() >= 19) {
                 Snackbar.make(parentView, "You cannot apply for a day pass after 7pm. Change the time.", Snackbar.LENGTH_LONG).show();
-            } else if(fromDate.getMillis() < DateTime.now().getMillis() + 30000) {
+            } else if (fromDate.getMillis() < DateTime.now().getMillis() + 30000) {
                 Snackbar.make(parentView, "Please change to a later time.", Snackbar.LENGTH_LONG).show();
             } else {
                 dialog.show();
@@ -128,12 +128,12 @@ public class PassApplyActivity extends BaseActivity {
                     }
                 });
             }
-        } else if(passType.equals("Home Pass")) {
-            if(fromDate == null || toDate == null) {
+        } else if (passType.equals("Home Pass")) {
+            if (fromDate == null || toDate == null) {
                 Snackbar.make(parentView, "Select the dates", Snackbar.LENGTH_LONG).show();
-            } else if(reasonEditText.getText().toString().split("\\s+").length < 2) {
+            } else if (reasonEditText.getText().toString().split("\\s+").length < 2) {
                 reasonEditText.setError("A minimum of two words is required for the reason");
-            } else if(fromDate.getMillis() < DateTime.now().getMillis() + 30000) {
+            } else if (fromDate.getMillis() < DateTime.now().getMillis() + 30000) {
                 Snackbar.make(parentView, "Please change the from date-time to a later time.", Snackbar.LENGTH_LONG).show();
             } else {
                 dialog.show();
@@ -165,12 +165,12 @@ public class PassApplyActivity extends BaseActivity {
 
     private void loadDateTimePicker(final DateTime startDate, final View v, final String toModify) {
         MonthAdapter.CalendarDay calendarDay = new MonthAdapter.CalendarDay();
-        calendarDay.setDay(startDate.getYear(), startDate.getMonthOfYear()-1, startDate.getDayOfMonth());
+        calendarDay.setDay(startDate.getYear(), startDate.getMonthOfYear() - 1, startDate.getDayOfMonth());
 
         CalendarDatePickerDialogFragment cdp = new CalendarDatePickerDialogFragment()
                 .setOnDateSetListener(new CalendarDatePickerDialogFragment.OnDateSetListener() {
                     @Override
-                    public void onDateSet(CalendarDatePickerDialogFragment dialog, final int year,final int monthOfYear, final int dayOfMonth) {
+                    public void onDateSet(CalendarDatePickerDialogFragment dialog, final int year, final int monthOfYear, final int dayOfMonth) {
 
                         RadialTimePickerDialogFragment rtpd = new RadialTimePickerDialogFragment()
                                 .setOnTimeSetListener(new RadialTimePickerDialogFragment.OnTimeSetListener() {
@@ -179,17 +179,17 @@ public class PassApplyActivity extends BaseActivity {
                                         Ln.d(minute);
                                         boolean error = false;
                                         DateTime selectedDateTime = new DateTime(year, monthOfYear + 1, dayOfMonth, hourOfDay, minute);
-                                        if(toModify.equals("fromDate")) {
+                                        if (toModify.equals("fromDate")) {
                                             fromDate = selectedDateTime;
                                             findViewById(R.id.to_date_btn).setEnabled(true);
-                                        } else if(toModify.equals("toDate")) {
+                                        } else if (toModify.equals("toDate")) {
                                             toDate = selectedDateTime;
-                                            if(toDate.getMillis() <= fromDate.getMillis()) {
+                                            if (toDate.getMillis() <= fromDate.getMillis()) {
                                                 error = true;
                                                 Snackbar.make(parentView, "The end date should be after the from date.", Snackbar.LENGTH_LONG).show();
                                             }
                                         }
-                                        if(!error) {
+                                        if (!error) {
                                             ((Button) v).setText(selectedDateTime.toString(Gpms.dateFormat));
                                         }
 
@@ -202,7 +202,7 @@ public class PassApplyActivity extends BaseActivity {
                     }
                 })
                 .setFirstDayOfWeek(Calendar.SUNDAY)
-                .setPreselectedDate(startDate.getYear(), startDate.getMonthOfYear()-1, startDate.getDayOfMonth())
+                .setPreselectedDate(startDate.getYear(), startDate.getMonthOfYear() - 1, startDate.getDayOfMonth())
                 .setDateRange(calendarDay, null)
                 .setThemeLight();
         cdp.show(getSupportFragmentManager(), "FRAG_TAG_DATE_PICKER");

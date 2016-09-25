@@ -112,22 +112,6 @@ public class AttendanceActivity extends BaseActivity {
 
         private List<CourseAttendanceData> courseAttendanceDataList;
 
-        public class ViewHolder extends RecyclerView.ViewHolder {
-
-            public TextView courseTitle;
-            public TextView attendanceStatus;
-            public TextView percentage;
-            public View indicator;
-
-            public ViewHolder(View v) {
-                super(v);
-                courseTitle = ((TextView) v.findViewById(R.id.course_title));
-                attendanceStatus = ((TextView) v.findViewById(R.id.attendance_status));
-                percentage = ((TextView) v.findViewById(R.id.percentage));
-                indicator = v.findViewById(R.id.indicator);
-            }
-        }
-
         public AttendanceAdapter(List<CourseAttendanceData> courseAttendanceDataList) {
             this.courseAttendanceDataList = courseAttendanceDataList;
         }
@@ -142,12 +126,12 @@ public class AttendanceActivity extends BaseActivity {
         public void onBindViewHolder(ViewHolder holder, int position) {
             CourseAttendanceData courseAttendanceData = courseAttendanceDataList.get(position);
             holder.courseTitle.setText(courseAttendanceData.courseTitle);
-            holder.attendanceStatus.setText(Html.fromHtml("You attended <b>" + courseAttendanceData.attended+"</b> of <b>" + courseAttendanceData.total+"</b> classes"));
-            holder.percentage.setText(Math.round(courseAttendanceData.percentage)+"%");
+            holder.attendanceStatus.setText(Html.fromHtml("You attended <b>" + courseAttendanceData.attended + "</b> of <b>" + courseAttendanceData.total + "</b> classes"));
+            holder.percentage.setText(Math.round(courseAttendanceData.percentage) + "%");
 
-            if(Math.round(courseAttendanceData.percentage)>=85) {
+            if (Math.round(courseAttendanceData.percentage) >= 85) {
                 holder.indicator.setBackgroundResource(R.drawable.circle_green);
-            } else if(Math.round(courseAttendanceData.percentage)>=80) {
+            } else if (Math.round(courseAttendanceData.percentage) >= 80) {
                 holder.indicator.setBackgroundResource(R.drawable.circle_yellow);
             } else {
                 holder.indicator.setBackgroundResource(R.drawable.circle_red);
@@ -157,6 +141,22 @@ public class AttendanceActivity extends BaseActivity {
         @Override
         public int getItemCount() {
             return courseAttendanceDataList.size();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+
+            public TextView courseTitle;
+            public TextView attendanceStatus;
+            public TextView percentage;
+            public View indicator;
+
+            public ViewHolder(View v) {
+                super(v);
+                courseTitle = ((TextView) v.findViewById(R.id.course_title));
+                attendanceStatus = ((TextView) v.findViewById(R.id.attendance_status));
+                percentage = ((TextView) v.findViewById(R.id.percentage));
+                indicator = v.findViewById(R.id.indicator);
+            }
         }
     }
 

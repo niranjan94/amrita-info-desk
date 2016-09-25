@@ -7,7 +7,6 @@ package com.njlabs.amrita.aid.util;
 import android.content.Context;
 import android.graphics.Typeface;
 
-
 import com.google.firebase.crash.FirebaseCrash;
 
 import java.lang.reflect.Field;
@@ -15,13 +14,13 @@ import java.lang.reflect.Field;
 public final class FontsOverride {
 
     public static void setDefaultFont(Context context) {
-        final Typeface regular = Typeface.createFromAsset(context.getAssets(),"fonts/Roboto-Light.ttf");
+        final Typeface regular = Typeface.createFromAsset(context.getAssets(), "fonts/Roboto-Light.ttf");
         replaceFont("DEFAULT", regular);
         replaceFont("MONOSPACE", regular);
         replaceFont("SANS_SERIF", regular);
     }
 
-    protected static void replaceFont(String staticTypefaceFieldName,  final Typeface newTypeface) {
+    protected static void replaceFont(String staticTypefaceFieldName, final Typeface newTypeface) {
         try {
             final Field staticField = Typeface.class
                     .getDeclaredField(staticTypefaceFieldName);

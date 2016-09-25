@@ -33,9 +33,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class PersistentCookieStore implements CookieStore {
 
-    private static final String LOG_TAG = "PersistentCookieStore";
     public static final String GPMS_COOKIE_PREFS = "CookiePrefsFileGpms";
     public static final String AUMS_COOKIE_PREFS = "CookiePrefsFileAums";
+    private static final String LOG_TAG = "PersistentCookieStore";
     private static final String COOKIE_NAME_PREFIX = "cookie_okhttp_";
 
     private final HashMap<String, ConcurrentHashMap<String, HttpCookie>> cookies;

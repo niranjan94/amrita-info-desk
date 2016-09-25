@@ -1,6 +1,5 @@
 package com.njlabs.amrita.aid.landing;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -9,7 +8,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -109,13 +107,13 @@ public class Landing extends BaseActivity {
 
         setupGrid();
 
-        File aumsCookieFile = new File(getApplicationContext().getFilesDir().getParent()+"/shared_prefs/" + PersistentCookieStore.AUMS_COOKIE_PREFS+ ".xml" );
-        if(aumsCookieFile.exists()) {
+        File aumsCookieFile = new File(getApplicationContext().getFilesDir().getParent() + "/shared_prefs/" + PersistentCookieStore.AUMS_COOKIE_PREFS + ".xml");
+        if (aumsCookieFile.exists()) {
             aumsCookieFile.delete();
         }
 
-        File gpmsCookieFile = new File(getApplicationContext().getFilesDir().getParent()+"/shared_prefs/" + PersistentCookieStore.GPMS_COOKIE_PREFS+ ".xml" );
-        if(gpmsCookieFile.exists()) {
+        File gpmsCookieFile = new File(getApplicationContext().getFilesDir().getParent() + "/shared_prefs/" + PersistentCookieStore.GPMS_COOKIE_PREFS + ".xml");
+        if (gpmsCookieFile.exists()) {
             gpmsCookieFile.delete();
         }
 
@@ -245,7 +243,7 @@ public class Landing extends BaseActivity {
                                     WebViewDialogLayout.setPadding(5, 5, 5, 5);
                                     WebView changelogWebView = (WebView) changelogView.findViewById(R.id.LicensesView);
                                     changelogWebView.loadData(String.format("%s", Description), "text/html", "utf-8");
-                                    changelogWebView.setPadding(5,5,5,5);
+                                    changelogWebView.setPadding(5, 5, 5, 5);
                                     changelogWebView.setBackgroundColor(0);
                                     changelogWebView.setOnLongClickListener(new View.OnLongClickListener() {
                                         @Override

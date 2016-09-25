@@ -32,14 +32,14 @@ public class BugReport extends BaseActivity {
         studentName = getIntent().getStringExtra("studentName");
         studentRollNo = getIntent().getStringExtra("studentRollNo");
 
-        ((TextView) findViewById(R.id.install_id_view)).setText("Installation ID: "+ FirebaseInstanceId.getInstance().getId());
+        ((TextView) findViewById(R.id.install_id_view)).setText("Installation ID: " + FirebaseInstanceId.getInstance().getId());
     }
 
-    public void sendReport(View v){
+    public void sendReport(View v) {
         String additionalInfo = ((EditText) findViewById(R.id.additional_info)).getText().toString();
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyy HH:mm:ss", Locale.US);
         String currentDateandTime = sdf.format(new Date());
-        Exception e = new Exception("AUMS Error Reported by "+studentName+" ("+studentRollNo+") on "+currentDateandTime+". Additional Info: "+ additionalInfo);
+        Exception e = new Exception("AUMS Error Reported by " + studentName + " (" + studentRollNo + ") on " + currentDateandTime + ". Additional Info: " + additionalInfo);
         FirebaseCrash.report(e);
         Toast.makeText(getBaseContext(), "The error has been reported. Thank you for helping us improve the app.", Toast.LENGTH_SHORT).show();
         finish();

@@ -104,12 +104,12 @@ public class GradesActivity extends BaseActivity {
 
     public void setupList(String sgpa, List<CourseGradeData> gradesData) {
 
-        if(sgpa == null || sgpa.trim().equals("null")){
-            Toast.makeText(baseContext,"Results for the semester have not been published yet.", Toast.LENGTH_LONG).show();
+        if (sgpa == null || sgpa.trim().equals("null")) {
+            Toast.makeText(baseContext, "Results for the semester have not been published yet.", Toast.LENGTH_LONG).show();
             finish();
         }
 
-        CourseGradeData cgpaData =  new CourseGradeData();
+        CourseGradeData cgpaData = new CourseGradeData();
         cgpaData.setGrade(sgpa);
         cgpaData.setCourseCode("sgpa");
         cgpaData.setCourseTitle(null);
@@ -126,25 +126,6 @@ public class GradesActivity extends BaseActivity {
         private int HEADER = 1;
         private int ITEM = 2;
 
-        class ViewHolder extends RecyclerView.ViewHolder {
-
-            TextView courseTitle;
-            TextView attendanceStatus;
-            TextView percentage;
-            public View indicator;
-            View root;
-
-            ViewHolder(View v) {
-                super(v);
-                courseTitle = ((TextView) v.findViewById(R.id.course_title));
-                attendanceStatus = ((TextView) v.findViewById(R.id.attendance_status));
-                percentage = ((TextView) v.findViewById(R.id.percentage));
-                indicator = v.findViewById(R.id.indicator);
-                root = v;
-            }
-
-        }
-
         GradesAdapter(List<CourseGradeData> courseGradeDataList) {
             this.courseGradeDataList = courseGradeDataList;
         }
@@ -152,7 +133,7 @@ public class GradesActivity extends BaseActivity {
         @Override
         public GradesAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View v;
-            if(viewType == HEADER) {
+            if (viewType == HEADER) {
                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_aums_grades_sgpa, parent, false);
             } else {
                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_aums_attendance, parent, false);
@@ -162,19 +143,18 @@ public class GradesActivity extends BaseActivity {
 
         @Override
         public int getItemViewType(int position) {
-            if(position == 0) {
+            if (position == 0) {
                 return HEADER;
             }
             return ITEM;
         }
-
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
 
             CourseGradeData courseGradeData = courseGradeDataList.get(position);
 
-            if(courseGradeData.courseCode.equals("sgpa") || courseGradeData.courseTitle == null) {
+            if (courseGradeData.courseCode.equals("sgpa") || courseGradeData.courseTitle == null) {
 
                 ((TextView) holder.root).setText("This semester's GPA : " + courseGradeData.grade);
 
@@ -182,11 +162,11 @@ public class GradesActivity extends BaseActivity {
 
                 holder.courseTitle.setText(courseGradeData.courseTitle);
                 String grade = courseGradeData.grade.trim();
-                if(grade.toLowerCase().contains("supply")) {
-                    grade = grade.replace("(Supply)","");
-                    holder.attendanceStatus.setText(courseGradeData.courseCode+" - " + courseGradeData.type + " - Supply");
+                if (grade.toLowerCase().contains("supply")) {
+                    grade = grade.replace("(Supply)", "");
+                    holder.attendanceStatus.setText(courseGradeData.courseCode + " - " + courseGradeData.type + " - Supply");
                 } else {
-                    holder.attendanceStatus.setText(courseGradeData.courseCode+" - " + courseGradeData.type);
+                    holder.attendanceStatus.setText(courseGradeData.courseCode + " - " + courseGradeData.type);
                 }
                 switch (grade) {
                     case "A+":
@@ -213,6 +193,25 @@ public class GradesActivity extends BaseActivity {
         @Override
         public int getItemCount() {
             return courseGradeDataList.size();
+        }
+
+        class ViewHolder extends RecyclerView.ViewHolder {
+
+            public View indicator;
+            TextView courseTitle;
+            TextView attendanceStatus;
+            TextView percentage;
+            View root;
+
+            ViewHolder(View v) {
+                super(v);
+                courseTitle = ((TextView) v.findViewById(R.id.course_title));
+                attendanceStatus = ((TextView) v.findViewById(R.id.attendance_status));
+                percentage = ((TextView) v.findViewById(R.id.percentage));
+                indicator = v.findViewById(R.id.indicator);
+                root = v;
+            }
+
         }
     }
 }

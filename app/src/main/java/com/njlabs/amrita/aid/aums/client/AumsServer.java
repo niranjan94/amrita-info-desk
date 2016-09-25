@@ -7,10 +7,6 @@ package com.njlabs.amrita.aid.aums.client;
 @SuppressWarnings("ALL")
 public class AumsServer {
 
-    public static enum Server {
-        ETTIMADAI, AMRITAPURI, BANGALORE, MYSORE, AIMS, BUSINESS, ASAS_KOCHI, ETTIMADAI_ONE, ETTIMADAI_TWO
-    }
-
     public static String get(Server identifier) {
         switch (identifier) {
             case ETTIMADAI:
@@ -34,5 +30,9 @@ public class AumsServer {
             default:
                 return null;
         }
+    }
+
+    public static enum Server {
+        ETTIMADAI, AMRITAPURI, BANGALORE, MYSORE, AIMS, BUSINESS, ASAS_KOCHI, ETTIMADAI_ONE, ETTIMADAI_TWO
     }
 }

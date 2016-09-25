@@ -118,6 +118,62 @@ public class MarksActivity extends BaseActivity {
         private int HEADER = 1;
         private int ITEM = 2;
 
+        MarksAdapter(List<CourseMarkData> courseMarkDataList) {
+            this.courseMarkDataList = courseMarkDataList;
+        }
+
+        public void setCourseMarkDataList(List<CourseMarkData> courseMarkDataList) {
+            this.courseMarkDataList = courseMarkDataList;
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            if (courseMarkDataList.get(position).mark == null) {
+                return HEADER;
+            }
+            return ITEM;
+        }
+
+        @Override
+        public MarksAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View v;
+
+            if (viewType == HEADER) {
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_aums_marks_section, parent, false);
+            } else {
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_aums_generic, parent, false);
+            }
+
+            return new ViewHolder(v);
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            CourseMarkData courseMarkData = courseMarkDataList.get(position);
+
+            if (courseMarkData.mark == null) {
+                holder.sectionHeader.setText(courseMarkData.exam);
+            } else {
+                holder.name.setText(courseMarkData.courseCode);
+                holder.value.setText(courseMarkData.mark);
+
+                double marks = Double.parseDouble(courseMarkData.mark);
+                if (marks >= 40) {
+                    holder.indicator.setBackgroundResource(R.drawable.circle_green);
+                } else if (marks >= 25) {
+                    holder.indicator.setBackgroundResource(R.drawable.circle_yellow);
+                } else {
+                    holder.indicator.setBackgroundResource(R.drawable.circle_red);
+                }
+            }
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return courseMarkDataList.size();
+        }
+
         class ViewHolder extends RecyclerView.ViewHolder {
 
             public TextView name;
@@ -132,69 +188,15 @@ public class MarksActivity extends BaseActivity {
                     name = (TextView) v.findViewById(R.id.name);
                     value = (TextView) v.findViewById(R.id.value);
                     indicator = (View) v.findViewById(R.id.indicator);
-                } catch (Exception ignored) { }
+                } catch (Exception ignored) {
+                }
 
                 try {
                     sectionHeader = (TextView) v.findViewById(R.id.section_header);
-                } catch (Exception ignored) { }
-            }
-
-        }
-
-        MarksAdapter(List<CourseMarkData> courseMarkDataList) {
-            this.courseMarkDataList = courseMarkDataList;
-        }
-
-        public void setCourseMarkDataList(List<CourseMarkData> courseMarkDataList) {
-            this.courseMarkDataList = courseMarkDataList;
-        }
-
-        @Override
-        public int getItemViewType(int position) {
-            if(courseMarkDataList.get(position).mark == null) {
-                return HEADER;
-            }
-            return ITEM;
-        }
-
-        @Override
-        public MarksAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View v;
-
-            if(viewType == HEADER) {
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_aums_marks_section, parent, false);
-            } else {
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_aums_generic, parent, false);
-            }
-
-            return new ViewHolder(v);
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
-            CourseMarkData courseMarkData = courseMarkDataList.get(position);
-
-            if(courseMarkData.mark == null) {
-                holder.sectionHeader.setText(courseMarkData.exam);
-            } else {
-                holder.name.setText(courseMarkData.courseCode);
-                holder.value.setText(courseMarkData.mark);
-
-                double marks = Double.parseDouble(courseMarkData.mark);
-                if(marks >= 40){
-                    holder.indicator.setBackgroundResource(R.drawable.circle_green);
-                } else if (marks >= 25){
-                    holder.indicator.setBackgroundResource(R.drawable.circle_yellow);
-                } else {
-                    holder.indicator.setBackgroundResource(R.drawable.circle_red);
+                } catch (Exception ignored) {
                 }
             }
 
-        }
-
-        @Override
-        public int getItemCount() {
-            return courseMarkDataList.size();
         }
     }
 }

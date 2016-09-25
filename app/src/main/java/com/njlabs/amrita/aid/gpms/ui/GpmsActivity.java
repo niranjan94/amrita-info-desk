@@ -59,19 +59,18 @@ import okhttp3.OkHttpClient;
 
 public class GpmsActivity extends BaseActivity {
 
+    private static long backPress;
+    public String identifier;
+    public ArrayList<Relay> relays;
     AbstractGpms gpms;
     EditText rollNoEditText;
     EditText passwordEditText;
+    SharedPreferences preferences;
     private ProgressDialog dialog;
     private String studentRollNo;
     private String studentName;
     private Boolean loggedIn = false;
-
-    SharedPreferences preferences;
-    private static long backPress;
-
-    public String identifier;
-    public ArrayList<Relay> relays;
+    private Toast toast;
 
     @Override
     public void init(Bundle savedInstanceState) {
@@ -81,7 +80,7 @@ public class GpmsActivity extends BaseActivity {
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(baseContext);
-        builder .setMessage("Amrita University does not provide an API for accessing GPMS data. " +
+        builder.setMessage("Amrita University does not provide an API for accessing GPMS data. " +
                 "So, if any changes are made to the GPMS Website, please be patient while I try to catch up.")
                 .setCancelable(true)
                 .setIcon(R.drawable.ic_action_info_small)
@@ -104,7 +103,7 @@ public class GpmsActivity extends BaseActivity {
         dialog.setMessage("Authenticating your credentials ... ");
         preferences = getSharedPreferences("gpms_prefs", Context.MODE_PRIVATE);
         String rollNo = preferences.getString("roll_no", "");
-        String encodedPassword = preferences.getString("password","");
+        String encodedPassword = preferences.getString("password", "");
         if (!rollNo.equals("")) {
             rollNoEditText.setText(rollNo);
             studentRollNo = rollNo;
@@ -112,14 +111,14 @@ public class GpmsActivity extends BaseActivity {
         } else {
             SharedPreferences aumsPrefs = getSharedPreferences("aums_prefs", Context.MODE_PRIVATE);
             String aumsRollNo = aumsPrefs.getString("RollNo", "");
-            if(!aumsRollNo.equals("")) {
+            if (!aumsRollNo.equals("")) {
                 rollNoEditText.setText(aumsRollNo);
                 studentRollNo = aumsRollNo;
                 hideSoftKeyboard();
             }
         }
 
-        if(!encodedPassword.equals("")) {
+        if (!encodedPassword.equals("")) {
             passwordEditText.setText(Security.decrypt(encodedPassword, MainApplication.key));
             hideSoftKeyboard();
         }
@@ -131,7 +130,7 @@ public class GpmsActivity extends BaseActivity {
 
     private void showConnectToAmritaAlert() {
         AlertDialog.Builder builder = new AlertDialog.Builder(baseContext);
-        builder .setMessage("Connect to the Amrita WiFi if possible, for a reliable connection to the GPMS Server.")
+        builder.setMessage("Connect to the Amrita WiFi if possible, for a reliable connection to the GPMS Server.")
                 .setCancelable(true)
                 .setIcon(R.drawable.ic_action_info_small)
                 .setPositiveButton("Ok. I'll connect.", new DialogInterface.OnClickListener() {
@@ -150,13 +149,12 @@ public class GpmsActivity extends BaseActivity {
 
         AlertDialog alert = builder.create();
         alert.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        if(!Identifier.isConnectedToAmrita(baseContext)) {
+        if (!Identifier.isConnectedToAmrita(baseContext)) {
             alert.show();
         } else {
             initialiseGpms();
         }
     }
-
 
     public void reset(View v) {
         rollNoEditText.setText("");
@@ -167,17 +165,17 @@ public class GpmsActivity extends BaseActivity {
         boolean hasError = false;
         final String rollNo = rollNoEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
-        if(StringUtils.isEmpty(rollNo)) {
+        if (StringUtils.isEmpty(rollNo)) {
             hasError = true;
             rollNoEditText.setError("Your Roll Number is required");
         }
 
-        if(StringUtils.isEmpty(password)) {
+        if (StringUtils.isEmpty(password)) {
             hasError = true;
             passwordEditText.setError("Your GPMS password is required");
         }
 
-        if(!hasError) {
+        if (!hasError) {
             hideSoftKeyboard();
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString("roll_no", rollNoEditText.getText().toString());
@@ -239,7 +237,7 @@ public class GpmsActivity extends BaseActivity {
             public void onClick(DialogInterface dialogList, int item) {
                 Intent intent = new Intent(baseContext, PassApplyActivity.class);
                 intent.putExtra("pass_type", items[item]);
-                if(relays != null && relays.size() > 0 && identifier != null) {
+                if (relays != null && relays.size() > 0 && identifier != null) {
                     intent.putParcelableArrayListExtra("relays", relays);
                     intent.putExtra("identifier", identifier);
                 }
@@ -252,7 +250,7 @@ public class GpmsActivity extends BaseActivity {
 
     public void openPassStatus(View v) {
         Intent pendingPassActivityIntent = new Intent(baseContext, PendingPassActivity.class);
-        if(relays != null && relays.size() > 0 && identifier != null) {
+        if (relays != null && relays.size() > 0 && identifier != null) {
             pendingPassActivityIntent.putParcelableArrayListExtra("relays", relays);
             pendingPassActivityIntent.putExtra("identifier", identifier);
         }
@@ -262,7 +260,7 @@ public class GpmsActivity extends BaseActivity {
     public void openPassesHistory(View v) {
 
         Intent passHistoryActivityIntent = new Intent(baseContext, PassHistoryActivity.class);
-        if(relays != null && relays.size() > 0 && identifier != null) {
+        if (relays != null && relays.size() > 0 && identifier != null) {
             passHistoryActivityIntent.putParcelableArrayListExtra("relays", relays);
             passHistoryActivityIntent.putExtra("identifier", identifier);
         }
@@ -289,9 +287,9 @@ public class GpmsActivity extends BaseActivity {
         }
     }
 
-    private void hideSoftKeyboard(){
+    private void hideSoftKeyboard() {
         View view = this.getCurrentFocus();
-        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         if (view != null) {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
@@ -299,14 +297,16 @@ public class GpmsActivity extends BaseActivity {
 
     public Picasso getUnsecuredPicassoDownloader() {
         try {
-            TrustManager[] trustAllCerts = new TrustManager[] {
+            TrustManager[] trustAllCerts = new TrustManager[]{
                     new X509TrustManager() {
 
                         @Override
-                        public void checkClientTrusted(X509Certificate[] certs, String authType) {}
+                        public void checkClientTrusted(X509Certificate[] certs, String authType) {
+                        }
 
                         @Override
-                        public void checkServerTrusted(X509Certificate[] certs, String authType) {}
+                        public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                        }
 
 
                         @Override
@@ -366,8 +366,8 @@ public class GpmsActivity extends BaseActivity {
                 return true;
             case R.id.action_bug_report:
                 Intent intent = new Intent(getApplicationContext(), BugReport.class);
-                intent.putExtra("studentName",(studentName != null ? studentName:"Anonymous"));
-                intent.putExtra("studentRollNo",(studentRollNo != null ? studentRollNo:"0"));
+                intent.putExtra("studentName", (studentName != null ? studentName : "Anonymous"));
+                intent.putExtra("studentRollNo", (studentRollNo != null ? studentRollNo : "0"));
                 startActivity(intent);
                 return true;
             default:
@@ -388,8 +388,6 @@ public class GpmsActivity extends BaseActivity {
         }
         return super.onKeyDown(keyCode, event);
     }
-
-    private Toast toast;
 
     private void exitGpms() {
         if (loggedIn) {
