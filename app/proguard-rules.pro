@@ -43,9 +43,6 @@
 -keepattributes InnerClasses
 -keepattributes InnerClasses,EnclosingMethod
 
--keep class com.crashlytics.** { *; }
--keep class com.crashlytics.android.**
-
 -keep class javax.net.ssl.** { *; }
 -keep class okhttp3.** { *; }
 -keep class com.njlabs.** { *; }
@@ -72,3 +69,18 @@
 -dontwarn okhttp3.**
 -dontwarn javax.net.ssl.**
 -dontwarn net.fortuna.ical4j.model.**
+-keep class org.apache.** { *; }
+-keepnames class com.fasterxml.jackson.** { *; }
+-keepnames class javax.servlet.** { *; }
+-keepnames class org.ietf.jgss.** { *; }
+-dontwarn org.w3c.dom.**
+-dontwarn org.joda.time.**
+-dontwarn org.shaded.apache.**
+-dontwarn org.ietf.jgss.**
+-dontwarn edu.emory.mathcs.backport.**
+
+-assumenosideeffects class android.util.Log {
+    public static *** w(...);
+    public static *** d(...);
+    public static *** v(...);
+}

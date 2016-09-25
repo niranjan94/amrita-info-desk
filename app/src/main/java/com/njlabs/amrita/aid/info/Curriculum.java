@@ -17,7 +17,7 @@ public class Curriculum extends BaseActivity {
 
         setupLayout(R.layout.activity_curriculum, department, Color.parseColor("#5e98e9"));
 
-        Snackbar.make(parentView, "The curriculum may be outdated", Snackbar.LENGTH_LONG).show();
+        Snackbar.make(parentView, "This curriculum is outdated.", Snackbar.LENGTH_LONG).show();
 
         WebView webView = (WebView) findViewById(R.id.CurriculumWeb);
 
