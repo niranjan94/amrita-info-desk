@@ -21,7 +21,7 @@ import com.njlabs.amrita.aid.aums.client.Aums;
 import com.njlabs.amrita.aid.aums.models.CourseMarkData;
 import com.njlabs.amrita.aid.aums.responses.MarksResponse;
 import com.njlabs.amrita.aid.util.ExtendedSwipeRefreshLayout;
-import com.njlabs.amrita.aid.util.ark.logging.Ln;
+import com.onemarker.ln.logger.Ln;
 
 import java.util.List;
 

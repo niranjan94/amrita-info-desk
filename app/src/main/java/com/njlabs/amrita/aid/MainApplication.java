@@ -9,7 +9,6 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.joanzapata.iconify.Iconify;
 import com.joanzapata.iconify.fonts.FontAwesomeModule;
 import com.njlabs.amrita.aid.news.NewsModel;
-import com.njlabs.amrita.aid.util.ark.logging.Ln;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
@@ -45,8 +44,6 @@ public class MainApplication extends Application {
     @Override
     public void onTerminate() {
         super.onTerminate();
-        Ln.d("onTerminate");
-
     }
 
 

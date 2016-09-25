@@ -14,11 +14,11 @@ import com.njlabs.amrita.aid.gpms.responses.HistoryResponse;
 import com.njlabs.amrita.aid.gpms.responses.InfoResponse;
 import com.njlabs.amrita.aid.gpms.responses.LoginResponse;
 import com.njlabs.amrita.aid.gpms.responses.PendingResponse;
-import com.njlabs.amrita.aid.util.ark.logging.Ln;
 import com.njlabs.amrita.aid.util.okhttp.extras.PersistentCookieStore;
 import com.njlabs.amrita.aid.util.okhttp.extras.RequestParams;
 import com.njlabs.amrita.aid.util.okhttp.responses.SuccessResponse;
 import com.njlabs.amrita.aid.util.okhttp.responses.TextResponse;
+import com.onemarker.ln.logger.Ln;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;

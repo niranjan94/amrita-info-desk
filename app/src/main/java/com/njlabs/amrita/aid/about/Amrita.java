@@ -74,13 +74,6 @@ public class Amrita extends BaseActivity {
         String number = "tel:" + num;
         Intent callIntent = new Intent(Intent.ACTION_CALL, Uri.parse(number));
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         startActivity(callIntent);
@@ -115,16 +108,8 @@ public class Amrita extends BaseActivity {
         Criteria criteria = new Criteria();
         String bestProvider = locationManager.getBestProvider(criteria, false);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        Location location = locationManager.getLastKnownLocation(bestProvider);
 
         LocationListener loc_listener = new LocationListener() {
             public void onLocationChanged(Location l) {
@@ -140,7 +125,7 @@ public class Amrita extends BaseActivity {
             }
         };
         locationManager.requestLocationUpdates(bestProvider, 0, 0, loc_listener);
-        location = locationManager.getLastKnownLocation(bestProvider);
+        Location location = locationManager.getLastKnownLocation(bestProvider);
 
         double lat;
         double lon;
@@ -167,7 +152,7 @@ public class Amrita extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        finish(); //go back to the previous Activity
+        finish();
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {

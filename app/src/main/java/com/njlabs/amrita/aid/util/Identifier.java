@@ -4,11 +4,10 @@
 
 package com.njlabs.amrita.aid.util;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.telephony.TelephonyManager;
-
-import com.njlabs.amrita.aid.util.ark.logging.Ln;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,6 +16,7 @@ import java.util.UUID;
 
 public class Identifier {
 
+    @SuppressLint("HardwareIds")
     public static String identify(Context context) {
         final TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
@@ -34,15 +34,16 @@ public class Identifier {
         int RSSI = wifiManager.getConnectionInfo().getRssi();
         String SSID = wifiManager.getConnectionInfo().getSSID().replace("\"", "");
         int level = WifiManager.calculateSignalLevel(RSSI, 5);
-        Ln.d("Wifi-" + SSID + "-" + level);
         return new String[]{SSID, String.valueOf(level)};
     }
 
     public static boolean isConnectedToAmrita(Context context) {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        String SSID = wifiManager.getConnectionInfo().getSSID().replace("\"", "").trim();
-        Ln.d("{%s}", SSID);
-        return SSID.contentEquals("Amrita");
+        if(wifiManager != null) {
+            String SSID = wifiManager.getConnectionInfo().getSSID().replace("\"", "").trim();
+            return SSID.contentEquals("Amrita");
+        }
+        return false;
     }
 
     public static String getJsonIdentifier(Context context) {

@@ -12,13 +12,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by Niranjan on 21-10-2014.
- */
 public class Util {
 
     public static Map<String, String> splitQuery(URL url) throws UnsupportedEncodingException {
-        Map<String, String> query_pairs = new LinkedHashMap<String, String>();
+        Map<String, String> query_pairs = new LinkedHashMap<>();
         String query = url.getQuery();
         String[] pairs = query.split("&");
         for (String pair : pairs) {
@@ -29,7 +26,7 @@ public class Util {
     }
 
     public static Map<String, List<String>> splitQuery(URL url, int flag) throws UnsupportedEncodingException {
-        final Map<String, List<String>> query_pairs = new LinkedHashMap<String, List<String>>();
+        final Map<String, List<String>> query_pairs = new LinkedHashMap<>();
         final String[] pairs = url.getQuery().split("&");
         for (String pair : pairs) {
             final int idx = pair.indexOf("=");

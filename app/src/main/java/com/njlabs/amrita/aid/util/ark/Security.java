@@ -5,16 +5,16 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class Security {
     public static String encrypt(String input, String key) {
-        byte[] crypted = null;
+        byte[] encrypted = null;
         try {
             SecretKeySpec skey = new SecretKeySpec(key.getBytes(), "AES");
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, skey);
-            crypted = cipher.doFinal(input.getBytes());
+            encrypted = cipher.doFinal(input.getBytes());
         } catch (Exception e) {
             System.out.println(e.toString());
         }
-        return new String(Base64.encode(crypted));
+        return Base64.encode(encrypted);
     }
 
     public static String decrypt(String input, String key) {
@@ -27,6 +27,6 @@ public class Security {
         } catch (Exception e) {
             System.out.println(e.toString());
         }
-        return new String(output);
+        return new String(output != null ? output : new byte[0]);
     }
 }

@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.MainApplication;
 import com.njlabs.amrita.aid.R;
@@ -36,12 +38,11 @@ import com.njlabs.amrita.aid.bugs.BugReport;
 import com.njlabs.amrita.aid.landing.Landing;
 import com.njlabs.amrita.aid.util.StringCallback;
 import com.njlabs.amrita.aid.util.ark.Security;
-import com.njlabs.amrita.aid.util.ark.logging.Ln;
+import com.onemarker.ln.logger.Ln;
 import com.njlabs.amrita.aid.util.okhttp.responses.FileResponse;
 import com.njlabs.amrita.aid.util.okhttp.responses.TextResponse;
 import com.squareup.picasso.Picasso;
 
-import org.angmarch.views.NiceSpinner;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 
@@ -56,13 +57,12 @@ public class AumsActivity extends BaseActivity {
     private static long backPressTime;
     EditText rollNoEditText;
     EditText passwordEditText;
-    NiceSpinner campusSpinner;
+    MaterialSpinner spinner;
     private ProgressDialog dialog = null;
     private Aums aums;
     private SharedPreferences aumsPreferences;
 
     private boolean isLoggedIn = false;
-    private List<String> campusDataSet;
     private Toast toast;
 
     @Override
@@ -71,9 +71,8 @@ public class AumsActivity extends BaseActivity {
 
         rollNoEditText = (EditText) findViewById(R.id.roll_no);
         passwordEditText = (EditText) findViewById(R.id.pwd);
-        campusSpinner = (NiceSpinner) findViewById(R.id.nice_spinner);
 
-        campusDataSet = new LinkedList<>(Arrays.asList(
+        List<String> campusDataSet = new LinkedList<>(Arrays.asList(
                 "Ettimadai",
                 "Amritapuri",
                 "Bangalore",
@@ -83,8 +82,9 @@ public class AumsActivity extends BaseActivity {
                 "ASAS Kochi"
         ));
 
-        campusSpinner.attachDataSource(campusDataSet);
-        campusSpinner.setBackgroundResource(R.drawable.selector_modded);
+
+        spinner = (MaterialSpinner) findViewById(R.id.spinner);
+        spinner.setItems(campusDataSet);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(baseContext);
         builder.setMessage("Amrita University does not provide an API for accessing AUMS data. " +
@@ -112,7 +112,7 @@ public class AumsActivity extends BaseActivity {
         aumsPreferences = getSharedPreferences("aums_prefs", Context.MODE_PRIVATE);
         String rollNo = aumsPreferences.getString("RollNo", "");
         String encodedPassword = aumsPreferences.getString("Password", "");
-        campusSpinner.setText(campusDataSet.get(aumsPreferences.getInt("server_ordinal", 0)));
+        spinner.setSelectedIndex(aumsPreferences.getInt("server_ordinal", 0));
 
         aums = new Aums(baseContext);
 
@@ -153,7 +153,7 @@ public class AumsActivity extends BaseActivity {
             editor.putString("RollNo", rollNoEditText.getText().toString());
             editor.putString("Password", Security.encrypt(passwordEditText.getText().toString(), MainApplication.key));
 
-            int serverOrdinal = campusDataSet.indexOf(campusSpinner.getText().toString());
+            int serverOrdinal = spinner.getSelectedIndex();
 
             editor.putInt("server_ordinal", serverOrdinal);
             editor.apply();

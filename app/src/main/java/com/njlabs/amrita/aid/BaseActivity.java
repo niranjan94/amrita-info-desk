@@ -88,7 +88,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void setRecentHeaderColor(int color) {
         if (isLollipop()) {
-            ActivityInfo activityInfo = null;
+            ActivityInfo activityInfo;
             String title = "Amrita Info Desk";
             try {
                 activityInfo = getPackageManager().getActivityInfo(getComponentName(), PackageManager.GET_META_DATA);

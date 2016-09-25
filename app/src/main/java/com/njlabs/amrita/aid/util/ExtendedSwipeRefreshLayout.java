@@ -8,9 +8,6 @@ import android.content.Context;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 
-/**
- * Created by Niranjan on 08-07-2015.
- */
 public class ExtendedSwipeRefreshLayout extends SwipeRefreshLayout {
 
     private boolean mMeasured = false;

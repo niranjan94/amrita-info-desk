@@ -1,5 +1,7 @@
 package com.njlabs.amrita.aid.util.ark;
 
+import android.util.Base64OutputStream;
+
 import java.io.UnsupportedEncodingException;
 
 public class Base64Adv {

@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.firebase.crash.FirebaseCrash;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
@@ -39,8 +40,8 @@ import com.njlabs.amrita.aid.info.Curriculum;
 import com.njlabs.amrita.aid.info.TrainBusInfo;
 import com.njlabs.amrita.aid.news.NewsActivity;
 import com.njlabs.amrita.aid.settings.SettingsActivity;
-import com.njlabs.amrita.aid.util.ark.logging.Ln;
 import com.njlabs.amrita.aid.util.okhttp.extras.PersistentCookieStore;
+import com.onemarker.ln.logger.Ln;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -83,6 +84,7 @@ public class Landing extends BaseActivity {
                         new PrimaryDrawerItem().withName("News").withIcon(R.drawable.ic_action_speaker_notes).withCheckable(false),
                         new DividerDrawerItem(),
                         new PrimaryDrawerItem().withName("About the app").withIcon(R.drawable.ic_action_info).withCheckable(false),
+                        new PrimaryDrawerItem().withName("Invite").withIcon(R.drawable.ic_action_info).withCheckable(false),
                         new PrimaryDrawerItem().withName("Settings").withIcon(R.drawable.ic_action_settings).withCheckable(false)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
@@ -96,6 +98,13 @@ public class Landing extends BaseActivity {
                                 startActivity(new Intent(baseContext, App.class));
                                 break;
                             case 4:
+                                Intent intent = new AppInviteInvitation.IntentBuilder("Invite users")
+                                        .setMessage("Spread the word to fellow Amrititans")
+                                        .setCallToActionText("Invite")
+                                        .build();
+                                startActivityForResult(intent, 211);
+                                break;
+                            case 5:
                                 startActivity(new Intent(baseContext, SettingsActivity.class));
                                 break;
                         }

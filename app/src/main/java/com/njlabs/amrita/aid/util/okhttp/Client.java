@@ -9,13 +9,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.njlabs.amrita.aid.util.ark.logging.Ln;
 import com.njlabs.amrita.aid.util.okhttp.extras.MapQuery;
 import com.njlabs.amrita.aid.util.okhttp.extras.PersistentCookieStore;
 import com.njlabs.amrita.aid.util.okhttp.extras.RequestParams;
 import com.njlabs.amrita.aid.util.okhttp.responses.FileResponse;
 import com.njlabs.amrita.aid.util.okhttp.responses.RawResponse;
 import com.njlabs.amrita.aid.util.okhttp.responses.TextResponse;
+import com.onemarker.ln.logger.Ln;
 
 import org.joda.time.DateTime;
 

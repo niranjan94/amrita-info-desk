@@ -55,6 +55,7 @@ dependencies {
     compile 'com.google.firebase:firebase-core:9.6.0'
     compile 'com.google.firebase:firebase-crash:9.6.0'
     compile 'com.google.firebase:firebase-messaging:9.6.0'
+    compile 'com.google.firebase:firebase-invites:9.6.0'
 
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:support-v4:24.2.1'
@@ -79,7 +80,7 @@ dependencies {
     compile 'com.jakewharton.picasso:picasso2-okhttp3-downloader:1.0.2'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
     compile 'com.squareup.okhttp3:okhttp-urlconnection:3.2.0'
-    compile 'com.github.arcadefire:nice-spinner:b17d3dd1f8'
+    compile 'com.jaredrummler:material-spinner:1.1.0'
     compile 'jp.wasabeef:recyclerview-animators:2.2.1'
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     compile 'com.google.code.gson:gson:2.6.2'
@@ -87,6 +88,7 @@ dependencies {
     compile 'org.mnode.ical4j:ical4j:1.0.5'
     compile 'backport-util-concurrent:backport-util-concurrent:3.1'
     compile 'commons-codec:commons-codec:1.8'
+    compile 'com.niranjan.ln:ln:1.1.2'
 }
 
 apply plugin: 'com.google.gms.google-services'

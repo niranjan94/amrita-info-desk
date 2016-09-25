@@ -25,8 +25,8 @@ import com.njlabs.amrita.aid.gpms.client.Gpms;
 import com.njlabs.amrita.aid.gpms.models.PendingEntry;
 import com.njlabs.amrita.aid.gpms.responses.PendingResponse;
 import com.njlabs.amrita.aid.util.ExtendedSwipeRefreshLayout;
-import com.njlabs.amrita.aid.util.ark.logging.Ln;
 import com.njlabs.amrita.aid.util.okhttp.responses.SuccessResponse;
+import com.onemarker.ln.logger.Ln;
 
 import java.util.List;
 

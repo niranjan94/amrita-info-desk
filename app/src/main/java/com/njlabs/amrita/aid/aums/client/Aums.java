@@ -26,6 +26,7 @@ import com.njlabs.amrita.aid.util.okhttp.extras.RequestParams;
 import com.njlabs.amrita.aid.util.okhttp.responses.FileResponse;
 import com.njlabs.amrita.aid.util.okhttp.responses.RawResponse;
 import com.njlabs.amrita.aid.util.okhttp.responses.TextResponse;
+import com.onemarker.ln.logger.Ln;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -524,8 +525,14 @@ public class Aums {
                         }
                     }
 
-                    courseDataList.add(courseData);
+                    if(courseData.getCourseCode() != null) {
+                        if(courseData.getCourseCode().trim().length() > 3 ) {
+                            courseDataList.add(courseData);
+                        }
+                    }
                 }
+
+                Ln.d("Courses found: " + courseDataList.size());
 
                 for (Element option : options) {
                     if (!option.attr("value").equals("0")) {
@@ -542,9 +549,16 @@ public class Aums {
                                 break;
                             }
                         }
-                        courseDataList.add(courseData);
+                        if(courseData.getCourseCode() != null) {
+                            if(courseData.getCourseCode().trim().length() > 3 ) {
+                                courseDataList.add(courseData);
+                            }
+                        }
                     }
                 }
+
+                Ln.d("Courses found: " + courseDataList.size());
+
 
                 final int[] responded = {0};
                 for (final CourseData courseData : courseDataList) {
@@ -564,6 +578,9 @@ public class Aums {
                         }
                     });
                 }
+
+                Ln.d("Courses found: " + courseDataList.size());
+
             }
 
             @Override

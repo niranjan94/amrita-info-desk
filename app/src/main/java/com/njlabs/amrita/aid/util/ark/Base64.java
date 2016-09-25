@@ -1,4 +1,6 @@
-package com.njlabs.amrita.aid.util.ark; /***************************************************************
+package com.njlabs.amrita.aid.util.ark;
+
+/***************************************************************
  * Copyright (c) 1998, 1999 Nate Sammons <nate@protomatter.com>
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -50,7 +52,7 @@ public class Base64 {
     /**
      *  Encode some data and return a String.
      */
-    public final static String encode(byte[] d) {
+    public static String encode(byte[] d) {
         if (d == null) return null;
         byte data[] = new byte[d.length + 2];
         System.arraycopy(d, 0, data, 0, d.length);
@@ -85,14 +87,14 @@ public class Base64 {
     /**
      * Encode a String using Base64 using the default platform encoding
      **/
-    public final static String encode(String s) {
+    public static String encode(String s) {
         return encode(s.getBytes());
     }
 
     /**
      *  Decode data and return bytes.
      */
-    public final static byte[] decode(String str) {
+    public static byte[] decode(String str) {
         if (str == null) return null;
         byte data[] = str.getBytes();
         return decode(data);
@@ -102,7 +104,7 @@ public class Base64 {
      *  Decode data and return bytes.  Assumes that the data passed
      *  in is ASCII text.
      */
-    public final static byte[] decode(byte[] data) {
+    public static byte[] decode(byte[] data) {
         int tail = data.length;
         while (data[tail - 1] == '=') tail--;
         byte dest[] = new byte[tail - data.length / 4];
@@ -144,7 +146,7 @@ public class Base64 {
     /**
      *  A simple test that encodes and decodes the first commandline argument.
      */
-    public static final void main(String[] args) {
+    public static void main(String[] args) {
         if (args.length != 1) {
             System.out.println("Usage: Base64 string");
             System.exit(0);

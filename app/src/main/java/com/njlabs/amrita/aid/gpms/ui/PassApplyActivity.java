@@ -19,16 +19,16 @@ import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialo
 import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter;
 import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.MainApplication;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.gpms.client.AbstractGpms;
 import com.njlabs.amrita.aid.gpms.client.Gpms;
 import com.njlabs.amrita.aid.util.ark.Security;
-import com.njlabs.amrita.aid.util.ark.logging.Ln;
 import com.njlabs.amrita.aid.util.okhttp.responses.SuccessResponse;
+import com.onemarker.ln.logger.Ln;
 
-import org.angmarch.views.NiceSpinner;
 import org.joda.time.DateTime;
 
 import java.util.Arrays;
@@ -43,7 +43,7 @@ public class PassApplyActivity extends BaseActivity {
     Button fromDateBtn;
     Button toDateBtn;
     EditText reasonEditText;
-    NiceSpinner spinner;
+    MaterialSpinner spinner;
     String passType;
 
     AbstractGpms gpms;
@@ -55,9 +55,10 @@ public class PassApplyActivity extends BaseActivity {
 
         passType = getIntent().getStringExtra("pass_type");
 
-        spinner = (NiceSpinner) findViewById(R.id.nice_spinner);
         List<String> dataset = new LinkedList<>(Arrays.asList("Regular Academic Semester", "Project during vacation", "Training", "Cultural/Club", "Vacation Course"));
-        spinner.attachDataSource(dataset);
+
+        spinner = (MaterialSpinner) findViewById(R.id.spinner);
+        spinner.setItems(dataset);
 
         fromDateBtn = (Button) findViewById(R.id.from_date_btn);
         toDateBtn = (Button) findViewById(R.id.to_date_btn);

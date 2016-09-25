@@ -8,9 +8,13 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,13 +34,14 @@ import com.njlabs.amrita.aid.aums.models.CourseResource;
 import com.njlabs.amrita.aid.aums.responses.CourseResourcesResponse;
 import com.njlabs.amrita.aid.aums.responses.CoursesResponse;
 import com.njlabs.amrita.aid.util.ExtendedSwipeRefreshLayout;
-import com.njlabs.amrita.aid.util.ark.logging.Ln;
 import com.njlabs.amrita.aid.util.okhttp.ProgressResponseBody;
 import com.njlabs.amrita.aid.util.okhttp.responses.FileResponse;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -137,10 +142,10 @@ public class AumsResourcesActivity extends BaseActivity {
             aums.getCourses(new CoursesResponse() {
                 @Override
                 public void onSuccess(List<CourseData> courseDataList) {
-                    CoursesListAdapter adapter = new CoursesListAdapter(courseDataList);
-                    recyclerView.setAdapter(adapter);
                     swipeRefreshLayout.setRefreshing(false);
                     courseDatas = courseDataList;
+                    CoursesListAdapter adapter = new CoursesListAdapter(courseDataList);
+                    recyclerView.setAdapter(adapter);
                 }
 
                 @Override
@@ -198,23 +203,37 @@ public class AumsResourcesActivity extends BaseActivity {
     @NeedsPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
     void downloadFile() {
         progressDialog.show();
-        aums.downloadResource(courseId, fileNameToDownload, new FileResponse() {
-            @SuppressWarnings("ResultOfMethodCallIgnored")
-            @Override
-            public void onSuccess(File file) {
-                if (fileNameToDownload == null) {
-                    file.delete();
-                } else {
-                    progressDialog.dismiss();
-                    Ln.d(file.getAbsolutePath());
+        File destinationFolder = new File(Environment.getExternalStorageDirectory() + "/amrita-info-desk/docs/" + courseId + "/");
+        if(!destinationFolder.exists()) {
+            destinationFolder.mkdirs();
+        }
+        final File destinationFile = new File(destinationFolder + "/" + fileNameToDownload);
+        if(destinationFile.exists()) {
+            openFile(destinationFile, fileNameToDownload);
+        } else {
+            aums.downloadResource(courseId, fileNameToDownload, new FileResponse() {
+                @SuppressWarnings("ResultOfMethodCallIgnored")
+                @Override
+                public void onSuccess(File file) {
+                    if (fileNameToDownload == null) {
+                        file.delete();
+                    } else {
+                        progressDialog.dismiss();
+                        try {
+                            FileUtils.copyFile(file, destinationFile);
+                            openFile(destinationFile, fileNameToDownload);
+                        } catch (IOException e) {
+                            Snackbar.make(parentView, "An error occurred while saving the file", Snackbar.LENGTH_SHORT).show();
+                        }
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Throwable throwable) {
-                progressDialog.dismiss();
-            }
-        });
+                @Override
+                public void onFailure(Throwable throwable) {
+                    progressDialog.dismiss();
+                }
+            });
+        }
     }
 
     @Override
@@ -350,12 +369,19 @@ public class AumsResourcesActivity extends BaseActivity {
             } else {
                 holder.icon.setImageResource(R.drawable.ic_aums_file);
             }
-
         }
 
         @Override
         public int getItemCount() {
             return courseResourceList.size();
         }
+    }
+
+    private void openFile(File file, String fileName) {
+        Intent fileOpenIntent = new Intent(Intent.ACTION_VIEW);
+        fileOpenIntent.setData(Uri.fromFile(file));
+        Intent fileChooserIntent = Intent.createChooser(fileOpenIntent, "Open " + fileName + " with:");
+        startActivity(fileChooserIntent);
+
     }
 }

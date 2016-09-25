@@ -39,7 +39,7 @@ import com.njlabs.amrita.aid.gpms.responses.InfoResponse;
 import com.njlabs.amrita.aid.landing.Landing;
 import com.njlabs.amrita.aid.util.Identifier;
 import com.njlabs.amrita.aid.util.ark.Security;
-import com.njlabs.amrita.aid.util.ark.logging.Ln;
+import com.onemarker.ln.logger.Ln;
 import com.squareup.picasso.Downloader;
 import com.squareup.picasso.Picasso;
 
