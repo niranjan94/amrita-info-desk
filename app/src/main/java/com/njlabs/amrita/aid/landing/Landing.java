@@ -143,7 +143,7 @@ public class Landing extends BaseActivity {
                         startActivity(new Intent(baseContext, Amrita.class));
                         break;
                     case "Amrita Explorer":
-                        Snackbar.make(parentView, "Amrita Explorer is under maintenance", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(parentView, "Announcements is under construction", Snackbar.LENGTH_SHORT).show();
                         break;
                     case "Academic Calender":
                         // ACADEMIC CALENDER
