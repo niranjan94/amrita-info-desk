@@ -5,6 +5,7 @@
 package com.njlabs.amrita.aid.news;
 
 import android.app.AlarmManager;
+import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -19,6 +20,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
 import com.activeandroid.ActiveAndroid;
+import com.google.firebase.crash.FirebaseCrash;
 import com.njlabs.amrita.aid.R;
 
 import org.jsoup.Jsoup;
@@ -34,25 +36,26 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class NewsUpdateService extends Service {
+public class NewsUpdateService extends IntentService {
 
     Context mContext;
     boolean allowNotification = true;
 
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    public NewsUpdateService(String name) {
+        super(name);
     }
 
+    public NewsUpdateService() {
+        super("NewsUpdateService");
+    }
+
+
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    protected void onHandleIntent(Intent intent) {
         mContext = this;
         SharedPreferences preferences = getSharedPreferences("com.njlabs.amrita.aid_preferences", Context.MODE_PRIVATE);
         allowNotification = preferences.getBoolean("news_updates_notification", true);
         new JobTask().execute();
-        stopSelf();
-        return START_NOT_STICKY;
     }
 
     private void getNews(final Boolean refresh, final List<NewsModel> oldArticles) {
@@ -151,7 +154,7 @@ public class NewsUpdateService extends Service {
                 }
             }
         } catch (IOException ignored) {
-
+            FirebaseCrash.report(ignored);
         }
 
     }

@@ -136,7 +136,7 @@ public class Landing extends BaseActivity {
                 PendingIntent.getService(this, 0, new Intent(this, NewsUpdateService.class), 0)
         );
 
-
+        startService(new Intent(baseContext, NewsUpdateService.class));
     }
 
 
