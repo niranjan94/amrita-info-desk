@@ -4,14 +4,17 @@
 
 package com.njlabs.amrita.aid.news;
 
-import android.app.IntentService;
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
@@ -31,25 +34,25 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class NewsUpdateService extends IntentService {
+public class NewsUpdateService extends Service {
 
     Context mContext;
     boolean allowNotification = true;
 
-    public NewsUpdateService(String name) {
-        super(name);
-    }
-
-    public NewsUpdateService() {
-        super("NewsUpdateService");
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    public int onStartCommand(Intent intent, int flags, int startId) {
         mContext = this;
         SharedPreferences preferences = getSharedPreferences("com.njlabs.amrita.aid_preferences", Context.MODE_PRIVATE);
         allowNotification = preferences.getBoolean("news_updates_notification", true);
-        new JobTask(this).execute();
+        new JobTask().execute();
+        stopSelf();
+        return START_NOT_STICKY;
     }
 
     private void getNews(final Boolean refresh, final List<NewsModel> oldArticles) {
@@ -154,12 +157,7 @@ public class NewsUpdateService extends IntentService {
     }
 
     private class JobTask {
-        private final NewsUpdateService jobService;
         private List<NewsModel> oldArticles;
-
-        JobTask(NewsUpdateService jobService) {
-            this.jobService = jobService;
-        }
 
         void execute() {
             oldArticles = NewsModel.getAll();
@@ -169,6 +167,17 @@ public class NewsUpdateService extends IntentService {
                 getNews(false, oldArticles);
             }
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        // I want to restart this service again in one hour
+        AlarmManager alarm = (AlarmManager)getSystemService(ALARM_SERVICE);
+        alarm.set(
+                AlarmManager.RTC_WAKEUP,
+                System.currentTimeMillis() + (1000 * 60 * 60 * 6),
+                PendingIntent.getService(this, 0, new Intent(this, NewsUpdateService.class), 0)
+        );
     }
 
 }

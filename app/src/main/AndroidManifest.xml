@@ -160,6 +160,14 @@
                 android:value=".landing.Landing" />
         </activity>
 
+        <service android:name=".news.NewsUpdateService" />
+
+        <receiver android:name=".news.NewsUpdateServiceBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

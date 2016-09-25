@@ -2,7 +2,9 @@ package com.njlabs.amrita.aid.landing;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -39,6 +41,7 @@ import com.njlabs.amrita.aid.info.Calender;
 import com.njlabs.amrita.aid.info.Curriculum;
 import com.njlabs.amrita.aid.info.TrainBusInfo;
 import com.njlabs.amrita.aid.news.NewsActivity;
+import com.njlabs.amrita.aid.news.NewsUpdateService;
 import com.njlabs.amrita.aid.settings.SettingsActivity;
 import com.njlabs.amrita.aid.util.okhttp.extras.PersistentCookieStore;
 import com.onemarker.ln.logger.Ln;
@@ -125,6 +128,14 @@ public class Landing extends BaseActivity {
         if (gpmsCookieFile.exists()) {
             gpmsCookieFile.delete();
         }
+
+        AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarm.set(
+                AlarmManager.RTC_WAKEUP,
+                System.currentTimeMillis() + (1000 * 60 * 60 * 6),
+                PendingIntent.getService(this, 0, new Intent(this, NewsUpdateService.class), 0)
+        );
+
 
     }
 
