@@ -52,11 +52,11 @@ android {
 }
 
 dependencies {
-    compile 'com.google.firebase:firebase-core:9.6.0'
-    compile 'com.google.firebase:firebase-crash:9.6.0'
-    compile 'com.google.firebase:firebase-messaging:9.6.0'
-    compile 'com.google.firebase:firebase-invites:9.6.0'
 
+    compile 'com.google.firebase:firebase-core:9.6.1'
+    compile 'com.google.firebase:firebase-crash:9.6.1'
+    compile 'com.google.firebase:firebase-messaging:9.6.1'
+    compile 'com.google.firebase:firebase-invites:9.6.1'
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:support-v4:24.2.1'
     compile 'com.android.support:design:24.2.1'
@@ -68,14 +68,9 @@ dependencies {
     compile 'com.joanzapata.iconify:android-iconify-fontawesome:2.0.9'
     compile 'com.roomorama:caldroid:2.3.1'
     compile 'joda-time:joda-time:2.8.1'
-
-    compile('com.mikepenz:materialdrawer:3.0.9@aar') {
-        transitive = true
-    }
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'uk.co.chrisjenx:calligraphy:2.1.0'
     compile 'com.github.hotchemi:permissionsdispatcher:2.0.1'
-    apt 'com.github.hotchemi:permissionsdispatcher-processor:2.0.1'
     compile 'com.code-troopers.betterpickers:library:2.5.1'
     compile 'com.jakewharton.picasso:picasso2-okhttp3-downloader:1.0.2'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
@@ -84,11 +79,15 @@ dependencies {
     compile 'jp.wasabeef:recyclerview-animators:2.2.1'
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     compile 'com.google.code.gson:gson:2.6.2'
-
     compile 'org.mnode.ical4j:ical4j:1.0.5'
     compile 'backport-util-concurrent:backport-util-concurrent:3.1'
-    compile 'commons-codec:commons-codec:1.8'
+    compile 'commons-codec:commons-codec:1.10'
     compile 'com.niranjan.ln:ln:1.1.2'
+    apt 'com.github.hotchemi:permissionsdispatcher-processor:2.0.1'
+    compile('com.mikepenz:materialdrawer:3.0.9@aar') {
+        transitive = true
+    }
+
 }
 
 apply plugin: 'com.google.gms.google-services'
