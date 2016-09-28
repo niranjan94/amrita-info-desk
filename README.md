@@ -4,6 +4,8 @@
 
 ![Amrita Info Desk](https://github.com/niranjan94/amrita-info-desk/blob/static-files/banner.jpg?raw=true)
 
+[<img src="https://play.google.com/intl/en_us/badges/images/apps/en-play-badge-border.png" width="200" alt="Get Amrita Info Desk on Google Play" />](https://play.google.com/store/apps/details?id=com.njlabs.amrita.aid "Get Amrita Info Desk on Google Play")
+
 ## Setting up the development environment
 
 1. Download and install [Oracle Java SE Development Kit 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html).
