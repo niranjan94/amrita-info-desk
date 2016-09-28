@@ -105,7 +105,7 @@ public class Calender extends BaseActivity {
                         if (title.length() > 4) {
                             Date startDate = parseDate(calendarComponent.getProperty(Property.DTSTART).getValue());
                             Date endDate = parseDate(calendarComponent.getProperty(Property.DTEND).getValue());
-                            title = title.replaceAll("^CD\\d\\d:\\s", "").replaceAll("^CD\\d:\\s", "");
+                            title = title.replaceAll("^CD\\d\\d:\\s", "").replaceAll("^CD\\d:\\s", "").replace("*", "");
 
                             int color = R.color.calendar_green;
 
