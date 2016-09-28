@@ -9,17 +9,17 @@
 1. Download and install [Oracle Java SE Development Kit 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html).
 2. Download and setup [Android Studio](https://developer.android.com/studio/index.html) and [Android SDK](https://developer.android.com/studio/index.html#downloads) on your development machine. 
 3. In the Android SDK Manager, make sure the following packages are installed.
-    1. Android SDK Tools - 25.2.2+
-    2. Android SDK Platform-Tools - 24.0.3+
-    3. Android SDK Build Tools - 24.0.2
-    4. Android 7.0 SDK Platform (API24)
-    5. Android Support Repository - Rev 38+
-    6. Google Play Services - Rev 33+
-    7. Google Repository - Rev 35+
+    1. `Android SDK Tools - 25.2.2+`
+    2. `Android SDK Platform-Tools - 24.0.3+`
+    3. `Android SDK Build Tools - 24.0.2`
+    4. `Android 7.0 SDK Platform (API24)`
+    5. `Android Support Repository - Rev 38+`
+    6. `Google Play Services - Rev 33+`
+    7. `Google Repository - Rev 35+`
 4. Clone the project repository
-```
-git clone git@github.com:niranjan94/amrita-info-desk.git
-```
+    ```
+    git clone git@github.com:niranjan94/amrita-info-desk.git
+    ```
 5. Create a new firebase project at [Firebase Console](https://console.firebase.google.com/). Download the `google-services.json` configuration file into the `app/` directory.
 6. Import the project into Android Studio and start working :) 
 
