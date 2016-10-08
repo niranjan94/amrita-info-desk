@@ -8,7 +8,7 @@ repositories {
 
 def versionMajor = 2
 def versionMinor = 1
-def versionPatch = 8
+def versionPatch = 9
 def versionBuild = 4
 
 configurations {

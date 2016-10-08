@@ -29,6 +29,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.ArrayMap;
 
 import com.njlabs.amrita.aid.util.okhttp.extras.MapQuery;
 import com.njlabs.amrita.aid.util.okhttp.extras.PersistentCookieStore;
@@ -50,7 +51,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -76,9 +80,11 @@ abstract public class Client {
     protected OkHttpClient client;
     protected String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/47.0.2526.106 Chrome/47.0.2526.106 Safari/537.36";
     protected Context context;
-    protected String referer = null;
+    protected String referrer = null;
     private ProgressResponseBody.ProgressListener progressListener = null;
     private SharedPreferences cookiePrefs;
+    private HashMap<String, String> customHeaders;
+
     Interceptor interceptor = new Interceptor() {
         @SuppressLint("DefaultLocale")
         @Override
@@ -168,10 +174,16 @@ abstract public class Client {
                         newRequest.addHeader("Origin", origin);
                         newRequest.addHeader("User-Agent", userAgent);
 
-                        if (referer != null) {
-                            newRequest.addHeader("Referer", referer);
+                        if (referrer != null) {
+                            newRequest.addHeader("Referer", referrer);
                         } else {
                             newRequest.removeHeader("Referer");
+                        }
+
+                        if(customHeaders != null) {
+                            for(String name : customHeaders.keySet()) {
+                                newRequest.addHeader(name, customHeaders.get(name));
+                            }
                         }
 
                         return chain.proceed(newRequest.build());
@@ -187,12 +199,29 @@ abstract public class Client {
         this.progressListener = progressListener;
     }
 
-    public void setReferer(String referer) {
-        this.referer = referer;
+    public void setReferrer(String referrer) {
+        this.referrer = referrer;
     }
 
-    public void removeReferer() {
-        this.referer = null;
+    public void removeReferrer() {
+        this.referrer = null;
+    }
+
+    public void setCustomHeaders(HashMap<String, String> customHeaders) {
+        this.customHeaders = customHeaders;
+    }
+
+    public void addCustomHeader(String name, String value) {
+        if(this.customHeaders == null) {
+            this.setCustomHeaders(new HashMap<String, String>());
+        }
+        this.customHeaders.put(name, value);
+    }
+
+    public void removeCustomHeaders() {
+        if(this.customHeaders != null) {
+            this.customHeaders.clear();
+        }
     }
 
     public void get(String path, RequestParams params, final TextResponse responseHandler) {

@@ -28,6 +28,11 @@ package com.njlabs.amrita.aid.gpms.client;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
+import android.util.Base64;
+import android.util.Log;
 
 import com.njlabs.amrita.aid.gpms.models.HistoryEntry;
 import com.njlabs.amrita.aid.gpms.models.PendingEntry;
@@ -35,6 +40,7 @@ import com.njlabs.amrita.aid.gpms.responses.HistoryResponse;
 import com.njlabs.amrita.aid.gpms.responses.InfoResponse;
 import com.njlabs.amrita.aid.gpms.responses.LoginResponse;
 import com.njlabs.amrita.aid.gpms.responses.PendingResponse;
+import com.njlabs.amrita.aid.util.ark.Security;
 import com.njlabs.amrita.aid.util.okhttp.extras.PersistentCookieStore;
 import com.njlabs.amrita.aid.util.okhttp.extras.RequestParams;
 import com.njlabs.amrita.aid.util.okhttp.responses.SuccessResponse;
@@ -50,6 +56,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.File;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,9 +70,12 @@ public class Gpms implements AbstractGpms {
     private String studentName = null;
     private String studentHostelCode = null;
     private SharedPreferences cookiePrefFile;
+    private Context context;
 
     public Gpms(Context context) {
+        this.context = context;
         client = new GpmsClient(context);
+        setupAuthentication();
         client.powerUp();
 
         cookiePrefFile = context.getSharedPreferences(PersistentCookieStore.GPMS_COOKIE_PREFS, Context.MODE_PRIVATE);
@@ -75,7 +86,9 @@ public class Gpms implements AbstractGpms {
     }
 
     public Gpms(Context context, String cookiePrefFilename) {
+        this.context = context;
         client = new GpmsClient(context, cookiePrefFilename);
+        setupAuthentication();
         client.powerUp();
 
         cookiePrefFile = context.getSharedPreferences(cookiePrefFilename, Context.MODE_PRIVATE);
@@ -83,6 +96,24 @@ public class Gpms implements AbstractGpms {
         studentRollNo = cookiePrefFile.getString("gpms_roll_no", null);
         studentName = cookiePrefFile.getString("gpms_name", null);
         studentHostelCode = cookiePrefFile.getString("gpms_hostel_code", null);
+    }
+
+    private void setupAuthentication() {
+        if(client.isProxyOn()) {
+            try {
+                PackageInfo info = context.getPackageManager().getPackageInfo("com.njlabs.amrita.aid", PackageManager.GET_SIGNATURES);
+                for (Signature signature : info.signatures) {
+                    MessageDigest md = MessageDigest.getInstance("SHA");
+                    md.update(signature.toByteArray());
+                    String hash = Security.convertToHex(md.digest());
+                    Log.d("KeyHash:", hash);
+                    client.addCustomHeader("Dilithium", hash);
+                }
+            } catch (PackageManager.NameNotFoundException | NoSuchAlgorithmException ignored) {
+
+            }
+
+        }
     }
 
     public String getStudentName() {
@@ -222,7 +253,7 @@ public class Gpms implements AbstractGpms {
         params.put("groundsforleave", reason);
         params.put("leavesubmit", "Submit Leave");
 
-        client.setReferer(client.getUnproxiedUrl("/applyleave.php"));
+        client.setReferrer(client.getUnproxiedUrl("/applyleave.php"));
         client.post("/applyleave.php", params, new TextResponse() {
 
             @Override
@@ -239,13 +270,13 @@ public class Gpms implements AbstractGpms {
                 client.post("/applyleave.php", params, new TextResponse() {
                     @Override
                     public void onFailure(Throwable throwable) {
-                        client.removeReferer();
+                        client.removeReferrer();
                         successResponse.onFailure(throwable);
                     }
 
                     @Override
                     public void onSuccess(String responseString) {
-                        client.removeReferer();
+                        client.removeReferrer();
                         successResponse.onSuccess();
                     }
                 });
@@ -253,7 +284,7 @@ public class Gpms implements AbstractGpms {
 
             @Override
             public void onFailure(Throwable throwable) {
-                client.removeReferer();
+                client.removeReferrer();
                 successResponse.onFailure(throwable);
             }
         });
@@ -282,7 +313,7 @@ public class Gpms implements AbstractGpms {
         params.put("groundsforleave", reason);
         params.put("leavesubmit", "Submit Leave");
 
-        client.setReferer(client.getUnproxiedUrl("/applyleave.php"));
+        client.setReferrer(client.getUnproxiedUrl("/applyleave.php"));
         client.post("/applyleave.php", params, new TextResponse() {
             @Override
             public void onSuccess(String responseString) {
@@ -300,13 +331,13 @@ public class Gpms implements AbstractGpms {
                 client.post("/applyleave.php", params, new TextResponse() {
                     @Override
                     public void onFailure(Throwable throwable) {
-                        client.removeReferer();
+                        client.removeReferrer();
                         successResponse.onFailure(throwable);
                     }
 
                     @Override
                     public void onSuccess(String responseString) {
-                        client.removeReferer();
+                        client.removeReferrer();
                         successResponse.onSuccess();
                     }
                 });
@@ -314,7 +345,7 @@ public class Gpms implements AbstractGpms {
 
             @Override
             public void onFailure(Throwable throwable) {
-                client.removeReferer();
+                client.removeReferrer();
                 successResponse.onFailure(throwable);
             }
         });
@@ -322,17 +353,17 @@ public class Gpms implements AbstractGpms {
 
     @Override
     public void getPendingPasses(final PendingResponse pendingResponse) {
-        client.setReferer(client.getUnproxiedUrl("/home.php"));
+        client.setReferrer(client.getUnproxiedUrl("/home.php"));
         client.get("/leavestatus.php", null, new TextResponse() {
             @Override
             public void onFailure(Throwable throwable) {
-                client.removeReferer();
+                client.removeReferrer();
                 pendingResponse.onFailure(throwable);
             }
 
             @Override
             public void onSuccess(String responseString) {
-                client.removeReferer();
+                client.removeReferrer();
                 Document doc = Jsoup.parse(responseString);
 
                 Element tBody = doc.select("body > div:nth-child(7) > table > tbody").first();
@@ -386,17 +417,17 @@ public class Gpms implements AbstractGpms {
 
     @Override
     public void getPassesHistory(final HistoryResponse historyResponse) {
-        client.setReferer(client.getUnproxiedUrl("/home.php"));
+        client.setReferrer(client.getUnproxiedUrl("/home.php"));
         client.get("/leavehistory.php", null, new TextResponse() {
             @Override
             public void onFailure(Throwable throwable) {
-                client.removeReferer();
+                client.removeReferrer();
                 historyResponse.onFailure(throwable);
             }
 
             @Override
             public void onSuccess(String responseString) {
-                client.removeReferer();
+                client.removeReferrer();
                 Document doc = Jsoup.parse(responseString);
                 Element tBody = doc.select("#FilterForm > label > table > tbody").first();
                 Elements rows = tBody.select("tr");

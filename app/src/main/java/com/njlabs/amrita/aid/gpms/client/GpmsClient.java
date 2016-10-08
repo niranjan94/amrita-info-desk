@@ -27,6 +27,7 @@ package com.njlabs.amrita.aid.gpms.client;
 
 import android.content.Context;
 
+import com.njlabs.amrita.aid.util.Identifier;
 import com.njlabs.amrita.aid.util.okhttp.Client;
 import com.njlabs.amrita.aid.util.okhttp.extras.PersistentCookieStore;
 
@@ -34,18 +35,20 @@ import java.net.URLEncoder;
 
 public class GpmsClient extends Client {
 
-    public String PROXY_URL = "https://anokha.amrita.edu/glype/browse.php?b=4";
+    public String PROXY_URL = "https://aid.codezero.xyz/wormhole/open.php?warp-factor=9.6";
     public String COOKIE_FILE = PersistentCookieStore.GPMS_COOKIE_PREFS;
+    private Context context;
 
     public GpmsClient(Context context) {
         super(context);
+        this.context = context;
         this.BASE_URL = "http://gpms.ettimadai.net/gpis/student";
     }
 
     public GpmsClient(Context context, String COOKIE_FILE) {
         this(context);
+        this.context = context;
         this.COOKIE_FILE = COOKIE_FILE;
-
     }
 
     @Override
@@ -78,6 +81,6 @@ public class GpmsClient extends Client {
     }
 
     protected boolean isProxyOn() {
-        return true;
+        return !Identifier.isConnectedToAmrita(this.context);
     }
 }
