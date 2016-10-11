@@ -106,11 +106,10 @@ public class Gpms implements AbstractGpms {
                     MessageDigest md = MessageDigest.getInstance("SHA");
                     md.update(signature.toByteArray());
                     String hash = Security.convertToHex(md.digest());
-                    Log.d("KeyHash:", hash);
                     client.addCustomHeader("Dilithium", hash);
                 }
             } catch (PackageManager.NameNotFoundException | NoSuchAlgorithmException ignored) {
-
+                Ln.e(ignored);
             }
 
         }
