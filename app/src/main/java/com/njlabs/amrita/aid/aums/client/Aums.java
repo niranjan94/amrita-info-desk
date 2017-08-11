@@ -62,6 +62,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -90,7 +92,11 @@ public class Aums {
         this.context = context;
         client = new AumsClient(context);
         client.setProgressListener(progressListener);
-        client.powerUp();
+        try {
+            client.powerUp();
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            e.printStackTrace();
+        }
         semesterMapping = new HashMap<>();
         loadSemesterMapping();
     }

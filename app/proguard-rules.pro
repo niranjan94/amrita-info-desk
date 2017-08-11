@@ -84,3 +84,7 @@
     public static *** d(...);
     public static *** v(...);
 }
+
+-keepclassmembers class * implements javax.net.ssl.SSLSocketFactory {
+    final javax.net.ssl.SSLSocketFactory delegate;
+}

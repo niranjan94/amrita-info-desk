@@ -60,7 +60,7 @@ public class Identifier {
 
     public static boolean isConnectedToAmrita(Context context) {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        if(wifiManager != null) {
+        if(wifiManager != null && wifiManager.getConnectionInfo() != null && wifiManager.getConnectionInfo().getSSID() != null) {
             String SSID = wifiManager.getConnectionInfo().getSSID().replace("\"", "").trim();
             return SSID.contentEquals("Amrita");
         }

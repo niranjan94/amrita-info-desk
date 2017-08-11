@@ -42,9 +42,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.activeandroid.ActiveAndroid;
+import com.google.firebase.crash.FirebaseCrash;
 import com.njlabs.amrita.aid.BaseActivity;
 import com.njlabs.amrita.aid.R;
 import com.njlabs.amrita.aid.util.ExtendedSwipeRefreshLayout;
+import com.njlabs.amrita.aid.util.TlsPicasso;
+import com.njlabs.amrita.aid.util.okhttp.Client;
+import com.njlabs.amrita.aid.util.okhttp.OkHttpTools;
+import com.onemarker.ln.logger.Ln;
 import com.squareup.picasso.Picasso;
 
 import org.jsoup.Jsoup;
@@ -119,11 +124,11 @@ public class NewsActivity extends BaseActivity {
             }
         })).start();
 
-        client = new OkHttpClient.Builder()
+        Client.initializeSSLContext(this);
+        OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
                 .followRedirects(true)
-                .followSslRedirects(true)
-                .build();
-
+                .followSslRedirects(true);
+        client = OkHttpTools.enableTls12OnPreLollipop(clientBuilder).build();
     }
 
     private void getNews(final Boolean refresh) {
@@ -133,10 +138,11 @@ public class NewsActivity extends BaseActivity {
 
         client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(Call call, final IOException e) {
                 ((Activity) baseContext).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        Ln.e(e);
                         swipeRefreshLayout.setRefreshing(false);
                         Snackbar.make(parentView, "Can't establish a reliable connection to the server.", Snackbar.LENGTH_SHORT)
                                 .setAction("Retry", new View.OnClickListener() {
@@ -170,14 +176,16 @@ public class NewsActivity extends BaseActivity {
                         Document doc = Jsoup.parse(responseString);
                         Elements articles = doc.select("article");
                         for (Element article : articles) {
-                            Element header = article.select(".flexslider").first();
-                            Element content = article.select(".group-blog-content").first();
-                            Element footer = article.select(".group-blog-footer").first();
-                            String imageUrl = header.select("ul > li > img").first().attr("src");
-                            String title = content.select(".field-name-title > div > div > h2").first().text();
-                            String url = "https://www.amrita.edu" + footer.select(".field-name-node-link > div > div > a").first().attr("href");
-                            newsArticles.add(new NewsModel(imageUrl, title, url));
+                            try {
+                                String imageUrl = article.select("img.img-responsive").first().attr("src");
+                                String title = article.select(".field-name-title").first().text();
+                                String url = "https://www.amrita.edu" + article.select(".field-name-node-link > div > div > a").first().attr("href");
+                                newsArticles.add(new NewsModel(imageUrl, title, url));
+                            } catch (Exception e) {
+                                FirebaseCrash.report(e);
+                            }
                         }
+
 
                         (new Thread(new Runnable() {
                             @Override
@@ -227,7 +235,7 @@ public class NewsActivity extends BaseActivity {
             NewsModel newsArticle = newsArticles.get(position);
             holder.title.setText(newsArticle.getTitle());
             holder.url.setText(newsArticle.getLink());
-            Picasso.with(baseContext).load(newsArticle.getImageUrl()).into(holder.image);
+            TlsPicasso.getInstance(baseContext).load(newsArticle.getImageUrl()).into(holder.image);
         }
 
         @Override

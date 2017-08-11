@@ -31,6 +31,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.ArrayMap;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.security.ProviderInstaller;
+import com.njlabs.amrita.aid.util.TLSSocketFactory;
 import com.njlabs.amrita.aid.util.okhttp.extras.MapQuery;
 import com.njlabs.amrita.aid.util.okhttp.extras.PersistentCookieStore;
 import com.njlabs.amrita.aid.util.okhttp.extras.RequestParams;
@@ -49,6 +53,8 @@ import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -85,6 +91,19 @@ abstract public class Client {
     private SharedPreferences cookiePrefs;
     private HashMap<String, String> customHeaders;
 
+    public static void initializeSSLContext(Context mContext){
+        try {
+            SSLContext.getInstance("TLSv1.2");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        try {
+            ProviderInstaller.installIfNeeded(mContext.getApplicationContext());
+        } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+            e.printStackTrace();
+        }
+    }
+
     Interceptor interceptor = new Interceptor() {
         @SuppressLint("DefaultLocale")
         @Override
@@ -119,9 +138,10 @@ abstract public class Client {
 
     public Client(Context context) {
         this.context = context;
+        Client.initializeSSLContext(context);
     }
 
-    public void powerUp() {
+    public void powerUp() throws NoSuchAlgorithmException, KeyManagementException {
         CookieManager cookieManager = new CookieManager(new PersistentCookieStore(context, getCookieFile()), CookiePolicy.ACCEPT_ALL);
         cookiePrefs = context.getSharedPreferences(getCookieFile(), 0);
         OkHttpClient.Builder builder;
@@ -145,7 +165,7 @@ abstract public class Client {
         }
 
 
-        client = builder
+        OkHttpClient.Builder clientBuilder = builder
                 .cookieJar(new JavaNetCookieJar(cookieManager))
                 .followRedirects(true)
                 .followSslRedirects(true)
@@ -180,8 +200,8 @@ abstract public class Client {
                             newRequest.removeHeader("Referer");
                         }
 
-                        if(customHeaders != null) {
-                            for(String name : customHeaders.keySet()) {
+                        if (customHeaders != null) {
+                            for (String name : customHeaders.keySet()) {
                                 newRequest.addHeader(name, customHeaders.get(name));
                             }
                         }
@@ -189,10 +209,8 @@ abstract public class Client {
                         return chain.proceed(newRequest.build());
                     }
                 })
-                .connectTimeout(0, TimeUnit.SECONDS)
-                .build();
-
-
+                .connectTimeout(0, TimeUnit.SECONDS);
+        client = OkHttpTools.enableTls12OnPreLollipop(clientBuilder).build();
     }
 
     public void setProgressListener(ProgressResponseBody.ProgressListener progressListener) {

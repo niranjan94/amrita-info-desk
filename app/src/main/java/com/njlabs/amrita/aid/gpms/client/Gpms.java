@@ -56,6 +56,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.File;
+import java.security.KeyManagementException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -76,7 +77,11 @@ public class Gpms implements AbstractGpms {
         this.context = context;
         client = new GpmsClient(context);
         setupAuthentication();
-        client.powerUp();
+        try {
+            client.powerUp();
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            e.printStackTrace();
+        }
 
         cookiePrefFile = context.getSharedPreferences(PersistentCookieStore.GPMS_COOKIE_PREFS, Context.MODE_PRIVATE);
 
@@ -89,7 +94,11 @@ public class Gpms implements AbstractGpms {
         this.context = context;
         client = new GpmsClient(context, cookiePrefFilename);
         setupAuthentication();
-        client.powerUp();
+        try {
+            client.powerUp();
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            e.printStackTrace();
+        }
 
         cookiePrefFile = context.getSharedPreferences(cookiePrefFilename, Context.MODE_PRIVATE);
 
