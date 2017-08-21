@@ -57,7 +57,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Support &amp; Queries: niranjan94@yahoo.com"
+        android:text="Support &amp; Queries: me@niranjan.io"
         android:paddingBottom="3dp"
         android:layout_gravity="center_horizontal"
         android:autoLink="email"

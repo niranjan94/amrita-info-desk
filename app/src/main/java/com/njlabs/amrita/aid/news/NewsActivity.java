@@ -124,7 +124,6 @@ public class NewsActivity extends BaseActivity {
             }
         })).start();
 
-        Client.initializeSSLContext(this);
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
                 .followRedirects(true)
                 .followSslRedirects(true);

@@ -84,8 +84,6 @@ public class NewsUpdateService extends IntentService {
 
         List<NewsModel> currentArticles;
 
-        Client.initializeSSLContext(this);
-
         OkHttpClient client;
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
                 .followRedirects(true)

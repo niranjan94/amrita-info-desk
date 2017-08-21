@@ -91,19 +91,6 @@ abstract public class Client {
     private SharedPreferences cookiePrefs;
     private HashMap<String, String> customHeaders;
 
-    public static void initializeSSLContext(Context mContext){
-        try {
-            SSLContext.getInstance("TLSv1.2");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        try {
-            ProviderInstaller.installIfNeeded(mContext.getApplicationContext());
-        } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
-            e.printStackTrace();
-        }
-    }
-
     Interceptor interceptor = new Interceptor() {
         @SuppressLint("DefaultLocale")
         @Override
@@ -138,7 +125,6 @@ abstract public class Client {
 
     public Client(Context context) {
         this.context = context;
-        Client.initializeSSLContext(context);
     }
 
     public void powerUp() throws NoSuchAlgorithmException, KeyManagementException {
@@ -210,7 +196,7 @@ abstract public class Client {
                     }
                 })
                 .connectTimeout(0, TimeUnit.SECONDS);
-        client = OkHttpTools.enableTls12OnPreLollipop(clientBuilder).build();
+        client = clientBuilder.build();
     }
 
     public void setProgressListener(ProgressResponseBody.ProgressListener progressListener) {

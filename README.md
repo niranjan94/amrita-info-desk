@@ -1,4 +1,4 @@
-[![Play Store Info](https://img.shields.io/badge/Play_Store-v2.1.8-36B0C1.svg?style=flat-square&v=2.1.8)](https://play.google.com/store/apps/details?id=com.njlabs.amrita.aid) [![GitHub app version](https://img.shields.io/badge/GitHub-v2.1.9-yellow.svg?style=flat-square&v=2.1.8)](https://github.com/niranjan94/amrita-info-desk) [![Play Store downloads](https://img.shields.io/badge/downloads-4.3k%20total-E04253.svg?style=flat-square)](https://play.google.com/store/apps/details?id=com.njlabs.amrita.aid)
+[![Play Store Info](https://img.shields.io/badge/Play_Store-v2.1.10-36B0C1.svg?style=flat-square&v=2.1.8)](https://play.google.com/store/apps/details?id=com.njlabs.amrita.aid) [![GitHub app version](https://img.shields.io/badge/GitHub-v2.1.10-yellow.svg?style=flat-square&v=2.1.8)](https://github.com/niranjan94/amrita-info-desk) [![Play Store downloads](https://img.shields.io/badge/downloads-6.6k%20total-E04253.svg?style=flat-square)](https://play.google.com/store/apps/details?id=com.njlabs.amrita.aid)
 
 # Amrita Information Desk
 ![Amrita Info Desk](https://github.com/niranjan94/amrita-info-desk/blob/static-files/banner.jpg?raw=true)
@@ -58,7 +58,7 @@ Unless explicitly stated otherwise all files in this repository are licensed und
         
     MIT License
     
-    Copyright (c) 2016 Niranjan Rajendran
+    Copyright (c) 2017 Niranjan Rajendran
     
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal

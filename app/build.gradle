@@ -8,8 +8,8 @@ repositories {
 
 def versionMajor = 2
 def versionMinor = 1
-def versionPatch = 9
-def versionBuild = 6
+def versionPatch = 10
+def versionBuild = 8
 
 configurations {
     compile.exclude group: 'commons-logging'
@@ -40,8 +40,8 @@ android {
             shrinkResources true
         }
         debug {
-            minifyEnabled false
-            shrinkResources false
+            minifyEnabled true
+            shrinkResources true
         }
     }
     packagingOptions {
