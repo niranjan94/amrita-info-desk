@@ -1,9 +1,13 @@
+### This project is old & unmaintained. check out https://github.com/amrita-repository/android-app instead ! :)
+
+---
+
 [![Play Store Info](https://img.shields.io/badge/Play_Store-v2.1.10-36B0C1.svg?style=flat-square&v=2.1.8)](https://play.google.com/store/apps/details?id=com.njlabs.amrita.aid) [![GitHub app version](https://img.shields.io/badge/GitHub-v2.1.10-yellow.svg?style=flat-square&v=2.1.8)](https://github.com/niranjan94/amrita-info-desk) [![Play Store downloads](https://img.shields.io/badge/downloads-6.6k%20total-E04253.svg?style=flat-square)](https://play.google.com/store/apps/details?id=com.njlabs.amrita.aid)
 
 # Amrita Information Desk
-![Amrita Info Desk](https://github.com/niranjan94/amrita-info-desk/blob/static-files/banner.jpg?raw=true)
+<img src="https://github.com/niranjan94/amrita-info-desk/blob/static-files/banner.jpg?raw=true" width="400"/>
 
-[<img src="https://play.google.com/intl/en_us/badges/images/apps/en-play-badge-border.png" width="200" alt="Get Amrita Info Desk on Google Play" />](https://play.google.com/store/apps/details?id=com.njlabs.amrita.aid "Get Amrita Info Desk on Google Play")
+[<img src="https://play.google.com/intl/en_us/badges/images/apps/en-play-badge-border.png" width="100" alt="Get Amrita Info Desk on Google Play" />](https://play.google.com/store/apps/details?id=com.njlabs.amrita.aid "Get Amrita Info Desk on Google Play")
 
 ## Features
 
